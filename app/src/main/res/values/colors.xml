@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paleta principal - Tonos marrones del recetario -->
+    <color name="color_primary">#5D4037</color>          <!-- Marrón oscuro -->
+    <color name="color_primary_dark">#3E2723</color>     <!-- Marrón muy oscuro -->
+    <color name="color_primary_light">#8D6E63</color>    <!-- Marrón medio -->
+
+    <color name="color_secondary">#A1887F</color>        <!-- Marrón claro -->
+    <color name="color_secondary_light">#D7CCC8</color>  <!-- Beige claro -->
+
+    <color name="color_accent">#FFD0B0</color>           <!-- Resaltado anaranjado suave -->
+    <color name="color_success">#689F38</color>          <!-- Verde para acciones positivas -->
+
+    <!-- Fondos -->
+    <color name="color_background">#FFFFFF</color>       <!-- Blanco -->
+    <color name="color_background_light">#FFF9F5</color> <!-- Blanco roto -->
+    <color name="color_surface">#EFEBE9</color>          <!-- Beige muy claro -->
+
+    <!-- Texto -->
+    <color name="color_text_primary">#3E2723</color>     <!-- Texto marrón oscuro -->
+    <color name="color_text_secondary">#5D4037</color>   <!-- Texto marrón medio -->
+    <color name="color_text_hint">#BCAAA4</color>        <!-- Texto placeholder -->
+
+    <!-- Bordes y divisores -->
+    <color name="color_border">#BCAAA4</color>           <!-- Borde marrón claro -->
+    <color name="color_divider">#D7CCC8</color>          <!-- Divisor suave -->
+
+    <!-- Estados -->
+    <color name="color_error">#D32F2F</color>            <!-- Rojo para errores -->
+    <color name="color_favorite">#E53935</color>         <!-- Rojo para favoritos -->
+
+    <!-- Transparencias -->
+    <color name="color_overlay">#80000000</color>        <!-- Negro semi-transparente -->
+    <color name="color_scrim">#B3000000</color>          <!-- Negro más opaco -->
+
+    <!-- Material Design básicos (requeridos) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
