@@ -1,9 +1,12 @@
 package com.example.recetarioapp.repository;
 
+import android.animation.RectEvaluator;
 import android.app.Application;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.room.Database;
 
 import com.example.recetarioapp.database.RecetaDAO;
 import com.example.recetarioapp.database.RecetasBD;
@@ -14,12 +17,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Manejo de operaciones de datos
@@ -101,12 +107,146 @@ public class RecetaRepository {
     //---------------------------------------------------------
 
     //GUARDAR NUEVA RECETA (EN FIREBASE + ROOM)
+    public void insertarReceta(Receta receta,OnRecetaGuardadaListener listener){
+        RecetasBD.bdWriteExecutor.execute(() -> {
+            try {
+                //Comprobacion usuario autenticado
+                FirebaseUser usuario = auth.getCurrentUser();
+                if (usuario == null){
+                    listener.onError("Usuario no autenticado");
+                    return;
+                }
+                //Adignacion de Metadatos
+                receta.setUsuarioId(usuario.getUid());
+                receta.setFechaCreacion(new Date());
+                receta.setFechaModificacion(new Date());
+
+                //PRIMERO: Guardar en Room
+                long localId = recetaDAO.insert(receta);
+                receta.setId(localId);
+                //LUEGO: Guardar en Firebase
+                Map<String, Object> recetaMap = recetaToMap(receta);
+                firestore.collection(RECETAS_COLECCION)
+                        .add(recetaMap)
+                        //si firebase responde correctamente
+                        .addOnSuccessListener(documentReference -> {
+                            String firebaseId = documentReference.getId();
+                            receta.setFirebaseId(firebaseId);
+                            //Actualizar en Room con FIREBASE ID
+                            RecetasBD.bdWriteExecutor.execute(() ->{
+                                recetaDAO.update(receta);
+                                listener.onSuccess(receta);
+                            });
+                            Log.d(TAG, "Receta guardada con ID: " + firebaseId);
+                        }) //si hay error al subir a firebase
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Error al guardar en Firebase", e);
+                            listener.onError("Error al guardar: " + e.getMessage());
+                        });
+            } catch (Exception e){
+                Log.e (TAG, "Error al insertar receta", e);
+                listener.onError("Error: " + e.getMessage());
+            }
+        });
+    }
 
     //SUBIR IMAGEN
+    public void subirImagen(Uri imagenUri, OnImagenSubidaListener listener){
+        if(imagenUri == null){
+            listener.onError("URI de imagen inválida");
+            return;
+        }
+        FirebaseUser usuario = auth.getCurrentUser();
+        if(usuario == null){
+            listener.onError("Usuario no autenticado");
+            return;
+        }
+        //Generar nombre unico para la imagen
+        String nombreArchivo = UUID.randomUUID().toString() + ".jpg";
+        StorageReference imagenRef = storage.getReference()
+                .child(RECETAS_STORAGE)
+                .child(usuario.getUid())
+                .child(nombreArchivo);
+        imagenRef.putFile(imagenUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    imagenRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                listener.onSuccess(uri.toString());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al obtener URL", e);
+                                listener.onError("Error al obtener URL: "+ e.getMessage());
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al subir imagen", e);
+                    listener.onError("Error al subir imagen: " + e.getMessage());
+                })
+                .addOnProgressListener(snapshot -> {
+                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                    listener.onProgress((int) progress);
+                });
+    }
 
     //ELIMINAR RECETA
+    public void eliminarReceta(Receta receta, OnRecetaEliminadaListener listener){
+        RecetasBD.bdWriteExecutor.execute(() -> {
+            try{
+                //Eliminar de Room
+                recetaDAO.delete(receta);
+                //Eliminar de Firebase (si tiene firebaseid)
+                if(receta.getFirebaseId() != null){
+                    firestore.collection(RECETAS_COLECCION)
+                            .document(receta.getFirebaseId())
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                listener.onSuccess();
+                                Log.d(TAG, "Receta eliminada: " + receta.getFirebaseId());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al eliminar de Firebase", e);
+                                listener.onError("Error al eliminar: " + e.getMessage());
+                            });
+                } else {
+                    listener.onSuccess();
+                }
+            } catch (Exception e){
+                Log.e(TAG, "Error al eliminar receta", e);
+                listener.onError("Error: " + e.getMessage());
+            }
+        });
+    }
 
     //ACTUALIZAR RECETA
+    public void actualizarReceta(Receta receta, OnRecetaGuardadaListener listener){
+        RecetasBD.bdWriteExecutor.execute(() ->{
+            try{
+                receta.setFechaModificacion(new Date());
+                //Actualizar Room
+                recetaDAO.update(receta);
+                //actualizar Firebase (si tiene firebaseId)
+                if (receta.getFirebaseId() != null){
+                    Map<String, Object> recetaMap = recetaToMap(receta);
+                    firestore.collection(RECETAS_COLECCION)
+                            .document(receta.getFirebaseId())
+                            .set(recetaMap)
+                            .addOnSuccessListener(aVoid -> {
+                                listener.onSuccess(receta);
+                                Log.d(TAG, "Receta actualizada: " + receta.getFirebaseId());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al actualizar en Firebase", e);
+                                listener.onError("Error al actualizar: " + e.getMessage());
+                            });
+                } else {
+                    listener.onSuccess(receta);
+                }
+            }catch (Exception e) {
+                Log.e(TAG, "Error al actualizar receta", e);
+                listener.onError("Error: " + e.getMessage());
+            }
+        });
+    }
 
     //SINCRONIZAR RECETAS de FIREBASE -> ROOM
     public void sincronizarFBaLocal() {
@@ -163,7 +303,6 @@ public class RecetaRepository {
         if (map.get("isFav") != null) {
             receta.setFav((Boolean) map.get("Fav"));
         }
-
         return receta;
     }
 
@@ -192,8 +331,17 @@ public class RecetaRepository {
     //                     INTERFACES DE CALLBACKS
     //---------------------------------------------------------
     //Comunicar resultados de operaciones en Interfaz
-
-
-
+    public interface OnRecetaGuardadaListener{
+        void onSuccess(Receta receta);
+        void onError(String mensaje);
+    }
+    public interface OnRecetaEliminadaListener{
+        void onSuccess();
+        void onError(String mensaje);
+    }
+    public interface OnImagenSubidaListener{
+        void onSuccess(String url);
+        void onError(String mensaje);
+        void onProgress(int porcentaje);
+    }
 }
-

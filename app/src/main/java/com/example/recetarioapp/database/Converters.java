@@ -2,7 +2,6 @@ package com.example.recetarioapp.database;
 
 
 import androidx.room.TypeConverter;
-
 import com.example.recetarioapp.models.Ingrediente;
 import com.example.recetarioapp.models.Paso;
 import com.google.gson.Gson;
@@ -21,7 +20,6 @@ import java.util.List;
 public class Converters {
 
     private static final Gson gson = new Gson();
-
 
     //De DATE -> Long (milisegundos)
     @TypeConverter

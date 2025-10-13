@@ -1,7 +1,8 @@
 package com.example.recetarioapp.models;
 
-import androidx.databinding.adapters.Converters;
+import com.example.recetarioapp.database.Converters;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -49,6 +50,7 @@ public class Receta {
         this.fechaModificacion = new Date();
         this.isFav = false;
     }
+    @Ignore
     public Receta(String nombre, String descripcion){ //RECETA BÁSICA
         this();
         this.nombre = nombre;
