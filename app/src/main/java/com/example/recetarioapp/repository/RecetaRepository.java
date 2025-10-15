@@ -1,17 +1,14 @@
 package com.example.recetarioapp.repository;
 
-import android.animation.RectEvaluator;
 import android.app.Application;
 import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.room.Database;
 
 import com.example.recetarioapp.database.RecetaDAO;
 import com.example.recetarioapp.database.RecetasBD;
 import com.example.recetarioapp.models.Receta;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -151,14 +147,14 @@ public class RecetaRepository {
     }
 
     //SUBIR IMAGEN
-    public void subirImagen(Uri imagenUri, OnImagenSubidaListener listener){
+    public void subirImagen(Uri imagenUri, OnImagenSubidaListener onImagenSubidaListener){
         if(imagenUri == null){
-            listener.onError("URI de imagen inválida");
+            onImagenSubidaListener.onError("URI de imagen inválida");
             return;
         }
         FirebaseUser usuario = auth.getCurrentUser();
         if(usuario == null){
-            listener.onError("Usuario no autenticado");
+            onImagenSubidaListener.onError("Usuario no autenticado");
             return;
         }
         //Generar nombre unico para la imagen
@@ -171,20 +167,20 @@ public class RecetaRepository {
                 .addOnSuccessListener(taskSnapshot -> {
                     imagenRef.getDownloadUrl()
                             .addOnSuccessListener(uri -> {
-                                listener.onSuccess(uri.toString());
+                                onImagenSubidaListener.onSuccess(uri.toString());
                             })
                             .addOnFailureListener(e -> {
                                 Log.e(TAG, "Error al obtener URL", e);
-                                listener.onError("Error al obtener URL: "+ e.getMessage());
+                                onImagenSubidaListener.onError("Error al obtener URL: "+ e.getMessage());
                             });
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error al subir imagen", e);
-                    listener.onError("Error al subir imagen: " + e.getMessage());
+                    onImagenSubidaListener.onError("Error al subir imagen: " + e.getMessage());
                 })
                 .addOnProgressListener(snapshot -> {
                     double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                    listener.onProgress((int) progress);
+                    onImagenSubidaListener.onProgress((int) progress);
                 });
     }
 
@@ -341,7 +337,7 @@ public class RecetaRepository {
     }
     public interface OnImagenSubidaListener{
         void onSuccess(String url);
-        void onError(String mensaje);
         void onProgress(int porcentaje);
+        void onError(String mensaje);
     }
 }
