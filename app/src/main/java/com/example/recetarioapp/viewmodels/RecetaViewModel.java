@@ -186,6 +186,15 @@ public class RecetaViewModel extends AndroidViewModel {
     public LiveData<List<Receta>> getRecetasFiltradas() {
         return recetasFiltradas;
     }
+    public LiveData<String> getMensajeError() {
+        return msgError;
+    }
+    public LiveData<Integer> getProgresoSubida() {
+        return msgProgresoSubida;
+    }
+    public LiveData<String> getMensajeExito() {
+        return msgExito;
+    }
 
 
     //INTERFACE

@@ -1,66 +1,101 @@
 package com.example.recetarioapp.ui.favs;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.recetarioapp.R;
+import com.example.recetarioapp.adapters.RecetaAdapter;
+import com.example.recetarioapp.viewmodels.RecetaViewModel;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link FavsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment que muestra las recetas favoritas
  */
 public class FavsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecetaViewModel viewModel;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    // Views
+    private RecyclerView rvFavoritas;
+    private LinearLayout layoutEmpty;
 
-    public FavsFragment() {
-        // Required empty public constructor
-    }
+    // Adapter
+    private RecetaAdapter adapter;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FavsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FavsFragment newInstance(String param1, String param2) {
-        FavsFragment fragment = new FavsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_favs, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Inicializar ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(RecetaViewModel.class);
+
+        // Inicializar vistas
+        initViews(view);
+
+        // Configurar RecyclerView
+        setupRecyclerView();
+
+        // Observar datos
+        observeData();
+    }
+
+    private void initViews(View view) {
+        rvFavoritas = view.findViewById(R.id.rv_favoritas);
+        layoutEmpty = view.findViewById(R.id.layout_empty);
+    }
+
+    private void setupRecyclerView() {
+        adapter = new RecetaAdapter();
+        rvFavoritas.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvFavoritas.setAdapter(adapter);
+
+        // Click en receta
+        adapter.setOnRecetaClickListener(receta -> {
+            // TODO: Navegar al detalle
+            Toast.makeText(getContext(), "Receta: " + receta.getNombre(), Toast.LENGTH_SHORT).show();
+        });
+
+        // Click en favorito
+        adapter.setOnFavClickListener((receta, esFavorita) -> {
+            viewModel.marcarFavorita(receta.getId(), esFavorita);
+            if (!esFavorita) {
+                Toast.makeText(getContext(), "Quitada de favoritos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void observeData() {
+        // Observar recetas favoritas
+        viewModel.getFavs().observe(getViewLifecycleOwner(), favoritas -> {
+            if (favoritas != null) {
+                adapter.submitList(favoritas);
+
+                // Mostrar/ocultar empty state
+                if (favoritas.isEmpty()) {
+                    rvFavoritas.setVisibility(View.GONE);
+                    layoutEmpty.setVisibility(View.VISIBLE);
+                } else {
+                    rvFavoritas.setVisibility(View.VISIBLE);
+                    layoutEmpty.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 }
