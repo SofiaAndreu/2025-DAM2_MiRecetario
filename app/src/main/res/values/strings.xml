@@ -1,3 +1,110 @@
 <resources>
-    <string name="app_name">RecetarioApp</string>
+    <string name="app_name">TusRecetasApp</string>
+    <string name="tagline">Crea y guarda recetas personalizadas</string> <!-- descripcion -->
+
+    <!-- TEXTOS MENU INFERIOR -->
+    <string name="nav_home"> Inicio </string>
+    <string name="nav_recipes"> Mis Recetas </string>
+    <string name="nav_add"> Nueva </string>
+    <string name="nav_favs"> Favoritas </string>
+
+    <!-- HOME -->
+    <string name="home_welcome">Bienvenido a tu recetario</string>
+    <string name="home_subtitle">Guarda y organiza tus recetas favoritas</string>
+    <string name="home_recetas_destacadas">Recetas Destacadas</string>
+    <string name="home_categorias">Categorías</string>
+    <string name="home_sin_recetas">Aún no tienes recetas</string>
+    <string name="home_sin_recetas_desc">Pulsa + para añadir una receta</string>
+
+    <!-- RECETAS -->
+    <string name="recetas_title">Mis Recetas</string>
+    <string name="recetas_buscar">Buscar recetas…</string>
+    <string name="recetas_filtrar">Filtrar</string>
+    <string name="recetas_ordenar">Ordenar</string>
+    <string name="recetas_sin_resultados">No se encontraron recetas</string>
+
+    <!-- AÑADIR/EDITAR -->
+    <string name="add_title">Nueva Receta</string>
+    <string name="edit_title">Editar Receta</string>
+    <string name="add_nombre">Nombre de la receta</string>
+    <string name="add_descripcion">Descripción</string>
+    <string name="add_tiempo">Tiempo (minutos)</string>
+    <string name="add_porciones">Porciones</string>
+    <string name="add_dificultad">Dificultad</string>
+    <string name="add_categoria">Categoría</string>
+    <string name="add_origen">Origen</string>
+    <string name="add_imagen">Añadir imagen</string>
+    <string name="add_ingredientes">Ingredientes</string>
+    <string name="add_pasos">Pasos de preparación</string>
+    <string name="add_etiquetas">Etiquetas</string>
+    <string name="add_guardar">Guardar Receta</string>
+    <string name="add_cancelar">Cancelar</string>
+
+    <!-- INGREDIENTES -->
+    <string name="ingrediente_nombre">Nombre del ingrediente</string>
+    <string name="ingrediente_cantidad">Cantidad</string>
+    <string name="ingrediente_notas">Notas (opcional)</string>
+    <string name="ingrediente_añadir">Añadir ingrediente</string>
+
+    <!-- PASOS -->
+    <string name="paso_descripcion">Descripción del paso</string>
+    <string name="paso_añadir">Añadir paso</string>
+    <string name="paso_numero">Paso %1$d</string>
+
+    <!-- DETALLES -->
+    <string name="detalle_ingredientes">Ingredientes</string>
+    <string name="detalle_preparacion">Preparación</string>
+    <string name="detalle_info">Información</string>
+    <string name="detalle_tiempo">%1$d min</string>
+    <string name="detalle_porciones">%1$d porciones</string>
+    <string name="detalle_compartir">Compartir</string>
+    <string name="detalle_editar">Editar</string>
+    <string name="detalle_eliminar">Eliminar</string>
+
+    <!-- DIFICULTAD NIVELES -->
+    <string name="dificultad_facil">Fácil</string>
+    <string name="dificultad_medio">Media</string>
+    <string name="dificultad_dificil">Difícil</string>
+
+    <!-- CATEGORIAS CLASIFICACION -->
+    <string name="categoria_postres">Postres</string>
+    <string name="categoria_principales">Platos Principales</string>
+    <string name="categoria_aperitivos">Aperitivos</string>
+    <string name="categoria_panaderia">Panadería</string>
+    <string name="categoria_bebidas">Bebidas</string>
+    <string name="categoria_ensaladas">Ensaladas</string>
+    <string name="categoria_sopas">Sopas</string>
+    <string name="categoria_otros">Otros</string>
+
+    <!-- ACCIONES -->
+    <string name="accion_buscar">Buscar</string>
+    <string name="accion_filtrar">Filtrar</string>
+    <string name="accion_guardar">Guardar</string>
+    <string name="accion_eliminar">Eliminar</string>
+    <string name="accion_cancelar">Cancelar</string>
+    <string name="accion_editar">Editar</string>
+    <string name="accion_compartir">Compartir</string>
+    <string name="accion_aceptar">Aceptar</string>
+
+    <!-- MENSAJES -->
+    <string name="mensaje_receta_guardada">Receta guardada correctamente</string>
+    <string name="mensaje_receta_eliminada">Receta eliminada</string>
+    <string name="mensaje_error">Ha ocurrido un error</string>
+    <string name="mensaje_campos_vacios">Por favor, completa los campos obligatorios</string>
+    <string name="mensaje_confirmacion_eliminar">¿Eliminar esta receta?</string>
+
+    <!-- ACCEDER A PERMISOS -->
+    <string name="permiso_camara">Permiso de cámara necesario</string>
+    <string name="permiso_galeria">Permiso de galería necesario</string>
+
+    <!-- VARIOS -->
+    <string name="seleccionar_imagen">Seleccionar imagen</string>
+    <string name="desde_camara">Desde cámara</string>
+    <string name="desde_galeria">Desde galería</string>
+    <string name="sin_imagen">Sin imagen</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <!-- -->
 </resources>
