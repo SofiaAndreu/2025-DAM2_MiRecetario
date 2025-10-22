@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -79,8 +80,9 @@ public class FragmentHome extends Fragment {
 
         // Click en receta
         adapter.setOnRecetaClickListener(receta -> {
-            // TODO: Navegar al detalle de la receta
-            Toast.makeText(getContext(), "Receta: " + receta.getNombre(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getContext(), com.example.recetarioapp.ui.RecipeDetailActivity.class);
+            intent.putExtra(com.example.recetarioapp.ui.RecipeDetailActivity.EXTRA_RECETA_ID, receta.getId());
+            startActivity(intent);
         });
 
         // Click en favorito

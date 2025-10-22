@@ -1,5 +1,6 @@
 package com.example.recetarioapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -28,46 +29,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Inicializar Firebase Auth.
+        // Inicializar Firebase Auth
         auth = FirebaseAuth.getInstance();
-        //Verificar usuario autenticado
+
+        // Verificar si hay usuario autenticado, si no, autenticar anónimamente
         verificarAutenticacion();
-        //Config. Nav
-        setNavigation();
+
+        // Configurar Navigation
+        setupNavigation();
+
+        // Verificar si viene de edición
+        verificarIntentoEdicion();
     }
 
-    //VERIFICACIÓN USUARIO AUTENTICADO / SESIÓN ANÓNIMA
-    private void verificarAutenticacion(){
-        FirebaseUser currentUser = auth.getCurrentUser();
-
-        if (currentUser == null) {
-            // Autenticación anónima para permitir el uso sin cuenta
-            auth.signInAnonymously()
-                    .addOnSuccessListener(authResult -> {
-                        // Usuario autenticado correctamente
-                    })
-                    .addOnFailureListener(e -> {
-                        // Error al autenticar
-                        // Mostrar un mensaje o intentar de nuevo
-                    });
+    /**
+     * Verifica si se está abriendo la app para editar una receta
+     */
+    private void verificarIntentoEdicion() {
+        Intent intent = getIntent();
+        if (intent.hasExtra("editar_receta_id")) {
+            long recetaId = intent.getLongExtra("editar_receta_id", -1);
+            if (recetaId != -1) {
+                // Navegar al fragment de añadir en modo edición
+                Bundle bundle = new Bundle();
+                bundle.putLong("receta_id", recetaId);
+                navController.navigate(R.id.addRecipeFragment, bundle);
+            }
         }
     }
 
-    //SISTEMA DE NAVEGACION
-    private void setNavigation(){
-        //Obtener NavHostFragment
+    /**
+     * Configura el sistema de navegación
+     */
+    private void setupNavigation() {
+        // Obtener NavHostFragment y NavController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
 
-        if (navHostFragment!= null){
+        if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
 
             // Configurar BottomNavigationView
             bottomNavigationView = findViewById(R.id.bottom_navigation);
+
             // Conectar BottomNavigationView con NavController
             NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-            //Listener para manejar la navegación
+            // Listener personalizado para manejar la navegación
             bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -86,17 +94,35 @@ public class MainActivity extends AppCompatActivity {
                         navController.navigate(R.id.favoritesFragment);
                         return true;
                     }
+
                     return false;
                 }
             });
         }
     }
 
-    //
+    /**
+     * Verifica si hay un usuario autenticado
+     * Si no hay, inicia sesión anónima
+     */
+    private void verificarAutenticacion() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser == null) {
+            // Autenticación anónima para permitir el uso sin cuenta
+            auth.signInAnonymously()
+                    .addOnSuccessListener(authResult -> {
+                        // Usuario autenticado correctamente
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error al autenticar
+                        // Aquí podrías mostrar un mensaje o intentar de nuevo
+                    });
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
-
-
 }

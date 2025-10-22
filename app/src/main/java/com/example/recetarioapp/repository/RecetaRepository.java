@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-
+import com.example.recetarioapp.utils.ImageHelper;
 import com.example.recetarioapp.database.RecetaDAO;
 import com.example.recetarioapp.database.RecetasBD;
 import com.example.recetarioapp.models.Receta;
@@ -14,20 +14,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Manejo de operaciones de datos
  * Conexion entre Firebase (nube) y Room (local)
  */
 public class RecetaRepository {
+
+    private final Application application;
 
     //Componentes
     private static final String TAG = "RecetaRepository";
@@ -41,8 +41,11 @@ public class RecetaRepository {
     private final FirebaseAuth auth;
     private final LiveData<List<Receta>> todasLasRecetas;
 
+
+
     //Inicializacion
     public RecetaRepository(Application application) {
+        this.application = application;
         //BD
         RecetasBD bd = RecetasBD.getInstance(application);
         recetaDAO = bd.recetaDAO();
@@ -103,42 +106,58 @@ public class RecetaRepository {
     //---------------------------------------------------------
 
     //GUARDAR NUEVA RECETA (EN FIREBASE + ROOM)
+    //Guarda SIEMPRE en local, Firebase opcional
     public void insertarReceta(Receta receta,OnRecetaGuardadaListener listener){
         RecetasBD.bdWriteExecutor.execute(() -> {
             try {
-                //Comprobacion usuario autenticado
-                FirebaseUser usuario = auth.getCurrentUser();
-                if (usuario == null){
-                    listener.onError("Usuario no autenticado");
-                    return;
-                }
-                //Adignacion de Metadatos
-                receta.setUsuarioId(usuario.getUid());
+                // Configurar metadatos
                 receta.setFechaCreacion(new Date());
                 receta.setFechaModificacion(new Date());
 
-                //PRIMERO: Guardar en Room
+                // PRIMERO: Guardar en Room (base de datos local) - SIEMPRE FUNCIONA
                 long localId = recetaDAO.insert(receta);
                 receta.setId(localId);
-                //LUEGO: Guardar en Firebase
-                Map<String, Object> recetaMap = recetaToMap(receta);
-                firestore.collection(RECETAS_COLECCION)
-                        .add(recetaMap)
-                        //si firebase responde correctamente
-                        .addOnSuccessListener(documentReference -> {
-                            String firebaseId = documentReference.getId();
-                            receta.setFirebaseId(firebaseId);
-                            //Actualizar en Room con FIREBASE ID
-                            RecetasBD.bdWriteExecutor.execute(() ->{
-                                recetaDAO.update(receta);
-                                listener.onSuccess(receta);
+
+                // Notificar éxito inmediatamente (ya está guardada localmente)
+                listener.onSuccess(receta);
+                Log.d(TAG, "Receta guardada localmente con ID: " + localId);
+
+                // SEGUNDO: Intentar guardar en Firebase (si hay usuario autenticado)
+                FirebaseUser user = auth.getCurrentUser();
+                if (user != null) {
+                    receta.setUsuarioId(user.getUid());
+
+                    Map<String, Object> recetaMap = recetaToMap(receta);
+
+                    firestore.collection(RECETAS_COLECCION)
+                            .add(recetaMap)
+                            .addOnSuccessListener(documentReference -> {
+                                String firebaseId = documentReference.getId();
+                                receta.setFirebaseId(firebaseId);
+
+                                // Actualizar en Room con el Firebase ID
+                                RecetasBD.bdWriteExecutor.execute(() -> {
+                                    recetaDAO.update(receta);
+                                });
+
+                                Log.d(TAG, "Receta sincronizada con Firebase: " + firebaseId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w(TAG, "No se pudo sincronizar con Firebase (modo offline): " + e.getMessage());
+                                // NO notificamos error porque ya está guardada localmente
                             });
-                            Log.d(TAG, "Receta guardada con ID: " + firebaseId);
-                        }) //si hay error al subir a firebase
-                        .addOnFailureListener(e -> {
-                            Log.e(TAG, "Error al guardar en Firebase", e);
-                            listener.onError("Error al guardar: " + e.getMessage());
-                        });
+                } else {
+                    // Intentar autenticación anónima en segundo plano
+                    auth.signInAnonymously()
+                            .addOnSuccessListener(authResult -> {
+                                Log.d(TAG, "Usuario autenticado anónimamente");
+                                // Reintentar sincronización
+                                sincronizarReceta(receta);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w(TAG, "Modo completamente offline - receta solo local");
+                            });
+                }
             } catch (Exception e){
                 Log.e (TAG, "Error al insertar receta", e);
                 listener.onError("Error: " + e.getMessage());
@@ -146,42 +165,58 @@ public class RecetaRepository {
         });
     }
 
+    private void sincronizarReceta(Receta receta) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return;
+
+        receta.setUsuarioId(user.getUid());
+        Map<String, Object> recetaMap = recetaToMap(receta);
+
+        firestore.collection(RECETAS_COLECCION)
+                .add(recetaMap)
+                .addOnSuccessListener(documentReference -> {
+                    String firebaseId = documentReference.getId();
+                    receta.setFirebaseId(firebaseId);
+
+                    RecetasBD.bdWriteExecutor.execute(() -> {
+                        recetaDAO.update(receta);
+                    });
+
+                    Log.d(TAG, "Receta sincronizada: " + firebaseId);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error al sincronizar: " + e.getMessage());
+                });
+    }
+
+
     //SUBIR IMAGEN
-    public void subirImagen(Uri imagenUri, OnImagenSubidaListener onImagenSubidaListener){
-        if(imagenUri == null){
+    public void guardarImagenLocal(Uri imagenUri, OnImagenSubidaListener onImagenSubidaListener){
+        if (imagenUri == null) {
             onImagenSubidaListener.onError("URI de imagen inválida");
             return;
         }
-        FirebaseUser usuario = auth.getCurrentUser();
-        if(usuario == null){
-            onImagenSubidaListener.onError("Usuario no autenticado");
-            return;
-        }
-        //Generar nombre unico para la imagen
-        String nombreArchivo = UUID.randomUUID().toString() + ".jpg";
-        StorageReference imagenRef = storage.getReference()
-                .child(RECETAS_STORAGE)
-                .child(usuario.getUid())
-                .child(nombreArchivo);
-        imagenRef.putFile(imagenUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    imagenRef.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                onImagenSubidaListener.onSuccess(uri.toString());
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e(TAG, "Error al obtener URL", e);
-                                onImagenSubidaListener.onError("Error al obtener URL: "+ e.getMessage());
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error al subir imagen", e);
-                    onImagenSubidaListener.onError("Error al subir imagen: " + e.getMessage());
-                })
-                .addOnProgressListener(snapshot -> {
-                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                    onImagenSubidaListener.onProgress((int) progress);
-                });
+        // Guardar en background thread
+        RecetasBD.bdWriteExecutor.execute(() -> {
+            try {
+                onImagenSubidaListener.onProgress(50);
+
+                // Usar ImageHelper para guardar localmente
+                String imagePath = ImageHelper.saveImageToInternalStorage(
+                        application.getApplicationContext(), imagenUri);
+
+                if (imagePath != null) {
+                    onImagenSubidaListener.onProgress(100);
+                    onImagenSubidaListener.onSuccess(imagePath);
+                    Log.d(TAG, "Imagen guardada localmente: " + imagePath);
+                } else {
+                    onImagenSubidaListener.onError("Error al guardar imagen");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error al guardar imagen", e);
+                onImagenSubidaListener.onError("Error: " + e.getMessage());
+            }
+        });
     }
 
     //ELIMINAR RECETA
@@ -214,14 +249,14 @@ public class RecetaRepository {
     }
 
     //ACTUALIZAR RECETA
-    public void actualizarReceta(Receta receta, OnRecetaGuardadaListener listener){
-        RecetasBD.bdWriteExecutor.execute(() ->{
-            try{
+    public void actualizarReceta(Receta receta, OnRecetaGuardadaListener listener) {
+        RecetasBD.bdWriteExecutor.execute(() -> {
+            try {
                 receta.setFechaModificacion(new Date());
-                //Actualizar Room
+                // Actualizar en Room
                 recetaDAO.update(receta);
-                //actualizar Firebase (si tiene firebaseId)
-                if (receta.getFirebaseId() != null){
+                // Actualizar en Firebase si tiene firebaseId
+                if (receta.getFirebaseId() != null) {
                     Map<String, Object> recetaMap = recetaToMap(receta);
                     firestore.collection(RECETAS_COLECCION)
                             .document(receta.getFirebaseId())
@@ -237,7 +272,7 @@ public class RecetaRepository {
                 } else {
                     listener.onSuccess(receta);
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Error al actualizar receta", e);
                 listener.onError("Error: " + e.getMessage());
             }

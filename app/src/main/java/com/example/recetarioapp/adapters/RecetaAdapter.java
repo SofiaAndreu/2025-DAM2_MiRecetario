@@ -17,6 +17,8 @@ import com.example.recetarioapp.R;
 import com.example.recetarioapp.models.Receta;
 import com.google.android.material.chip.Chip;
 
+import java.io.File;
+
 
 /**
  * Adapter para mostrar la lista de recetas en RecyclerView
@@ -98,6 +100,7 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
                     listener.onRecetaClick(getItem(position));
                 }
             });
+
             // Click en el botón de favorito
             btnFavorito.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -144,8 +147,11 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
 
             // Imagen
             if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
+                // Cargar imagen local usando File
+                File imageFile = new File(receta.getImagenPortadaURL());
+
                 Glide.with(itemView.getContext())
-                        .load(receta.getImagenPortadaURL())
+                        .load(imageFile)
                         .placeholder(R.drawable.placeholder_receta)
                         .error(R.drawable.placeholder_receta)
                         .centerCrop()
@@ -162,6 +168,9 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
             }
         }
     }
+
+
+
     // Interfaces para callbacks
     public interface OnRecetaClickListener {
         void onRecetaClick(Receta receta);

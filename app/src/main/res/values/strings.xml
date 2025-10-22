@@ -106,5 +106,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
+    <string name="fab_favorito_desc">Marcar o quitar de favoritos</string>
+
     <!-- -->
 </resources>

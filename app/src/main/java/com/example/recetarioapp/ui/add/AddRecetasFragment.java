@@ -32,6 +32,7 @@ import com.example.recetarioapp.models.Paso;
 import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.viewmodels.RecetaViewModel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,11 @@ import java.util.List;
 public class AddRecetasFragment extends Fragment {
 
     private RecetaViewModel viewModel;
+
+    // Modo edición
+    private boolean modoEdicion = false;
+    private long recetaIdEditar = -1;
+    private Receta recetaEditar;
 
     // Views
     private MaterialCardView cardImagen;
@@ -61,10 +67,14 @@ public class AddRecetasFragment extends Fragment {
 
     // Imagen seleccionada
     private Uri imagenUri;
+    private Uri imagenUriTemporal; // Para fotos de cámara
     private String imagenUrl;
 
     // Launcher para seleccionar imagen de galería
     private ActivityResultLauncher<Intent> pickImageLauncher;
+
+    // Launcher para tomar foto con cámara
+    private ActivityResultLauncher<Intent> takePictureLauncher;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,6 +106,14 @@ public class AddRecetasFragment extends Fragment {
         // Inicializar ViewModel
         viewModel = new ViewModelProvider(requireActivity()).get(RecetaViewModel.class);
 
+        // Verificar si estamos en modo edición
+        if (getArguments() != null) {
+            recetaIdEditar = getArguments().getLong("receta_id", -1);
+            if (recetaIdEditar != -1) {
+                modoEdicion = true;
+            }
+        }
+
         // Inicializar vistas
         initViews(view);
 
@@ -107,6 +125,11 @@ public class AddRecetasFragment extends Fragment {
 
         // Observar progreso de subida
         observeViewModel();
+
+        // Si estamos en modo edición, cargar la receta
+        if (modoEdicion) {
+            cargarRecetaParaEditar();
+        }
     }
 
     private void initViews(View view) {
@@ -220,10 +243,10 @@ public class AddRecetasFragment extends Fragment {
         // Si hay imagen, subirla primero
         if (imagenUri != null) {
             progressBar.setVisibility(View.VISIBLE);
-            viewModel.subirImagen(imagenUri, new RecetaViewModel.OnImagenSubidaListener() {
+            viewModel.guardarImagenLocal(imagenUri, new RecetaViewModel.OnImagenSubidaListener() {
                 @Override
-                public void onImagenSubida(String url) {
-                    imagenUrl = url;
+                public void onImagenSubida(String path) {
+                    imagenUrl = path;
                     crearYGuardarReceta();
                 }
 
@@ -240,8 +263,17 @@ public class AddRecetasFragment extends Fragment {
     }
 
     private void crearYGuardarReceta() {
-        // Crear objeto Receta
-        Receta receta = new Receta();
+        // Crear o actualizar objeto Receta
+        Receta receta;
+
+        if (modoEdicion && recetaEditar != null) {
+            // Modo edición: usar la receta existente
+            receta = recetaEditar;
+        } else {
+            // Modo nuevo: crear receta nueva
+            receta = new Receta();
+        }
+
         receta.setNombre(etNombre.getText().toString().trim());
         receta.setDescripcion(etDescripcion.getText().toString().trim());
 
@@ -262,7 +294,7 @@ public class AddRecetasFragment extends Fragment {
         receta.setCategoria(etCategoria.getText().toString());
         receta.setOrigen(etOrigen.getText().toString().trim());
 
-        // Imagen (si se subió)
+        // Imagen (si se subió una nueva, o mantener la existente)
         if (imagenUrl != null) {
             receta.setImagenPortadaURL(imagenUrl);
         }
@@ -279,11 +311,14 @@ public class AddRecetasFragment extends Fragment {
         );
         receta.setPasos(pasos);
 
-        // Guardar en ViewModel
-        viewModel.insertarReceta(receta);
-
-        // Mostrar mensaje
-        Toast.makeText(getContext(), "Receta guardada", Toast.LENGTH_SHORT).show();
+        // Guardar o actualizar en ViewModel
+        if (modoEdicion) {
+            viewModel.actualizarReceta(receta);
+            Toast.makeText(getContext(), "Receta actualizada", Toast.LENGTH_SHORT).show();
+        } else {
+            viewModel.insertarReceta(receta);
+            Toast.makeText(getContext(), "Receta guardada", Toast.LENGTH_SHORT).show();
+        }
 
         // Volver atrás
         Navigation.findNavController(requireView()).navigateUp();
@@ -340,5 +375,79 @@ public class AddRecetasFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    /**
+     * Carga una receta existente para editarla
+     */
+    private void cargarRecetaParaEditar() {
+        viewModel.getRecetaById(recetaIdEditar).observe(getViewLifecycleOwner(), receta -> {
+            if (receta != null) {
+                recetaEditar = receta;
+                rellenarFormulario(receta);
+            }
+        });
+    }
+
+    /**
+     * Rellena el formulario con los datos de la receta
+     */
+    private void rellenarFormulario(Receta receta) {
+        // Nombre y descripción
+        etNombre.setText(receta.getNombre());
+        etDescripcion.setText(receta.getDescripcion());
+
+        // Tiempo y porciones
+        if (receta.getTiempoPreparacion() > 0) {
+            etTiempo.setText(String.valueOf(receta.getTiempoPreparacion()));
+        }
+        if (receta.getPorciones() > 0) {
+            etPorciones.setText(String.valueOf(receta.getPorciones()));
+        }
+
+        // Dificultad, categoría y origen
+        if (receta.getDificultad() != null) {
+            etDificultad.setText(receta.getDificultad(), false);
+        }
+        if (receta.getCategoria() != null) {
+            etCategoria.setText(receta.getCategoria(), false);
+        }
+        if (receta.getOrigen() != null) {
+            etOrigen.setText(receta.getOrigen());
+        }
+
+        // Imagen existente
+        if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
+            imagenUrl = receta.getImagenPortadaURL();
+            File imageFile = new File(receta.getImagenPortadaURL());
+            layoutAddImage.setVisibility(View.GONE);
+            ivPreview.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(imageFile)
+                    .centerCrop()
+                    .into(ivPreview);
+        }
+
+        // Ingredientes (convertir lista a texto)
+        StringBuilder ingredientesTexto = new StringBuilder();
+        if (receta.getIngredientes() != null) {
+            for (Ingrediente ing : receta.getIngredientes()) {
+                ingredientesTexto.append(ing.getIngredienteCompleto()).append("\n");
+            }
+        }
+        etIngredientes.setText(ingredientesTexto.toString().trim());
+
+        // Pasos (convertir lista a texto)
+        StringBuilder pasosTexto = new StringBuilder();
+        if (receta.getPasos() != null) {
+            for (Paso paso : receta.getPasos()) {
+                pasosTexto.append(paso.getNumeroPaso()).append(". ")
+                        .append(paso.getDescripcion()).append("\n\n");
+            }
+        }
+        etPasos.setText(pasosTexto.toString().trim());
+
+        // Cambiar texto del botón
+        btnGuardar.setText("Actualizar Receta");
     }
 }

@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class RecetaViewModel extends AndroidViewModel {
 
-    private final RecetaRepository repository;
+    private final RecetaRepository recetaRepository;
 
     //LiveData
     //Datos que observa la interfaz -> si cambian se actualiza automaticamente
@@ -45,10 +45,11 @@ public class RecetaViewModel extends AndroidViewModel {
     public RecetaViewModel(@NonNull Application application) {
         super(application);
 
-        repository = new RecetaRepository(application);
-        todasLasRecetas = repository.getAllRecetas();
-        favs = repository.getFavs();
-        categorias = repository.getCategorias();
+        recetaRepository = new RecetaRepository(application);
+
+        todasLasRecetas = recetaRepository.getAllRecetas();
+        favs = recetaRepository.getFavs();
+        categorias = recetaRepository.getCategorias();
 
         //LiveData derivado de otro LiveData -> BUSQUEDA REACTIVA
         //  switchMap -> reacciona cada vez que cambia el valor de busqueda
@@ -56,15 +57,15 @@ public class RecetaViewModel extends AndroidViewModel {
             if(query == null || query.trim().isEmpty()) { //si esta vacio -> ver todas
                 return todasLasRecetas;
             } else {
-                return repository.buscarPorNombre(query);
+                return recetaRepository.buscarPorNombre(query);
             }
         });
     } //-------------------------------------------------------------------------------------
 
     //INSERTAR NUEVA RECETA
     public void insertarReceta(Receta receta){
-        msgLoading.setValue(true);
-        repository.insertarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
+        msgLoading.postValue(true);
+        recetaRepository.insertarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
             @Override
             public void onSuccess(Receta recetaG) {
                 msgLoading.postValue(false);
@@ -81,7 +82,7 @@ public class RecetaViewModel extends AndroidViewModel {
     //ACTUALIZAR RECETA
     public void actualizarReceta(Receta receta){
         msgLoading.setValue(true);
-        repository.actualizarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
+        recetaRepository.actualizarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
             @Override
             public void onSuccess(Receta recetaA) {
                 msgLoading.postValue(false);
@@ -98,7 +99,7 @@ public class RecetaViewModel extends AndroidViewModel {
     //ELIMINAR RECETA
     public void eliminarReceta(Receta receta){
         msgLoading.setValue(true);
-        repository.eliminarReceta(receta, new RecetaRepository.OnRecetaEliminadaListener() {
+        recetaRepository.eliminarReceta(receta, new RecetaRepository.OnRecetaEliminadaListener() {
             @Override
             public void onSuccess() {
                 msgLoading.postValue(false);
@@ -114,24 +115,26 @@ public class RecetaViewModel extends AndroidViewModel {
 
     //MARCAR/DESMARCAR FAVORITA
     public void marcarFavorita(long id, boolean isFav){
-        repository.establecerFavorita(id, isFav);
+        recetaRepository.establecerFavorita(id, isFav);
     }
 
     //SUBIR IMAGEN
-    public void subirImagen(Uri imagenUri, OnImagenSubidaListener listener){
+    public void guardarImagenLocal(Uri imageUri, OnImagenSubidaListener listener) {
         msgProgresoSubida.setValue(0);
-        repository.subirImagen(imagenUri, new RecetaRepository.OnImagenSubidaListener(){
+        recetaRepository.guardarImagenLocal(imageUri, new RecetaRepository.OnImagenSubidaListener() {
             @Override
-            public void onSuccess(String url){
+            public void onSuccess(String path) {
                 msgProgresoSubida.postValue(100);
-                listener.onImagenSubida(url);
+                listener.onImagenSubida(path);
             }
+
             @Override
-            public void onProgress(int porcentaje){
+            public void onProgress(int porcentaje) {
                 msgProgresoSubida.postValue(porcentaje);
             }
+
             @Override
-            public void onError(String mensaje){
+            public void onError(String mensaje) {
                 msgError.postValue(mensaje);
                 listener.onError(mensaje);
             }
@@ -146,22 +149,22 @@ public class RecetaViewModel extends AndroidViewModel {
      }
     //FILTRAR CATEGORIA
     public LiveData<List<Receta>> filtrarPorCategoria(String categoria){
-        return repository.getRecetasPorCategoria(categoria);
+        return recetaRepository.getRecetasPorCategoria(categoria);
     }
     //FILTRAR DIFICULTAD
     public LiveData<List<Receta>> filtrarPorDificultad(String dificultad){
-        return repository.getRecetasPorDificultad(dificultad);
+        return recetaRepository.getRecetasPorDificultad(dificultad);
     }
     //FILTRAR POR TIEMPO PREPARACION
     public LiveData<List<Receta>> filtrarPorTiempo(int tiempo){
-        return repository.getRecetasPorTiempo(tiempo);
+        return recetaRepository.getRecetasPorTiempo(tiempo);
     }
     //----------------------------------------------------------------------
 
     //SINCRONIZAR CON FIREBASE
     public void sincronizar(){
         msgLoading.setValue(true);
-        repository.sincronizarFBaLocal();
+        recetaRepository.sincronizarFBaLocal();
         msgLoading.postValue(false);
         msgExito.postValue("Sincronizando...");
     }
@@ -194,6 +197,10 @@ public class RecetaViewModel extends AndroidViewModel {
     }
     public LiveData<String> getMensajeExito() {
         return msgExito;
+    }
+
+    public LiveData<Receta> getRecetaById(long id) {
+        return recetaRepository.getRecetaById(id);
     }
 
 
