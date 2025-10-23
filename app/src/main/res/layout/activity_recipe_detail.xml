@@ -311,9 +311,7 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:tint="@color/white"
-        app:backgroundTint="@color/color_primary"
-        android:contentDescription="@string/fab_favorito_desc"
-        />
+        app:backgroundTint="@color/color_primary" />
 
     <!-- Botones inferiores -->
     <LinearLayout
@@ -326,11 +324,23 @@
         android:elevation="8dp">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_eliminar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="@string/detalle_eliminar"
+            android:textColor="@color/color_error"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="@color/color_error" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_editar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:text="@string/detalle_editar"
             style="@style/Widget.RecetarioClasico.Button.Outlined" />
 
@@ -339,7 +349,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:text="@string/detalle_compartir"
             style="@style/Widget.RecetarioClasico.Button" />
 

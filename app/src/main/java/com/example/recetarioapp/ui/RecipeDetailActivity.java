@@ -7,6 +7,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,12 +56,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
     private RecyclerView rvIngredientes;
     private RecyclerView rvPasos;
     private FloatingActionButton fabFavorito;
+    private MaterialButton btnEliminar;
     private MaterialButton btnEditar;
     private MaterialButton btnCompartir;
 
     // Adapters
     private IngredienteAdapter ingredienteAdapter;
     private PasoAdapter pasoAdapter;
+
+    // Selector de imagen (Photo Picker)
+    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +93,24 @@ public class RecipeDetailActivity extends AppCompatActivity {
         // Configurar RecyclerViews
         setupRecyclerViews();
 
+        // Inicializar Photo Picker (nuevo selector de imágenes sin permisos)
+        pickMedia = registerForActivityResult(
+                new ActivityResultContracts.PickVisualMedia(),
+                uri -> {
+                    if (uri != null) {
+                        ivRecetaImagen.setImageURI(uri);
+
+                        // Si quieres guardar la ruta en tu objeto Receta:
+                        if (recetaActual != null) {
+                            recetaActual.setImagenPortadaURL(uri.toString());
+                        }
+                    } else {
+                        Toast.makeText(this, "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+
         // Configurar listeners
         setupListeners();
 
@@ -103,6 +131,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         rvIngredientes = findViewById(R.id.rv_ingredientes);
         rvPasos = findViewById(R.id.rv_pasos);
         fabFavorito = findViewById(R.id.fab_favorito);
+        btnEliminar = findViewById(R.id.btn_eliminar);
         btnEditar = findViewById(R.id.btn_editar);
         btnCompartir = findViewById(R.id.btn_compartir);
     }
@@ -142,6 +171,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
             }
         });
 
+        // Eliminar
+        btnEliminar.setOnClickListener(v -> mostrarDialogEliminar());
+
         // Editar
         btnEditar.setOnClickListener(v -> {
             if (recetaActual != null) {
@@ -150,26 +182,15 @@ public class RecipeDetailActivity extends AppCompatActivity {
         });
 
         // Compartir
-        btnCompartir.setOnClickListener(v -> compartirReceta());
+        btnCompartir.setOnClickListener(v -> mostrarOpcionesCompartir());
 
-        // Menú de opciones (eliminar)
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == android.R.id.home) {
-                finish();
-                return true;
-            }
-            return false;
+        // Cambiar imagen de receta
+        ivRecetaImagen.setOnClickListener(v -> {
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
         });
 
-        // Agregar opción de eliminar al toolbar
-        toolbar.inflateMenu(R.menu.menu_recipe_detail);
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_delete) {
-                mostrarDialogEliminar();
-                return true;
-            }
-            return false;
-        });
     }
 
     private void cargarReceta(long recetaId) {
@@ -187,9 +208,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
         // Imagen
         if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
-            File imageFile = new File(receta.getImagenPortadaURL());
             Glide.with(this)
-                    .load(imageFile)
+                    .load(Uri.parse(receta.getImagenPortadaURL()))
                     .placeholder(R.drawable.placeholder_receta)
                     .error(R.drawable.placeholder_receta)
                     .centerCrop()
@@ -197,6 +217,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         } else {
             ivRecetaImagen.setImageResource(R.drawable.placeholder_receta);
         }
+
 
         // Descripción
         if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
@@ -302,12 +323,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Abre el formulario de edición
-     */
     private void abrirEdicion() {
-        // Como estamos en una Activity, necesitamos volver a MainActivity
-        // y navegar al fragment de añadir con el ID de la receta
         Intent intent = new Intent(this, com.example.recetarioapp.MainActivity.class);
         intent.putExtra("editar_receta_id", recetaActual.getId());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -315,10 +331,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
         finish();
     }
 
-
-    /**
-     * Muestra opciones para compartir (texto o PDF)
-     */
     private void mostrarOpcionesCompartir() {
         String[] opciones = {"Compartir como texto", "Exportar a PDF"};
 
@@ -334,15 +346,11 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Exporta la receta a PDF
-     */
     private void exportarPDF() {
         if (recetaActual == null) return;
 
         Toast.makeText(this, "Generando PDF...", Toast.LENGTH_SHORT).show();
 
-        // Ejecutar en background thread
         new Thread(() -> {
             String pdfPath = com.example.recetarioapp.utils.PDFHelper
                     .exportarRecetaToPDF(this, recetaActual);
@@ -351,7 +359,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 if (pdfPath != null) {
                     Toast.makeText(this, "PDF guardado en: Documentos/RecetasPDF", Toast.LENGTH_LONG).show();
 
-                    // Opción de abrir el PDF
                     new AlertDialog.Builder(this)
                             .setTitle("PDF creado")
                             .setMessage("La receta se ha exportado correctamente.\n\nRuta: " + pdfPath)
@@ -365,9 +372,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }).start();
     }
 
-    /**
-     * Abre el PDF generado
-     */
     private void abrirPDF(String pdfPath) {
         try {
             File pdfFile = new File(pdfPath);

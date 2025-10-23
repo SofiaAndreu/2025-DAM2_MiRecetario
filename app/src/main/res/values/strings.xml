@@ -107,6 +107,24 @@
 
 
     <string name="fab_favorito_desc">Marcar o quitar de favoritos</string>
-
     <!-- -->
+
+    <string name="filtros_avanzados">Filtros Avanzados</string>
+
+    <string name="label_categoria">Categoría</string>
+    <string name="hint_categoria">Selecciona categoría</string>
+    <string name="descripcion_spinner_categoria">Selecciona la categoría de la receta</string>
+
+    <string name="label_dificultad">Dificultad</string>
+    <string name="hint_dificultad">Selecciona dificultad</string>
+    <string name="descripcion_spinner_dificultad">Selecciona el nivel de dificultad</string>
+
+    <string name="label_tiempo">Tiempo máximo (minutos)</string>
+    <string name="descripcion_slider_tiempo">Ajusta el tiempo máximo de preparación en minutos</string>
+    <string name="tiempo_predeterminado">60 minutos</string>
+
+    <string name="solo_favoritas">Solo mostrar favoritas</string>
+    <string name="btn_limpiar">Limpiar</string>
+    <string name="btn_aplicar">Aplicar</string>
+
 </resources>
