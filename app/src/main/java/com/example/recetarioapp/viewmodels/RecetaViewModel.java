@@ -79,9 +79,9 @@ public class RecetaViewModel extends AndroidViewModel {
         });
     }
 
-    //ACTUALIZAR RECETA
+    //ACTUALIZAR RECETA - CORREGIDO
     public void actualizarReceta(Receta receta){
-        msgLoading.setValue(true);
+        msgLoading.postValue(true); // Cambiado a postValue
         recetaRepository.actualizarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
             @Override
             public void onSuccess(Receta recetaA) {
@@ -96,9 +96,9 @@ public class RecetaViewModel extends AndroidViewModel {
         });
     }
 
-    //ELIMINAR RECETA
+    //ELIMINAR RECETA - CORREGIDO
     public void eliminarReceta(Receta receta){
-        msgLoading.setValue(true);
+        msgLoading.postValue(true); // Cambiado a postValue
         recetaRepository.eliminarReceta(receta, new RecetaRepository.OnRecetaEliminadaListener() {
             @Override
             public void onSuccess() {
@@ -118,9 +118,9 @@ public class RecetaViewModel extends AndroidViewModel {
         recetaRepository.establecerFavorita(id, isFav);
     }
 
-    //SUBIR IMAGEN
+    //SUBIR IMAGEN - YA ESTÁ CORRECTO CON postValue
     public void guardarImagenLocal(Uri imageUri, OnImagenSubidaListener listener) {
-        msgProgresoSubida.setValue(0);
+        msgProgresoSubida.postValue(0); // Cambiado a postValue
         recetaRepository.guardarImagenLocal(imageUri, new RecetaRepository.OnImagenSubidaListener() {
             @Override
             public void onSuccess(String path) {
@@ -144,9 +144,9 @@ public class RecetaViewModel extends AndroidViewModel {
     //BUSCAR/FILTRAR
 
     //BUSCAR
-     public void buscar(String query){
-        busquedaQuery.setValue(query);
-     }
+    public void buscar(String query){
+        busquedaQuery.setValue(query); // Este puede ser setValue porque se llama desde UI thread
+    }
     //FILTRAR CATEGORIA
     public LiveData<List<Receta>> filtrarPorCategoria(String categoria){
         return recetaRepository.getRecetasPorCategoria(categoria);
@@ -161,9 +161,9 @@ public class RecetaViewModel extends AndroidViewModel {
     }
     //----------------------------------------------------------------------
 
-    //SINCRONIZAR CON FIREBASE
+    //SINCRONIZAR CON FIREBASE - CORREGIDO
     public void sincronizar(){
-        msgLoading.setValue(true);
+        msgLoading.postValue(true); // Cambiado a postValue
         recetaRepository.sincronizarFBaLocal();
         msgLoading.postValue(false);
         msgExito.postValue("Sincronizando...");
@@ -171,7 +171,7 @@ public class RecetaViewModel extends AndroidViewModel {
 
     //LIMPIAR MENSAJES EXITO/ERROR
     public void limpiarMensajesE(){
-        msgExito.setValue(null);
+        msgExito.setValue(null); // Estos pueden ser setValue si se llaman desde UI thread
         msgError.setValue(null);
     }
 

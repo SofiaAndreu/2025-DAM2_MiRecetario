@@ -246,15 +246,21 @@ public class AddRecetasFragment extends Fragment {
             viewModel.guardarImagenLocal(imagenUri, new RecetaViewModel.OnImagenSubidaListener() {
                 @Override
                 public void onImagenSubida(String path) {
-                    imagenUrl = path;
-                    crearYGuardarReceta();
+                    // CORREGIDO: Ejecutar en UI Thread
+                    requireActivity().runOnUiThread(() -> {
+                        imagenUrl = path;
+                        crearYGuardarReceta();
+                    });
                 }
 
                 @Override
                 public void onError(String mensaje) {
-                    Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
-                    btnGuardar.setEnabled(true);
-                    progressBar.setVisibility(View.GONE);
+                    // CORREGIDO: Ejecutar en UI Thread
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                        btnGuardar.setEnabled(true);
+                        progressBar.setVisibility(View.GONE);
+                    });
                 }
             });
         } else {
@@ -314,14 +320,22 @@ public class AddRecetasFragment extends Fragment {
         // Guardar o actualizar en ViewModel
         if (modoEdicion) {
             viewModel.actualizarReceta(receta);
-            Toast.makeText(getContext(), "Receta actualizada", Toast.LENGTH_SHORT).show();
+            // CORREGIDO: Toast en UI Thread
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(getContext(), "Receta actualizada", Toast.LENGTH_SHORT).show();
+            });
         } else {
             viewModel.insertarReceta(receta);
-            Toast.makeText(getContext(), "Receta guardada", Toast.LENGTH_SHORT).show();
+            // CORREGIDO: Toast en UI Thread
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(getContext(), "Receta guardada", Toast.LENGTH_SHORT).show();
+            });
         }
 
-        // Volver atrás
-        Navigation.findNavController(requireView()).navigateUp();
+        // Volver atrás (esto debe ejecutarse en UI Thread)
+        requireActivity().runOnUiThread(() -> {
+            Navigation.findNavController(requireView()).navigateUp();
+        });
     }
 
     private List<Ingrediente> parsearIngredientes(String texto) {
