@@ -31,6 +31,7 @@ import com.example.recetarioapp.models.Ingrediente;
 import com.example.recetarioapp.models.Paso;
 import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.viewmodels.RecetaViewModel;
+import com.example.recetarioapp.utils.WebScraperHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,8 +74,11 @@ public class AddRecetasFragment extends Fragment {
     // Launcher para seleccionar imagen de galería
     private ActivityResultLauncher<Intent> pickImageLauncher;
 
-    // Launcher para tomar foto con cámara
+    // Launcher para foto con cámara
     private ActivityResultLauncher<Intent> takePictureLauncher;
+
+    //
+    private MaterialButton btnImportarUrl;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -148,6 +152,7 @@ public class AddRecetasFragment extends Fragment {
         btnCancelar = view.findViewById(R.id.btn_cancelar);
         btnGuardar = view.findViewById(R.id.btn_guardar);
         progressBar = view.findViewById(R.id.progress_bar);
+        btnImportarUrl = view.findViewById(R.id.btn_importar_url);
     }
 
     private void setupDropdowns() {
@@ -194,6 +199,8 @@ public class AddRecetasFragment extends Fragment {
 
         // Botón guardar
         btnGuardar.setOnClickListener(v -> guardarReceta());
+        // Botón importar desde URL
+        btnImportarUrl.setOnClickListener(v -> mostrarDialogImportarURL());
     }
 
     private void seleccionarImagen() {
@@ -463,5 +470,115 @@ public class AddRecetasFragment extends Fragment {
 
         // Cambiar texto del botón
         btnGuardar.setText("Actualizar Receta");
+    }
+
+    /**
+     * Muestra dialog para pegar URL
+     */
+    private void mostrarDialogImportarURL() {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_importar_url, null);
+
+        TextInputEditText etUrl = dialogView.findViewById(R.id.et_url);
+
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Importar receta desde URL")
+                .setView(dialogView)
+                .setPositiveButton("Importar", null)
+                .setNegativeButton("Cancelar", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String url = etUrl.getText().toString().trim();
+                if (url.isEmpty()) {
+                    etUrl.setError("Introduce una URL");
+                    return;
+                }
+
+                if (!url.startsWith("http")) {
+                    url = "https://" + url;
+                }
+
+                dialog.dismiss();
+                importarRecetaDesdeURL(url);
+            });
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Importa receta desde URL
+     */
+    private void importarRecetaDesdeURL(String url) {
+        progressBar.setVisibility(View.VISIBLE);
+        btnImportarUrl.setEnabled(false);
+
+        // Ejecutar en background thread
+        new Thread(() -> {
+            com.example.recetarioapp.utils.WebScraperHelper.RecetaExtraida recetaExtraida =
+                    com.example.recetarioapp.utils.WebScraperHelper.extraerRecetaDesdeURL(url);
+
+            requireActivity().runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                btnImportarUrl.setEnabled(true);
+
+                if (recetaExtraida != null && !recetaExtraida.nombre.isEmpty()) {
+                    rellenarFormularioDesdeWeb(recetaExtraida);
+                    Toast.makeText(getContext(), "Receta importada correctamente", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "No se pudo extraer la receta. Verifica la URL.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
+    }
+
+    /**
+     * Rellena el formulario con datos extraídos de la web
+     */
+    private void rellenarFormularioDesdeWeb(com.example.recetarioapp.utils.WebScraperHelper.RecetaExtraida recetaExtraida) {
+        // Nombre
+        if (!recetaExtraida.nombre.isEmpty()) {
+            etNombre.setText(recetaExtraida.nombre);
+        }
+
+        // Descripción
+        if (!recetaExtraida.descripcion.isEmpty()) {
+            etDescripcion.setText(recetaExtraida.descripcion);
+        }
+
+        // Tiempo
+        if (recetaExtraida.tiempoPreparacion > 0) {
+            etTiempo.setText(String.valueOf(recetaExtraida.tiempoPreparacion));
+        }
+
+        // Porciones
+        if (recetaExtraida.porciones > 0) {
+            etPorciones.setText(String.valueOf(recetaExtraida.porciones));
+        }
+
+        // Origen
+        if (recetaExtraida.origen != null) {
+            etOrigen.setText(recetaExtraida.origen);
+        }
+
+        // Ingredientes
+        if (!recetaExtraida.ingredientes.isEmpty()) {
+            StringBuilder ingredientesTexto = new StringBuilder();
+            for (Ingrediente ing : recetaExtraida.ingredientes) {
+                ingredientesTexto.append(ing.getIngredienteCompleto()).append("\n");
+            }
+            etIngredientes.setText(ingredientesTexto.toString().trim());
+        }
+
+        // Pasos
+        if (!recetaExtraida.pasos.isEmpty()) {
+            StringBuilder pasosTexto = new StringBuilder();
+            for (Paso paso : recetaExtraida.pasos) {
+                pasosTexto.append(paso.getNumeroPaso()).append(". ")
+                        .append(paso.getDescripcion()).append("\n\n");
+            }
+            etPasos.setText(pasosTexto.toString().trim());
+        }
     }
 }

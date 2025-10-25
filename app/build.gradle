@@ -35,6 +35,11 @@ android {
 }
 
 dependencies {
+    //WEB SCRAPING
+    implementation 'org.jsoup:jsoup:1.21.2' // Analizar HTML
+    implementation 'com.squareup.okhttp3:okhttp:5.2.1' // Cliente HTTP para peticiones web
+
+    //CONVERTIR PDF
     implementation 'com.itextpdf:itext7-core:7.2.5'
 
     //GSON
