@@ -1,28 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<!-- ARCHIVO: res/layout/item_ingrediente.xml -->
+<!-- REEMPLAZAR COMPLETAMENTE -->
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    android:gravity="center_vertical">
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_neumorphic_search"
+    android:clickable="true"
+    android:focusable="true">
 
-    <CheckBox
-        android:id="@+id/cb_ingrediente"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:buttonTint="@color/color_primary" />
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tv_ingrediente"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="15sp"
-        android:textColor="@color/color_text_primary"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        tools:text="200g de harina" />
+        <!-- Checkbox -->
+        <CheckBox
+            android:id="@+id/cb_ingrediente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/color_primary"
+            android:layout_marginEnd="12dp" />
 
-</LinearLayout>
+        <!-- Texto del ingrediente -->
+        <TextView
+            android:id="@+id/tv_ingrediente"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15sp"
+            android:textColor="@color/color_text_primary"
+            android:lineSpacingExtra="2dp"
+            tools:text="200g de harina" />
+
+    </LinearLayout>
+
+</FrameLayout>

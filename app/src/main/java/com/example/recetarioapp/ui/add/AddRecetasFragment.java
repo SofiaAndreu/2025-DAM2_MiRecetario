@@ -476,32 +476,62 @@ public class AddRecetasFragment extends Fragment {
      * Muestra dialog para pegar URL
      */
     private void mostrarDialogImportarURL() {
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_importar_url, null);
+        View dialogView = LayoutInflater.from(getContext())
+                .inflate(R.layout.dialog_importar_url, null);
 
         TextInputEditText etUrl = dialogView.findViewById(R.id.et_url);
-
+        FrameLayout btnCancelarDialog = dialogView.findViewById(R.id.btn_cancelar_dialog);
+        FrameLayout btnImportarDialog = dialogView.findViewById(R.id.btn_importar_dialog);
+        ProgressBar progressImport = dialogView.findViewById(R.id.progress_import);
+        //Crear el dialog básico
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Importar receta desde URL")
                 .setView(dialogView)
-                .setPositiveButton("Importar", null)
-                .setNegativeButton("Cancelar", null)
                 .create();
+        //Fondo transparente
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        //Configurar los botones de layout personalizado
+        btnCancelarDialog.setOnClickListener(v -> dialog.dismiss());
 
-        dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                String url = etUrl.getText().toString().trim();
-                if (url.isEmpty()) {
-                    etUrl.setError("Introduce una URL");
-                    return;
-                }
+        btnImportarDialog.setOnClickListener(v -> {
+            String url = etUrl.getText().toString().trim();
 
-                if (!url.startsWith("http")) {
-                    url = "https://" + url;
-                }
+            if (url.isEmpty()) {
+                etUrl.setError("Introduce una URL");
+                return;
+            }
 
-                dialog.dismiss();
-                importarRecetaDesdeURL(url);
-            });
+            if (!url.startsWith("http")) {
+                url = "https://" + url;
+            }
+
+            // Deshabilitar botón y mostrar progreso
+            btnImportarDialog.setClickable(false);
+            btnImportarDialog.setAlpha(0.5f);
+            progressImport.setVisibility(View.VISIBLE);
+
+            final String urlFinal = url;
+
+            // Ejecutar en background
+            new Thread(() -> {
+                WebScraperHelper.RecetaExtraida recetaExtraida =
+                        WebScraperHelper.extraerRecetaDesdeURL(urlFinal);
+
+                requireActivity().runOnUiThread(() -> {
+                    progressImport.setVisibility(View.GONE);
+                    btnImportarDialog.setClickable(true);
+                    btnImportarDialog.setAlpha(1.0f);
+
+                    if (recetaExtraida != null && !recetaExtraida.nombre.isEmpty()) {
+                        rellenarFormularioDesdeWeb(recetaExtraida);
+                        dialog.dismiss();
+                        Toast.makeText(getContext(), "¡Receta importada!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "No se pudo extraer la receta", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }).start();
         });
 
         dialog.show();

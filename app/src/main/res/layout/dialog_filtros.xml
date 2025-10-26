@@ -1,136 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- ARCHIVO: res/layout/dialog_filtros.xml -->
+<!-- REEMPLAZAR COMPLETAMENTE -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@drawable/bg_neumorphic_card"
+    android:padding="4dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/filtros_avanzados"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/color_primary"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Filtrar por categoría -->
-    <TextView
-        android:id="@+id/label_categoria"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/label_categoria"
-        android:textStyle="bold"
-        android:textColor="@color/color_text_primary"
-        android:layout_marginBottom="8dp"
-        android:labelFor="@id/spinner_categoria" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:hint="@string/hint_categoria">
-
-        <AutoCompleteTextView
-            android:id="@+id/spinner_categoria"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:hint="@string/hint_categoria" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Filtrar por dificultad -->
-    <TextView
-        android:id="@+id/label_dificultad"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/label_dificultad"
-        android:textStyle="bold"
-        android:textColor="@color/color_text_primary"
-        android:layout_marginBottom="8dp"
-        android:labelFor="@id/spinner_dificultad" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:hint="@string/hint_dificultad">
-
-        <AutoCompleteTextView
-            android:id="@+id/spinner_dificultad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:hint="@string/hint_dificultad" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Filtrar por tiempo máximo -->
-    <TextView
-        android:id="@+id/label_tiempo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/label_tiempo"
-        android:textStyle="bold"
-        android:textColor="@color/color_text_primary"
-        android:layout_marginBottom="8dp"
-        android:labelFor="@id/slider_tiempo" />
-
-    <com.google.android.material.slider.Slider
-        android:id="@+id/slider_tiempo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:valueFrom="0"
-        android:valueTo="180"
-        android:value="60"
-        android:stepSize="15"
-        app:labelBehavior="withinBounds"
-        android:layout_marginBottom="8dp"
-        android:contentDescription="@string/descripcion_slider_tiempo" />
-
-    <TextView
-        android:id="@+id/tv_tiempo_seleccionado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tiempo_predeterminado"
-        android:textColor="@color/color_text_secondary"
-        android:layout_marginBottom="16dp"
-        android:layout_gravity="center_horizontal" />
-
-    <!-- Solo favoritas -->
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/cb_solo_favoritas"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/solo_favoritas"
-        android:layout_marginBottom="24dp" />
-
-    <!-- Botones -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_limpiar"
+        <!-- Título -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btn_limpiar"
-            android:layout_marginEnd="8dp"
-            style="@style/Widget.Material3.Button.TextButton" />
+            android:text="@string/filtros_avanzados"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_primary"
+            android:fontFamily="serif"
+            android:layout_marginBottom="20dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_aplicar"
+        <!-- Filtrar por categoría -->
+        <TextView
+            android:id="@+id/label_categoria"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btn_aplicar"
-            style="@style/Widget.RecetarioClasico.Button" />
+            android:text="@string/label_categoria"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/color_text_primary"
+            android:layout_marginBottom="8dp"
+            android:labelFor="@id/spinner_categoria" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:hint="@string/hint_categoria">
+
+            <AutoCompleteTextView
+                android:id="@+id/spinner_categoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:padding="14dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Filtrar por dificultad -->
+        <TextView
+            android:id="@+id/label_dificultad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_dificultad"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/color_text_primary"
+            android:layout_marginBottom="8dp"
+            android:labelFor="@id/spinner_dificultad" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:hint="@string/hint_dificultad">
+
+            <AutoCompleteTextView
+                android:id="@+id/spinner_dificultad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:padding="14dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Filtrar por tiempo máximo -->
+        <TextView
+            android:id="@+id/label_tiempo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_tiempo"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/color_text_primary"
+            android:layout_marginBottom="8dp"
+            android:labelFor="@id/slider_tiempo" />
+
+        <!-- Slider con fondo neumórfico -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_neumorphic_search"
+            android:padding="12dp">
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_tiempo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="0"
+                android:valueTo="180"
+                android:value="60"
+                android:stepSize="15"
+                app:labelBehavior="withinBounds"
+                app:thumbColor="@color/color_primary"
+                app:trackColorActive="@color/color_primary"
+                app:trackColorInactive="@color/color_border"
+                android:contentDescription="@string/descripcion_slider_tiempo" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_tiempo_seleccionado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tiempo_predeterminado"
+            android:textColor="@color/color_text_secondary"
+            android:textSize="13sp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Solo favoritas (checkbox neumórfico) -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_neumorphic_search"
+            android:padding="4dp">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_solo_favoritas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/solo_favoritas"
+                android:padding="12dp"
+                android:textSize="15sp" />
+
+        </FrameLayout>
+
+        <!-- Botones (neumórficos) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <FrameLayout
+                android:id="@+id/btn_limpiar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_neumorphic"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_limpiar"
+                    android:textColor="@color/color_text_secondary"
+                    android:textStyle="bold"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btn_aplicar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_neumorphic_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_aplicar"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp" />
+
+            </FrameLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>
