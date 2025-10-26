@@ -79,7 +79,7 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         private final TextView tvDificultad;
         private final TextView tvPorciones;
         private final Chip chipCategoria;
-        private final ImageButton btnFavorito;
+        private final ImageView btnFavorito;
 
         public RecetaViewHolder(@NonNull View itemView) {
             super(itemView);

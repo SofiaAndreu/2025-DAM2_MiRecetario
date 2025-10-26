@@ -118,7 +118,7 @@ public class RecetaViewModel extends AndroidViewModel {
         recetaRepository.establecerFavorita(id, isFav);
     }
 
-    //SUBIR IMAGEN - YA ESTÁ CORRECTO CON postValue
+    //SUBIR IMAGEN
     public void guardarImagenLocal(Uri imageUri, OnImagenSubidaListener listener) {
         msgProgresoSubida.postValue(0); // Cambiado a postValue
         recetaRepository.guardarImagenLocal(imageUri, new RecetaRepository.OnImagenSubidaListener() {
@@ -136,7 +136,9 @@ public class RecetaViewModel extends AndroidViewModel {
             @Override
             public void onError(String mensaje) {
                 msgError.postValue(mensaje);
-                listener.onError(mensaje);
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                    listener.onError(mensaje);
+                });
             }
         });
     } // ----------------------------------------------------------------------------------

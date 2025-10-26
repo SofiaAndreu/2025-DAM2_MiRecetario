@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ARCHIVO: res/layout/fragment_favs.xml -->
+<!-- REEMPLAZAR COMPLETAMENTE -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_background_light">
+    android:background="@color/color_background">
 
     <!-- RecyclerView de favoritas -->
     <androidx.recyclerview.widget.RecyclerView
@@ -16,42 +18,54 @@
         android:padding="8dp"
         tools:listitem="@layout/item_receta" />
 
-    <!-- Empty state -->
-    <LinearLayout
+    <!-- Empty state (neumórfico) -->
+    <FrameLayout
         android:id="@+id/layout_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp"
+        android:layout_margin="32dp"
+        android:background="@drawable/bg_neumorphic_card"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⭐"
-            android:textSize="64sp" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="40dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No tienes favoritas"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/color_text_primary"
-            android:layout_marginTop="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐"
+                android:textSize="72sp"
+                android:layout_marginBottom="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Marca recetas con ⭐ para verlas aquí"
-            android:textSize="14sp"
-            android:textColor="@color/color_text_secondary"
-            android:textAlignment="center"
-            android:layout_marginTop="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No tienes favoritas"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/color_primary"
+                android:fontFamily="serif"
+                android:layout_marginBottom="8dp" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Marca recetas con ⭐ para verlas aquí"
+                android:textSize="14sp"
+                android:textColor="@color/color_text_secondary"
+                android:textAlignment="center"
+                android:lineSpacingExtra="2dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

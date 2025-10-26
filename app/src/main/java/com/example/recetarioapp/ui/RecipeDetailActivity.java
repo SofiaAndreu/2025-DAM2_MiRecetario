@@ -126,8 +126,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
         tvTiempo = findViewById(R.id.tv_tiempo);
         tvPorciones = findViewById(R.id.tv_porciones);
         tvDificultad = findViewById(R.id.tv_dificultad);
-        chipCategoria = findViewById(R.id.chip_categoria);
-        chipOrigen = findViewById(R.id.chip_origen);
+        chipCategoria = findViewById(R.id.detail_chip_categoria);
+        chipOrigen = findViewById(R.id.detail_chip_origen);
         rvIngredientes = findViewById(R.id.rv_ingredientes);
         rvPasos = findViewById(R.id.rv_pasos);
         fabFavorito = findViewById(R.id.fab_favorito);

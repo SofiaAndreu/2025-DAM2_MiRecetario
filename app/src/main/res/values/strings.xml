@@ -65,6 +65,8 @@
     <string name="dificultad_facil">Fácil</string>
     <string name="dificultad_medio">Media</string>
     <string name="dificultad_dificil">Difícil</string>
+    <string name="desc_dificultad">Seleccionar nivel de dificultad</string>
+
 
     <!-- CATEGORIAS CLASIFICACION -->
     <string name="categoria_postres">Postres</string>
@@ -92,6 +94,7 @@
     <string name="mensaje_error">Ha ocurrido un error</string>
     <string name="mensaje_campos_vacios">Por favor, completa los campos obligatorios</string>
     <string name="mensaje_confirmacion_eliminar">¿Eliminar esta receta?</string>
+    <string name="desc_categoria">Seleccionar categoría de la receta</string>
 
     <!-- ACCEDER A PERMISOS -->
     <string name="permiso_camara">Permiso de cámara necesario</string>

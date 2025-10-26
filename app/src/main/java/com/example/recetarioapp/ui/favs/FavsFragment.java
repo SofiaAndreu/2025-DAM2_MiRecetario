@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.content.Intent;
@@ -28,7 +29,7 @@ public class FavsFragment extends Fragment {
 
     // Views
     private RecyclerView rvFavoritas;
-    private LinearLayout layoutEmpty;
+    private FrameLayout layoutEmpty;
 
     // Adapter
     private RecetaAdapter adapter;

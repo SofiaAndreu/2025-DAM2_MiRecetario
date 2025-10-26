@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ARCHIVO: res/layout/fragment_home.xml -->
+<!-- REEMPLAZAR COMPLETAMENTE TU ARCHIVO ACTUAL -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_background_light">
+    android:background="@color/color_background">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,34 +21,39 @@
             android:padding="16dp">
 
             <!-- Header con bienvenida -->
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@color/color_surface"
-                android:elevation="2dp"
+                android:background="@drawable/bg_neumorphic_card"
                 android:layout_marginBottom="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_welcome"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/color_primary"
-                    android:fontFamily="serif" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/tagline"
-                    android:textSize="14sp"
-                    android:textStyle="italic"
-                    android:textColor="@color/color_text_secondary"
-                    android:layout_marginTop="4dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_welcome"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/color_primary"
+                        android:fontFamily="serif" />
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tagline"
+                        android:textSize="14sp"
+                        android:textStyle="italic"
+                        android:textColor="@color/color_text_secondary"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+
+            </FrameLayout>
 
             <!-- Estadísticas rápidas -->
             <LinearLayout
@@ -57,20 +64,18 @@
                 android:weightSum="3">
 
                 <!-- Total de recetas -->
-                <androidx.cardview.widget.CardView
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/color_primary"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
+                    android:layout_margin="6dp"
+                    android:background="@drawable/bg_neumorphic_card">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <TextView
@@ -78,35 +83,34 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="32sp"
+                            android:textSize="36sp"
                             android:textStyle="bold"
-                            android:textColor="@color/white" />
+                            android:textColor="@color/color_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Recetas"
-                            android:textSize="12sp"
-                            android:textColor="@color/white" />
+                            android:textSize="13sp"
+                            android:textColor="@color/color_text_secondary"
+                            android:layout_marginTop="4dp" />
 
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </FrameLayout>
 
                 <!-- Favoritas -->
-                <androidx.cardview.widget.CardView
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/color_secondary"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
+                    android:layout_margin="6dp"
+                    android:background="@drawable/bg_neumorphic_card">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <TextView
@@ -114,35 +118,34 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="32sp"
+                            android:textSize="36sp"
                             android:textStyle="bold"
-                            android:textColor="@color/white" />
+                            android:textColor="@color/color_secondary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Favoritas"
-                            android:textSize="12sp"
-                            android:textColor="@color/white" />
+                            android:textSize="13sp"
+                            android:textColor="@color/color_text_secondary"
+                            android:layout_marginTop="4dp" />
 
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </FrameLayout>
 
                 <!-- Categorías -->
-                <androidx.cardview.widget.CardView
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="@color/color_accent"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
+                    android:layout_margin="6dp"
+                    android:background="@drawable/bg_neumorphic_card">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <TextView
@@ -150,19 +153,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="32sp"
+                            android:textSize="36sp"
                             android:textStyle="bold"
-                            android:textColor="@color/color_text_primary" />
+                            android:textColor="@color/color_accent" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Categorías"
-                            android:textSize="12sp"
-                            android:textColor="@color/color_text_primary" />
+                            android:textSize="13sp"
+                            android:textColor="@color/color_text_secondary"
+                            android:layout_marginTop="4dp" />
 
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </FrameLayout>
 
             </LinearLayout>
 

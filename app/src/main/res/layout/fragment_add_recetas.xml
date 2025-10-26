@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ARCHIVO: res/layout/fragment_add_recetas.xml -->
+<!-- REEMPLAZAR COMPLETAMENTE -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_background_light"
+    android:background="@color/color_background"
     android:fillViewport="true">
 
     <LinearLayout
@@ -24,31 +26,54 @@
             android:fontFamily="serif"
             android:layout_marginBottom="16dp" />
 
-        <!-- Botón importar desde URL -->
-        <com.google.android.material.button.MaterialButton
+        <!-- Botón importar desde URL (neumórfico) -->
+        <FrameLayout
             android:id="@+id/btn_importar_url"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📎 Importar desde URL"
             android:layout_marginBottom="16dp"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            app:icon="@android:drawable/ic_menu_search"
-            app:iconGravity="start" />
+            android:background="@drawable/bg_neumorphic"
+            android:clickable="true"
+            android:focusable="true">
 
-        <!-- Imagen (placeholder por ahora) -->
-        <com.google.android.material.card.MaterialCardView
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📎"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Importar desde URL"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_primary" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- Imagen (neumórfica) -->
+        <FrameLayout
             android:id="@+id/card_imagen"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="2dp"
-            app:strokeColor="@color/color_border">
+            android:background="@drawable/bg_neumorphic_card">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="8dp">
 
                 <ImageView
                     android:id="@+id/iv_preview"
@@ -63,7 +88,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:background="@color/color_surface">
+                    android:background="@drawable/rounded_bg">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -82,91 +107,102 @@
 
             </FrameLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </FrameLayout>
 
         <!-- Nombre -->
-        <com.google.android.material.textfield.TextInputLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="@string/add_nombre"
-            style="@style/Widget.RecetarioClasico.TextInputLayout">
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_neumorphic_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_nombre"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/add_nombre"
                 android:inputType="textCapWords"
                 android:maxLines="1"
-                android:hint="Nombre"/>
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_hint" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </FrameLayout>
 
         <!-- Descripción -->
-        <com.google.android.material.textfield.TextInputLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="@string/add_descripcion"
-            style="@style/Widget.RecetarioClasico.TextInputLayout">
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_neumorphic_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_descripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/add_descripcion"
                 android:inputType="textMultiLine|textCapSentences"
                 android:minLines="3"
                 android:maxLines="5"
                 android:gravity="top"
-                android:hint="Descripción de la receta"/>
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_hint" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </FrameLayout>
 
-        <!-- Tiempo y Porciones (en fila) -->
+        <!-- Tiempo y Porciones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="16dp">
 
             <!-- Tiempo -->
-            <com.google.android.material.textfield.TextInputLayout
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:hint="@string/add_tiempo"
-                style="@style/Widget.RecetarioClasico.TextInputLayout">
+                android:background="@drawable/bg_neumorphic_search">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_tiempo"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_tiempo"
                     android:inputType="number"
                     android:maxLines="1"
-                    android:hint="Tiempo preparación"
-                 />
+                    android:padding="16dp"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/color_text_primary"
+                    android:textColorHint="@color/color_text_hint" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+            </FrameLayout>
 
             <!-- Porciones -->
-            <com.google.android.material.textfield.TextInputLayout
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:hint="@string/add_porciones"
-                style="@style/Widget.RecetarioClasico.TextInputLayout">
+                android:background="@drawable/bg_neumorphic_search">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_porciones"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_porciones"
                     android:inputType="number"
                     android:maxLines="1"
-                    android:hint="Porciones"/>
+                    android:padding="16dp"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/color_text_primary"
+                    android:textColorHint="@color/color_text_hint" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+            </FrameLayout>
 
         </LinearLayout>
 
@@ -174,16 +210,16 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="16dp"
             android:hint="@string/add_dificultad"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
                 android:id="@+id/et_dificultad"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:inputType="none"
-                android:hint="Nivel de dificultad"/>
+                android:padding="16dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -191,36 +227,39 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="16dp"
             android:hint="@string/add_categoria"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
                 android:id="@+id/et_categoria"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:inputType="none"
-                android:hint="Categoría"/>
+                android:padding="16dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Origen -->
-        <com.google.android.material.textfield.TextInputLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="@string/add_origen"
-            style="@style/Widget.RecetarioClasico.TextInputLayout">
+            android:background="@drawable/bg_neumorphic_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_origen"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/add_origen"
                 android:inputType="textCapWords"
                 android:maxLines="1"
-                android:hint="Origen"/>
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_hint" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </FrameLayout>
 
         <!-- Sección Ingredientes -->
         <TextView
@@ -233,23 +272,26 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="@string/add_ingredientes"
-            style="@style/Widget.RecetarioClasico.TextInputLayout">
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_neumorphic_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_ingredientes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="Ejemplo:&#10;200g de harina&#10;2 huevos&#10;100ml de leche..."
                 android:inputType="textMultiLine|textCapSentences"
                 android:minLines="5"
                 android:gravity="top"
-                android:hint="Ejemplo:\n200g de harina\n2 huevos\n100ml de leche..." />
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_hint" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </FrameLayout>
 
         <!-- Sección Pasos -->
         <TextView
@@ -262,23 +304,26 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:hint="@string/add_pasos"
-            style="@style/Widget.RecetarioClasico.TextInputLayout">
+            android:background="@drawable/bg_neumorphic_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_pasos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="Ejemplo:&#10;1. Precalentar el horno...&#10;2. Mezclar ingredientes...&#10;3. Hornear durante..."
                 android:inputType="textMultiLine|textCapSentences"
                 android:minLines="8"
                 android:gravity="top"
-                android:hint="Ejemplo:\n1. Precalentar el horno...\n2. Mezclar ingredientes...\n3. Hornear durante..." />
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/color_text_primary"
+                android:textColorHint="@color/color_text_hint" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </FrameLayout>
 
         <!-- Botones -->
         <LinearLayout
@@ -289,24 +334,52 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp">
 
-            <com.google.android.material.button.MaterialButton
+            <FrameLayout
                 android:id="@+id/btn_cancelar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_cancelar"
-                android:layout_marginEnd="8dp"
-                style="@style/Widget.RecetarioClasico.Button.Outlined" />
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_neumorphic"
+                android:clickable="true"
+                android:focusable="true">
 
-            <com.google.android.material.button.MaterialButton
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_cancelar"
+                    android:textColor="@color/color_primary"
+                    android:textStyle="bold"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp" />
+
+            </FrameLayout>
+
+            <FrameLayout
                 android:id="@+id/btn_guardar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_guardar"
-                style="@style/Widget.RecetarioClasico.Button" />
+                android:background="@drawable/bg_neumorphic_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_guardar"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp" />
+
+            </FrameLayout>
 
         </LinearLayout>
 
-        <!-- ProgressBar para subida de imagen -->
+        <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="match_parent"

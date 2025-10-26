@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -50,7 +51,7 @@ public class AddRecetasFragment extends Fragment {
     private Receta recetaEditar;
 
     // Views
-    private MaterialCardView cardImagen;
+    private FrameLayout cardImagen;
     private ImageView ivPreview;
     private LinearLayout layoutAddImage;
     private TextInputEditText etNombre;
@@ -62,8 +63,11 @@ public class AddRecetasFragment extends Fragment {
     private TextInputEditText etOrigen;
     private TextInputEditText etIngredientes;
     private TextInputEditText etPasos;
-    private MaterialButton btnCancelar;
-    private MaterialButton btnGuardar;
+
+    private FrameLayout btnCancelar;
+    private FrameLayout btnGuardar;
+    private FrameLayout btnImportarUrl;
+
     private ProgressBar progressBar;
 
     // Imagen seleccionada
@@ -77,8 +81,7 @@ public class AddRecetasFragment extends Fragment {
     // Launcher para foto con cámara
     private ActivityResultLauncher<Intent> takePictureLauncher;
 
-    //
-    private MaterialButton btnImportarUrl;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -467,9 +470,6 @@ public class AddRecetasFragment extends Fragment {
             }
         }
         etPasos.setText(pasosTexto.toString().trim());
-
-        // Cambiar texto del botón
-        btnGuardar.setText("Actualizar Receta");
     }
 
     /**

@@ -203,7 +203,7 @@
                         android:layout_marginTop="16dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_categoria"
+                            android:id="@+id/detail_chip_categoria"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:chipBackgroundColor="@color/color_secondary_light"
@@ -211,7 +211,7 @@
                             tools:text="Platos Principales" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_origen"
+                            android:id="@+id/detail_chip_origen"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -311,6 +311,7 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:tint="@color/white"
+        android:contentDescription="@string/fab_favorito_desc"
         app:backgroundTint="@color/color_primary" />
 
     <!-- Botones inferiores -->
