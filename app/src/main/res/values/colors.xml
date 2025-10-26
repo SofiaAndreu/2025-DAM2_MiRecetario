@@ -1,63 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Paleta moderna inspirada en iOS - Tonos cálidos y elegantes -->
+<resources>  <!-- PALETA DE COLORES -->
 
-    <!-- Primarios - Marrón sofisticado con iluminación cálida -->
-    <color name="color_primary">#6D4C41</color>          <!-- Marrón chocolate cálido -->
-    <color name="color_primary_dark">#4E342E</color>     <!-- Marrón intenso -->
-    <color name="color_primary_light">#8D6E63</color>    <!-- Marrón suave -->
-    <color name="color_primary_variant">#795548</color>  <!-- Variante intermedia -->
+    <!-- Primarios - Marrones -->
+    <color name="color_primary">#6D4C41</color>              <!-- Marrón chocolate cálido -->
+    <color name="color_primary_dark">#4E342E</color>         <!-- Marrón intenso -->
+    <color name="color_primary_light">#8D6E63</color>        <!-- Marrón suave -->
+    <color name="color_primary_variant">#795548</color>      <!-- Variante intermedia -->
 
     <!-- Secundarios - Tonos complementarios -->
-    <color name="color_secondary">#BCAAA4</color>        <!-- Beige rosado -->
-    <color name="color_secondary_light">#D7CCC8</color>  <!-- Beige claro luminoso -->
-    <color name="color_secondary_variant">#A1887F</color><!-- Taupe -->
+    <color name="color_secondary">#BCAAA4</color>            <!-- Beige rosado -->
+    <color name="color_secondary_light">#D7CCC8</color>      <!-- Beige claro luminoso -->
+    <color name="color_secondary_variant">#A1887F</color>    <!-- Taupe -->
 
-    <!-- Acentos - Detalles vibrantes pero elegantes -->
-    <color name="color_accent">#FFB74D</color>           <!-- Naranja cálido (mantequilla tostada) -->
-    <color name="color_accent_light">#FFD0B0</color>     <!-- Durazno suave -->
-    <color name="color_highlight">#FFA726</color>        <!-- Ámbar brillante -->
+    <!-- Acentos - Detalles elegantes -->
+    <color name="color_accent">#FFB74D</color>               <!-- Naranja cálido (mantequilla tostada) -->
+    <color name="color_accent_light">#FFD0B0</color>         <!-- Durazno suave -->
+    <color name="color_highlight">#FFA726</color>            <!-- Ámbar brillante -->
 
-    <!-- Superficies y fondos - Sistema de capas con profundidad -->
-    <color name="color_background">#FAFAF8</color>       <!-- Blanco cálido off-white -->
-    <color name="color_background_light">#FFFFFF</color> <!-- Blanco puro -->
-    <color name="color_surface">#F5F5F3</color>          <!-- Superficie elevada -->
-    <color name="color_surface_elevated">#FFFFFF</color> <!-- Cards principales -->
-    <color name="color_surface_variant">#EFEBE9</color>  <!-- Superficie alternativa -->
+    <!-- Superficies y fondos - capas/profundidad -->
+    <color name="color_background">#FAFAF8</color>           <!-- Blanco cálido off-white -->
+    <color name="color_background_light">#FFFFFF</color>     <!-- Blanco puro -->
+    <color name="color_surface">#F5F5F3</color>              <!-- Superficie elevada -->
+    <color name="color_surface_elevated">#FFFFFF</color>     <!-- Cards principales -->
+    <color name="color_surface_variant">#EFEBE9</color>      <!-- Superficie alternativa -->
 
-    <!-- Texto - Jerarquía clara y legible -->
-    <color name="color_text_primary">#3E2723</color>     <!-- Texto principal oscuro -->
-    <color name="color_text_secondary">#6D4C41</color>   <!-- Texto secundario -->
-    <color name="color_text_tertiary">#8D6E63</color>    <!-- Texto terciario -->
-    <color name="color_text_hint">#BCAAA4</color>        <!-- Placeholders y hints -->
-    <color name="color_text_disabled">#D7CCC8</color>    <!-- Texto deshabilitado -->
+    <!-- Texto -->
+    <color name="color_text_disabled">#D7CCC8</color>        <!-- Texto deshabilitado -->
+    <color name="color_text_hint">#BCAAA4</color>            <!-- Placeholders y hints -->
+    <color name="color_text_primary">#3E2723</color>         <!-- Texto principal oscuro -->
+    <color name="color_text_secondary">#6D4C41</color>       <!-- Texto secundario -->
+    <color name="color_text_tertiary">#8D6E63</color>        <!-- Texto terciario -->
 
-    <!-- Bordes y divisores - Sutiles pero presentes -->
-    <color name="color_border">#E0E0E0</color>           <!-- Borde principal -->
-    <color name="color_border_light">#EEEEEE</color>     <!-- Borde sutil -->
-    <color name="color_divider">#F5F5F5</color>          <!-- Líneas divisorias -->
+    <!-- Bordes y divisores -->
+    <color name="color_border">#E0E0E0</color>               <!-- Borde principal -->
+    <color name="color_border_light">#EEEEEE</color>         <!-- Borde sutil -->
+    <color name="color_divider">#F5F5F5</color>              <!-- Líneas divisorias -->
 
-    <!-- Estados y feedback -->
-    <color name="color_success">#66BB6A</color>          <!-- Verde éxito -->
-    <color name="color_error">#EF5350</color>            <!-- Rojo error -->
-    <color name="color_warning">#FFA726</color>          <!-- Naranja advertencia -->
-    <color name="color_info">#42A5F5</color>             <!-- Azul información -->
-    <color name="color_favorite">#EC407A</color>         <!-- Rosa favoritos -->
+    <!-- Estados/retroalimentación -->
+    <color name="color_error">#EF5350</color>                <!-- Rojo error -->
+    <color name="color_favorite">#EC407A</color>             <!-- Rosa favoritos -->
+    <color name="color_info">#42A5F5</color>                 <!-- Azul información -->
+    <color name="color_success">#66BB6A</color>              <!-- Verde éxito -->
+    <color name="color_warning">#FFA726</color>              <!-- Naranja advertencia -->
 
     <!-- Overlays y sombras -->
-    <color name="color_overlay">#40000000</color>        <!-- Overlay suave -->
-    <color name="color_scrim">#80000000</color>          <!-- Scrim medio -->
-    <color name="color_shadow">#20000000</color>         <!-- Sombra difuminada -->
+    <color name="color_overlay">#40000000</color>            <!-- Overlay suave -->
+    <color name="color_scrim">#80000000</color>              <!-- Scrim medio -->
+    <color name="color_shadow">#20000000</color>             <!-- Sombra difuminada -->
 
-    <!-- Gradientes (para efectos especiales) -->
-    <color name="gradient_start">#6D4C41</color>
+    <!-- Gradientes para fondos especiales -->
     <color name="gradient_end">#8D6E63</color>
+    <color name="gradient_start">#6D4C41</color>
 
-    <!-- Básicos del sistema -->
+    <!-- Colores del sistema -->
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
-    <!-- Colores interactivos - Estados hover/pressed -->
-    <color name="color_ripple">#20FFB74D</color>         <!-- Efecto ripple cálido -->
-    <color name="color_pressed">#10000000</color>        <!-- Estado presionado -->
+    <!-- Interacciones de usuario - Estados hover/pressed -->
+    <color name="color_pressed">#10000000</color>            <!-- Estado presionado -->
+    <color name="color_ripple">#20FFB74D</color>             <!-- Efecto ripple cálido -->
 </resources>

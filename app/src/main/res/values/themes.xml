@@ -1,11 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Tema principal - Diseño moderno inspirado en iOS -->
     <style name="Theme.RecetarioApp" parent="Theme.Material3.Light.NoActionBar">
+
         <!-- Colores principales -->
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryVariant">@color/color_primary_variant</item>
         <item name="colorOnPrimary">@color/white</item>
 
+        <!-- Colores secundarios -->
         <item name="colorSecondary">@color/color_accent</item>
         <item name="colorSecondaryVariant">@color/color_highlight</item>
         <item name="colorOnSecondary">@color/white</item>
@@ -28,19 +29,16 @@
         <item name="android:navigationBarColor">@color/color_background</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
-        <!-- Shapes - Bordes redondeados generosos -->
+        <!-- Apariencia de esquinas -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.RecetarioApp.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.RecetarioApp.MediumComponent</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.RecetarioApp.LargeComponent</item>
 
-        <!-- Elevaciones y sombras -->
+        <!-- Elevación general -->
         <item name="elevation">8dp</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          FORMAS MODERNAS (iOS-like)      -->
-    <!-- ========================================= -->
-
+    <!-- Formas redondeadas -->
     <style name="ShapeAppearance.RecetarioApp.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">12dp</item>
@@ -56,10 +54,7 @@
         <item name="cornerSize">24dp</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          TOOLBAR MODERNO                 -->
-    <!-- ========================================= -->
-
+    <!-- Toolbar -->
     <style name="Widget.RecetarioClasico.Toolbar" parent="Widget.Material3.Toolbar">
         <item name="titleTextColor">@color/white</item>
         <item name="subtitleTextColor">@color/color_secondary_light</item>
@@ -74,10 +69,7 @@
         <item name="android:letterSpacing">-0.02</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          BOTONES MODERNOS (iOS-style)    -->
-    <!-- ========================================= -->
-
+    <!-- Botones -->
     <style name="Widget.RecetarioClasico.Button" parent="Widget.Material3.Button">
         <item name="backgroundTint">@color/color_primary</item>
         <item name="cornerRadius">14dp</item>
@@ -109,10 +101,7 @@
         <item name="rippleColor">@color/color_ripple</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          CARDS MODERNAS (Neumorfismo)    -->
-    <!-- ========================================= -->
-
+    <!-- Cards -->
     <style name="Widget.RecetarioClasico.CardView" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">@color/color_surface_elevated</item>
         <item name="cardElevation">6dp</item>
@@ -130,10 +119,7 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          TEXT INPUT MODERNO              -->
-    <!-- ========================================= -->
-
+    <!-- TextInput -->
     <style name="Widget.RecetarioClasico.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/color_primary</item>
         <item name="boxStrokeWidth">1.5dp</item>
@@ -146,10 +132,7 @@
         <item name="boxBackgroundColor">@color/color_background_light</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          CHIPS MODERNOS                  -->
-    <!-- ========================================= -->
-
+    <!-- Chips -->
     <style name="Widget.RecetarioClasico.Chip" parent="Widget.Material3.Chip.Filter">
         <item name="chipBackgroundColor">@color/color_surface</item>
         <item name="chipCornerRadius">20dp</item>
@@ -161,10 +144,7 @@
         <item name="checkedIconVisible">false</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          FAB MODERNO                     -->
-    <!-- ========================================= -->
-
+    <!-- FAB -->
     <style name="Widget.RecetarioClasico.FAB" parent="Widget.Material3.FloatingActionButton.Primary">
         <item name="backgroundTint">@color/color_primary</item>
         <item name="tint">@color/white</item>
@@ -177,10 +157,7 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          BOTTOM NAVIGATION MODERNO       -->
-    <!-- ========================================= -->
-
+    <!-- Bottom Navigation -->
     <style name="Widget.RecetarioClasico.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
         <item name="backgroundTint">@color/color_background</item>
         <item name="itemIconTint">@color/bottom_nav_color</item>
@@ -191,10 +168,7 @@
         <item name="android:paddingBottom">8dp</item>
     </style>
 
-    <!-- ========================================= -->
-    <!--          TIPOGRAFÍA MODERNA              -->
-    <!-- ========================================= -->
-
+    <!-- Tipografía -->
     <style name="TextAppearance.RecetarioApp.Headline1" parent="TextAppearance.Material3.HeadlineLarge">
         <item name="android:textSize">32sp</item>
         <item name="android:textStyle">bold</item>
@@ -214,5 +188,4 @@
         <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
-
 </resources>
