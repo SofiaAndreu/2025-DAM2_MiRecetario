@@ -55,10 +55,10 @@
 
             <ImageView
                 android:id="@+id/btn_favorito"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_gravity="center"
-                android:src="@android:drawable/star_big_off"
+                android:src="@drawable/ic_star_outline"
                 android:contentDescription="@string/nav_favs"
                 app:tint="@color/color_accent" />
 

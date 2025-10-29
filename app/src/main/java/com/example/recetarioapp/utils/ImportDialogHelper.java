@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import com.example.recetarioapp.R;
 
@@ -23,8 +24,12 @@ public class ImportDialogHelper {
         FrameLayout btnCancelar = dialogView.findViewById(R.id.btn_cancelar_dialog);
         FrameLayout btnImportar = dialogView.findViewById(R.id.btn_importar_dialog);
         ProgressBar progressBar = dialogView.findViewById(R.id.progress_import);
+        LinearLayout bannerInfo = dialogView.findViewById(R.id.banner_info); // Nuevo
 
         AlertDialog dialog = builder.setView(dialogView).create();
+
+        // Mostrar el banner informativo
+        ViewExtensions.setVisible(bannerInfo, true);
 
         btnCancelar.setOnClickListener(v -> dialog.dismiss());
 
@@ -35,12 +40,11 @@ public class ImportDialogHelper {
                 return;
             }
 
-            // Mostrar progreso
             ViewExtensions.setVisible(progressBar, true);
             ViewExtensions.setEnabled(btnImportar, false);
 
             if (listener != null) {
-                listener.onUrlImport(url, dialog); // Pasar el diálogo al listener
+                listener.onUrlImport(url, dialog);
             }
         });
 

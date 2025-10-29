@@ -162,10 +162,12 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
 
             // Favorito
             if (receta.isFav()) {
-                btnFavorito.setImageResource(android.R.drawable.star_big_on);
+                btnFavorito.setImageResource(R.drawable.ic_star_filled);
             } else {
-                btnFavorito.setImageResource(android.R.drawable.star_big_off);
+                btnFavorito.setImageResource(R.drawable.ic_star_outline);
             }
+            //Color tema
+            btnFavorito.setColorFilter(itemView.getContext().getColor(R.color.color_accent));
         }
     }
 

@@ -110,6 +110,7 @@
     <string name="mensaje_error">Ha ocurrido un error</string>
     <string name="mensaje_receta_eliminada">Receta eliminada</string>
     <string name="mensaje_receta_guardada">Receta guardada correctamente</string>
+    <string name="import_warning_message">Revise los datos, la importación automática no siempre es exacta.</string>
 
     <!-- PERMISOS -->
     <string name="permiso_camara">Permiso de cámara necesario</string>

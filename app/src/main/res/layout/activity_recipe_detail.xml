@@ -315,6 +315,7 @@
         app:backgroundTint="@color/color_primary" />
 
     <!-- Botones inferiores -->
+    <!-- Botones inferiores -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -324,36 +325,57 @@
         android:background="@color/color_background"
         android:elevation="8dp">
 
+        <!-- Eliminar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_eliminar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:textSize="12sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/detalle_eliminar"
             android:textColor="@color/color_error"
+            app:icon="@drawable/ic_delete"
+            app:iconTint="@color/color_error"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            app:strokeColor="@color/color_error" />
+            app:strokeColor="@color/color_error"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp" />
 
+        <!-- Editar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_editar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="12sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="@string/detalle_editar"
-            style="@style/Widget.RecetarioClasico.Button.Outlined" />
+            app:icon="@drawable/ic_edit"
+            app:iconTint="@color/color_primary"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="@color/color_primary"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp" />
 
+        <!-- Compartir -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_compartir"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
+            android:textSize="11sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="@string/detalle_compartir"
-            style="@style/Widget.RecetarioClasico.Button" />
-
+            app:icon="@drawable/ic_share"
+            app:iconTint="@color/white"
+            style="@style/Widget.Material3.Button"
+            app:backgroundTint="@color/color_primary" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

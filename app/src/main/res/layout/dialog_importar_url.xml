@@ -31,11 +31,39 @@
             android:textColor="@color/color_text_secondary"
             android:layout_marginBottom="16dp" />
 
+        <LinearLayout
+            android:id="@+id/banner_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/color_info_bg"
+            android:padding="12dp"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_info_outline"
+                app:tint="@color/color_info_icon"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/import_warning_message"
+                android:textColor="@color/color_info_text"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp" />
+        </LinearLayout>
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:background="@drawable/bg_neumorphic_search">
+
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_url"
