@@ -5,71 +5,37 @@ package com.example.recetarioapp.models;
 **/
 public class Paso {
 
+    //ATRIBUTOS
     private int numeroPaso;
     private String descripcion;
-    private String imagenOpcionalURL;
-    private int duracionOpcional;
 
-    //CONSTRUCTORES
+    //CONSTRUCTOR VACÍO para Firebase/Room
     public Paso(){
     }
+
+    //CONSTRUCTOR COMPLETO - paso con numero y descripción
     public Paso(int numeroPaso, String descripcion) {
         this.numeroPaso = numeroPaso;
         this.descripcion = descripcion;
     }
-    public Paso(int numeroPaso, String descripcion, String imagenOpcionalURL, int duracionOpcional) {
-        this.numeroPaso = numeroPaso;
-        this.descripcion = descripcion;
-        this.imagenOpcionalURL = imagenOpcionalURL;
-        this.duracionOpcional = duracionOpcional;
-    }
-    // -- -- -- --
 
-    //METODOS
-    public boolean tieneImg(){
-        return imagenOpcionalURL != null && !imagenOpcionalURL.isEmpty();
-    }
-    public String getDuracionFormateada(){
-        if (duracionOpcional <= 0){
-            return "";
-        }
-        return duracionOpcional + "min";
-    }
+    //Sobreescribe toString para imprimir
     @Override
     public String toString(){
         return "Paso " + numeroPaso + ": " + descripcion;
     }
-    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------ //
 
     public int getNumeroPaso() {
         return numeroPaso;
     }
-
     public void setNumeroPaso(int numeroPaso) {
         this.numeroPaso = numeroPaso;
     }
-
     public String getDescripcion() {
         return descripcion;
     }
-
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public String getImagenOpcionalURL() {
-        return imagenOpcionalURL;
-    }
-
-    public void setImagenOpcionalURL(String imagenOpcionalURL) {
-        this.imagenOpcionalURL = imagenOpcionalURL;
-    }
-
-    public int getDuracionOpcional() {
-        return duracionOpcional;
-    }
-
-    public void setDuracionOpcional(int duracionOpcional) {
-        this.duracionOpcional = duracionOpcional;
     }
 }

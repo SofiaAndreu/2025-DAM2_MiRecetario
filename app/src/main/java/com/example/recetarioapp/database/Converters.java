@@ -1,6 +1,5 @@
 package com.example.recetarioapp.database;
 
-
 import androidx.room.TypeConverter;
 import com.example.recetarioapp.models.Ingrediente;
 import com.example.recetarioapp.models.Paso;
@@ -19,31 +18,28 @@ import java.util.List;
  */
 public class Converters {
 
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new Gson(); //Instancia estática de Gson (evitar multiples instancias)
 
-    //De DATE -> Long (milisegundos)
-    @TypeConverter
+    @TypeConverter //De DATE -> Long (milisegundos)
     public static Long dateAtimestamp(Date date){
         return date == null ? null :date.getTime();
     }
-    //De Long -> a DATE (contrario al anterior)
-    @TypeConverter
+    @TypeConverter //De Long -> a DATE (contrario al anterior)
     public static Date deTimestamp(Long value){
         return value == null ? null : new Date(value);
     }
 
-    //LIST -------------------------------
+    // ------------------------------------------------------------------------------------------ //
 
-    //De List -> cadena JSON
-    @TypeConverter
+    @TypeConverter //De List -> cadena JSON
     public static String ListStringToString(List<String> list){
         if(list==null){
             return null;
         }
         return gson.toJson(list);
     }
-    //De cadena JSON -> Lista de String
-    @TypeConverter
+
+    @TypeConverter //De cadena JSON -> Lista de String
     public static List<String> deListString(String value){
         if(value == null){
             return new ArrayList<>();
@@ -51,8 +47,8 @@ public class Converters {
         Type listType = new TypeToken<List<String>>() {}.getType();
         return gson.fromJson(value, listType);
     }
-    //Lista de INGREDIENTES -> cadena JSON
-    @TypeConverter
+
+    @TypeConverter //Lista de INGREDIENTES -> cadena JSON
     public static List<Ingrediente> fromIngredientesList(String value){
         if (value == null) {
             return new ArrayList<>();
@@ -60,16 +56,16 @@ public class Converters {
         Type listType = new TypeToken<List<Ingrediente>>() {}.getType();
         return gson.fromJson(value, listType);
     }
-    //JSON Ingredientes -> List<Ingredientes>
-    @TypeConverter
+
+    @TypeConverter //JSON Ingredientes -> List<Ingredientes>
     public static String ingredientesListToString(List<Ingrediente> list){
         if (list == null) {
             return null;
         }
         return gson.toJson(list);
     }
-    //Lista de PASOS -> cadena JSON
-    @TypeConverter
+
+    @TypeConverter //Lista de PASOS -> cadena JSON
     public static List<Paso> fromPasosList(String value) {
         if (value == null) {
             return new ArrayList<>();
@@ -77,8 +73,8 @@ public class Converters {
         Type listType = new TypeToken<List<Paso>>() {}.getType();
         return gson.fromJson(value, listType);
     }
-    //JSON Pasos -> List<Paso>
-    @TypeConverter
+
+    @TypeConverter //JSON Pasos -> List<Paso>
     public static String pasosListToString(List<Paso> list) {
         if (list == null) {
             return null;

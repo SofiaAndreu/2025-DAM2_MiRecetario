@@ -15,27 +15,28 @@ import com.example.recetarioapp.repository.RecetaRepository;
 import java.util.List;
 
 /**
- * ViewModel para gestión de recetas en Interfaz
- * Intermediario entre Activity y Repo
+ * ViewModel intermediario entre interfaz <-> datos RecetaRepository
  */
 public class RecetaViewModel extends AndroidViewModel {
 
+    //ATRIBUTOS PRINCIPALES
     private final RecetaRepository recetaRepository;
 
-    //LiveData
-    //Datos que observa la interfaz -> si cambian se actualiza automaticamente
+    //LIVEDATA - Datos que observa la interfaz (se actualiza automaticamente)
     private final LiveData<List<Receta>> todasLasRecetas;
     private final LiveData<List<Receta>> favs;
     private final LiveData<List<String>> categorias;
-    //Filtros de busqueda
+
+    //Filtros + Busqueda
     private final MutableLiveData<String> busquedaQuery = new MutableLiveData<>();
     private final MutableLiveData<String> filtroCategoria = new MutableLiveData<>();
     private final MutableLiveData<String> filtroDificultad = new MutableLiveData<>();
     private final MutableLiveData<Integer> filtroTiempo = new MutableLiveData<>();
 
+    //Lista Recetas - resultante de la búsqueda/filtros
     private final LiveData<List<Receta>> recetasFiltradas;
 
-    //Estados
+    //Estados/Mensajes UI
     private final MutableLiveData<String> msgError = new MutableLiveData<>();
     private final MutableLiveData<String> msgExito = new MutableLiveData<>();
     private final MutableLiveData<Boolean> msgLoading = new MutableLiveData<>();
@@ -44,96 +45,100 @@ public class RecetaViewModel extends AndroidViewModel {
     //CONSTRUCTOR
     public RecetaViewModel(@NonNull Application application) {
         super(application);
-
         recetaRepository = new RecetaRepository(application);
 
+        //Obtiene LiveData iniciales
         todasLasRecetas = recetaRepository.getAllRecetas();
         favs = recetaRepository.getFavs();
         categorias = recetaRepository.getCategorias();
 
         //LiveData derivado de otro LiveData -> BUSQUEDA REACTIVA
-        //  switchMap -> reacciona cada vez que cambia el valor de busqueda
+        //switchMap -> reacciona cada vez que cambia el valor de busqueda
         recetasFiltradas = Transformations.switchMap(busquedaQuery, query ->{
             if(query == null || query.trim().isEmpty()) { //si esta vacio -> ver todas
                 return todasLasRecetas;
-            } else {
+            } else { // si tiene texto -> buscar por nombre
                 return recetaRepository.buscarPorNombre(query);
             }
         });
-    } //-------------------------------------------------------------------------------------
+    } // --------------------------------------------------------------------------- //
 
     //INSERTAR NUEVA RECETA
     public void insertarReceta(Receta receta){
+        //Llama a Repo. para insertar
         msgLoading.postValue(true);
         recetaRepository.insertarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
-            @Override
+            @Override //Éxito
             public void onSuccess(Receta recetaG) {
                 msgLoading.postValue(false);
                 msgExito.postValue("Receta guardada correctamente");
             }
-            @Override
+            @Override //Error
             public void onError(String mensaje) {
                 msgLoading.postValue(false);
                 msgError.postValue(mensaje);
             }
         });
-    }
+    } // --------------------------------------------------------------------------- //
 
-    //ACTUALIZAR RECETA - CORREGIDO
+
+    //ACTUALIZAR RECETA
     public void actualizarReceta(Receta receta){
-        msgLoading.postValue(true); // Cambiado a postValue
+        //Llama a Repo. para actualizar
+        msgLoading.postValue(true);
         recetaRepository.actualizarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
-            @Override
+            @Override //Éxito
             public void onSuccess(Receta recetaA) {
                 msgLoading.postValue(false);
                 msgExito.postValue("Receta actualizada correctamente");
             }
-            @Override
+            @Override //Error
             public void onError(String mensaje) {
                 msgLoading.postValue(false);
                 msgError.postValue(mensaje);
             }
         });
-    }
+    } // --------------------------------------------------------------------------- //
 
-    //ELIMINAR RECETA - CORREGIDO
+    //ELIMINAR RECETA
     public void eliminarReceta(Receta receta){
-        msgLoading.postValue(true); // Cambiado a postValue
+        //Llama a Repo. para eliminar
+        msgLoading.postValue(true);
         recetaRepository.eliminarReceta(receta, new RecetaRepository.OnRecetaEliminadaListener() {
-            @Override
+            @Override //Éxito
             public void onSuccess() {
                 msgLoading.postValue(false);
                 msgExito.postValue("Receta eliminada correctamente");
             }
-            @Override
+            @Override //Error
             public void onError(String mensaje) {
                 msgLoading.postValue(false);
                 msgError.postValue(mensaje);
             }
         });
-    }
+    } // --------------------------------------------------------------------------- //
 
     //MARCAR/DESMARCAR FAVORITA
     public void marcarFavorita(long id, boolean isFav){
+        //Llama a Repo. para marcar directamente.
         recetaRepository.establecerFavorita(id, isFav);
-    }
+    } // --------------------------------------------------------------------------- //
 
     //SUBIR IMAGEN
     public void guardarImagenLocal(Uri imageUri, OnImagenSubidaListener listener) {
-        msgProgresoSubida.postValue(0); // Cambiado a postValue
+        //Sube img. actualizando progreso
+        msgProgresoSubida.postValue(0); //Inicia msg en 0
         recetaRepository.guardarImagenLocal(imageUri, new RecetaRepository.OnImagenSubidaListener() {
-            @Override
+            @Override //Éxito
             public void onSuccess(String path) {
                 msgProgresoSubida.postValue(100);
                 listener.onImagenSubida(path);
             }
-
-            @Override
+            @Override //Progreso
             public void onProgress(int porcentaje) {
                 msgProgresoSubida.postValue(porcentaje);
             }
-
-            @Override
+            @Override //Error
             public void onError(String mensaje) {
                 msgError.postValue(mensaje);
                 new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
@@ -141,31 +146,39 @@ public class RecetaViewModel extends AndroidViewModel {
                 });
             }
         });
-    } // ----------------------------------------------------------------------------------
+    } // ---------------------------------------------------------------------------------- //
 
     //BUSCAR/FILTRAR
-
-    //BUSCAR
     public void buscar(String query){
-        busquedaQuery.setValue(query); // Este puede ser setValue porque se llama desde UI thread
+        //Actualiza valor de busqueda - transformación reactiva
+        busquedaQuery.setValue(query);
     }
+    // --------------------------------------------------------------------- //
+
     //FILTRAR CATEGORIA
     public LiveData<List<Receta>> filtrarPorCategoria(String categoria){
+        //Livedata con filtro x categoria seleccionada
         return recetaRepository.getRecetasPorCategoria(categoria);
     }
+    // --------------------------------------------------------------------- //
+
     //FILTRAR DIFICULTAD
     public LiveData<List<Receta>> filtrarPorDificultad(String dificultad){
+        //Livedata con filtro x dificultad seleccionada
         return recetaRepository.getRecetasPorDificultad(dificultad);
     }
+    // --------------------------------------------------------------------- //
+
     //FILTRAR POR TIEMPO PREPARACION
     public LiveData<List<Receta>> filtrarPorTiempo(int tiempo){
+        //Livedata con filtro x tiempo seleccionado
         return recetaRepository.getRecetasPorTiempo(tiempo);
     }
-    //----------------------------------------------------------------------
+    // --------------------------------------------------------------------- //
 
-    //SINCRONIZAR CON FIREBASE - CORREGIDO
+    //SINCRONIZAR CON FIREBASE a LOCAL
     public void sincronizar(){
-        msgLoading.postValue(true); // Cambiado a postValue
+        msgLoading.postValue(true);
         recetaRepository.sincronizarFBaLocal();
         msgLoading.postValue(false);
         msgExito.postValue("Sincronizando...");
@@ -173,10 +186,10 @@ public class RecetaViewModel extends AndroidViewModel {
 
     //LIMPIAR MENSAJES EXITO/ERROR
     public void limpiarMensajesE(){
-        msgExito.setValue(null); // Estos pueden ser setValue si se llaman desde UI thread
+        //Reset mensajes Exito/Error
+        msgExito.setValue(null);
         msgError.setValue(null);
     }
-
 
     //GETTERS LIVEDATA
     public LiveData<List<Receta>> getTodasLasRecetas() {

@@ -30,8 +30,7 @@ public abstract class RecetasBD extends RoomDatabase {
 
     //DAO
     public abstract RecetaDAO recetaDAO();
-
-
+    
     public static RecetasBD getInstance(Context context){
         if (INSTANCE == null){ //Verificación 1: Si INSTANCE = NULL
             synchronized (RecetasBD.class){ //evita multiples hilos creando la bd
