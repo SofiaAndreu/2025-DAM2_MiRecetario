@@ -5,39 +5,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.recetarioapp.R;
 import com.example.recetarioapp.adapters.RecetaAdapter;
-import com.example.recetarioapp.viewmodels.RecetaViewModel;
+import com.example.recetarioapp.ui.base.BaseFragment;
+import com.example.recetarioapp.utils.ViewExtensions;
 
-/**
- * Fragment que muestra las recetas favoritas
- */
-public class FavsFragment extends Fragment {
+public class FavsFragment extends BaseFragment {
 
-    private RecetaViewModel viewModel;
-
-    // Views
     private RecyclerView rvFavoritas;
     private FrameLayout layoutEmpty;
-
-    // Adapter
     private RecetaAdapter adapter;
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_favs, container, false);
     }
 
@@ -45,16 +30,9 @@ public class FavsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar ViewModel
-        viewModel = new ViewModelProvider(requireActivity()).get(RecetaViewModel.class);
-
-        // Inicializar vistas
+        initViewModel();
         initViews(view);
-
-        // Configurar RecyclerView
         setupRecyclerView();
-
-        // Observar datos
         observeData();
     }
 
@@ -68,37 +46,20 @@ public class FavsFragment extends Fragment {
         rvFavoritas.setLayoutManager(new LinearLayoutManager(getContext()));
         rvFavoritas.setAdapter(adapter);
 
-        // Click en receta
-        adapter.setOnRecetaClickListener(receta -> {
-            Intent intent = new Intent(getContext(), com.example.recetarioapp.ui.RecipeDetailActivity.class);
-            intent.putExtra(com.example.recetarioapp.ui.RecipeDetailActivity.EXTRA_RECETA_ID, receta.getId());
-            startActivity(intent);
-        });
-
-        // Click en favorito
-        adapter.setOnFavClickListener((receta, esFavorita) -> {
-            viewModel.marcarFavorita(receta.getId(), esFavorita);
-            if (!esFavorita) {
-                Toast.makeText(getContext(), "Quitada de favoritos", Toast.LENGTH_SHORT).show();
-            }
+        adapter.setOnRecetaClickListener(this::openRecipeDetail);
+        adapter.setOnFavClickListener((receta, isFav) -> {
+            toggleFavorite(receta, isFav);
+            if (!isFav) showToast("Quitada de favoritos");
         });
     }
 
     private void observeData() {
-        // Observar recetas favoritas
         viewModel.getFavs().observe(getViewLifecycleOwner(), favoritas -> {
-            if (favoritas != null) {
-                adapter.submitList(favoritas);
+            if (favoritas == null) return;
 
-                // Mostrar/ocultar empty state
-                if (favoritas.isEmpty()) {
-                    rvFavoritas.setVisibility(View.GONE);
-                    layoutEmpty.setVisibility(View.VISIBLE);
-                } else {
-                    rvFavoritas.setVisibility(View.VISIBLE);
-                    layoutEmpty.setVisibility(View.GONE);
-                }
-            }
+            adapter.submitList(favoritas);
+            ViewExtensions.setVisible(rvFavoritas, !favoritas.isEmpty());
+            ViewExtensions.setVisible(layoutEmpty, favoritas.isEmpty());
         });
     }
 }

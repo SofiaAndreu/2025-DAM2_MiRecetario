@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 /**
- * Main Activity con Bottom Nav
+ * Activity principal con navegación mediante Bottom Navigation
  */
 public class MainActivity extends AppCompatActivity {
 

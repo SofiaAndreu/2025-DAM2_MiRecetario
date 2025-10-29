@@ -6,103 +6,62 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-
-import com.bumptech.glide.Glide;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.recetarioapp.R;
-import com.example.recetarioapp.models.Ingrediente;
-import com.example.recetarioapp.models.Paso;
 import com.example.recetarioapp.models.Receta;
-import com.example.recetarioapp.viewmodels.RecetaViewModel;
-import com.example.recetarioapp.utils.WebScraperHelper;
+import com.example.recetarioapp.ui.base.BaseFragment;
+import com.example.recetarioapp.utils.*;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+public class AddRecetasFragment extends BaseFragment {
 
-/**
- * Fragment para añadir una nueva receta
- */
-public class AddRecetasFragment extends Fragment {
-
-    private RecetaViewModel viewModel;
-
-    // Modo edición
     private boolean modoEdicion = false;
     private long recetaIdEditar = -1;
     private Receta recetaEditar;
+
+    private Uri imagenUri;
+    private String imagenUrl;
 
     // Views
     private FrameLayout cardImagen;
     private ImageView ivPreview;
     private LinearLayout layoutAddImage;
-    private TextInputEditText etNombre;
-    private TextInputEditText etDescripcion;
-    private TextInputEditText etTiempo;
-    private TextInputEditText etPorciones;
-    private AutoCompleteTextView etDificultad;
-    private AutoCompleteTextView etCategoria;
-    private TextInputEditText etOrigen;
-    private TextInputEditText etIngredientes;
-    private TextInputEditText etPasos;
-
-    private FrameLayout btnCancelar;
-    private FrameLayout btnGuardar;
-    private FrameLayout btnImportarUrl;
-
+    private TextInputEditText etNombre, etDescripcion, etTiempo, etPorciones;
+    private TextInputEditText etOrigen, etIngredientes, etPasos;
+    private AutoCompleteTextView etDificultad, etCategoria;
+    private FrameLayout btnCancelar, btnGuardar, btnImportarUrl;
     private ProgressBar progressBar;
 
-    // Imagen seleccionada
-    private Uri imagenUri;
-    private Uri imagenUriTemporal; // Para fotos de cámara
-    private String imagenUrl;
-
-    // Launcher para seleccionar imagen de galería
     private ActivityResultLauncher<Intent> pickImageLauncher;
-
-    // Launcher para foto con cámara
-    private ActivityResultLauncher<Intent> takePictureLauncher;
-
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Configurar launcher para seleccionar imagen
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                         imagenUri = result.getData().getData();
-                        mostrarImagenPreview(imagenUri);
+                        mostrarImagenPreview();
                     }
                 }
         );
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_add_recetas, container, false);
     }
 
@@ -110,32 +69,20 @@ public class AddRecetasFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar ViewModel
-        viewModel = new ViewModelProvider(requireActivity()).get(RecetaViewModel.class);
-
-        // Verificar si estamos en modo edición
-        if (getArguments() != null) {
-            recetaIdEditar = getArguments().getLong("receta_id", -1);
-            if (recetaIdEditar != -1) {
-                modoEdicion = true;
-            }
-        }
-
-        // Inicializar vistas
+        initViewModel();
+        checkEditMode();
         initViews(view);
-
-        // Configurar dropdowns
         setupDropdowns();
-
-        // Configurar listeners
         setupListeners();
-
-        // Observar progreso de subida
         observeViewModel();
 
-        // Si estamos en modo edición, cargar la receta
-        if (modoEdicion) {
-            cargarRecetaParaEditar();
+        if (modoEdicion) cargarRecetaParaEditar();
+    }
+
+    private void checkEditMode() {
+        if (getArguments() != null) {
+            recetaIdEditar = getArguments().getLong("receta_id", -1);
+            modoEdicion = (recetaIdEditar != -1);
         }
     }
 
@@ -154,56 +101,40 @@ public class AddRecetasFragment extends Fragment {
         etPasos = view.findViewById(R.id.et_pasos);
         btnCancelar = view.findViewById(R.id.btn_cancelar);
         btnGuardar = view.findViewById(R.id.btn_guardar);
-        progressBar = view.findViewById(R.id.progress_bar);
         btnImportarUrl = view.findViewById(R.id.btn_importar_url);
+        progressBar = view.findViewById(R.id.progress_bar);
     }
 
     private void setupDropdowns() {
-        // Dificultades
-        String[] dificultades = {
-                getString(R.string.dificultad_facil),
-                getString(R.string.dificultad_medio),
-                getString(R.string.dificultad_dificil)
-        };
-        ArrayAdapter<String> dificultadAdapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                dificultades
-        );
-        etDificultad.setAdapter(dificultadAdapter);
+        setupDropdown(etDificultad, R.string.dificultad_facil,
+                R.string.dificultad_medio, R.string.dificultad_dificil);
 
-        // Categorías
-        String[] categorias = {
-                getString(R.string.categoria_postres),
-                getString(R.string.categoria_principales),
-                getString(R.string.categoria_aperitivos),
-                getString(R.string.categoria_panaderia),
-                getString(R.string.categoria_bebidas),
-                getString(R.string.categoria_ensaladas),
-                getString(R.string.categoria_sopas),
-                getString(R.string.categoria_otros)
-        };
-        ArrayAdapter<String> categoriaAdapter = new ArrayAdapter<>(
+        setupDropdown(etCategoria, R.string.categoria_postres,
+                R.string.categoria_principales, R.string.categoria_aperitivos,
+                R.string.categoria_panaderia, R.string.categoria_bebidas,
+                R.string.categoria_ensaladas, R.string.categoria_sopas,
+                R.string.categoria_otros);
+    }
+
+    private void setupDropdown(AutoCompleteTextView view, int... stringResIds) {
+        String[] items = new String[stringResIds.length];
+        for (int i = 0; i < stringResIds.length; i++) {
+            items[i] = getString(stringResIds[i]);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
-                categorias
+                items
         );
-        etCategoria.setAdapter(categoriaAdapter);
+        view.setAdapter(adapter);
     }
 
     private void setupListeners() {
-        // Click en card de imagen
         cardImagen.setOnClickListener(v -> seleccionarImagen());
-
-        // Botón cancelar
-        btnCancelar.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigateUp();
-        });
-
-        // Botón guardar
+        btnCancelar.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
         btnGuardar.setOnClickListener(v -> guardarReceta());
-        // Botón importar desde URL
-        btnImportarUrl.setOnClickListener(v -> mostrarDialogImportarURL());
+        btnImportarUrl.setOnClickListener(v -> showImportDialog());
     }
 
     private void seleccionarImagen() {
@@ -212,65 +143,33 @@ public class AddRecetasFragment extends Fragment {
         pickImageLauncher.launch(intent);
     }
 
-    private void mostrarImagenPreview(Uri uri) {
-        layoutAddImage.setVisibility(View.GONE);
-        ivPreview.setVisibility(View.VISIBLE);
-
-        Glide.with(this)
-                .load(uri)
-                .centerCrop()
-                .into(ivPreview);
+    private void mostrarImagenPreview() {
+        ViewExtensions.setVisible(layoutAddImage, false);
+        ViewExtensions.setVisible(ivPreview, true);
+        ImageLoader.loadImage(requireContext(), imagenUri, ivPreview);
     }
 
     private void guardarReceta() {
-        // Validar campos obligatorios
-        String nombre = etNombre.getText().toString().trim();
-        String descripcion = etDescripcion.getText().toString().trim();
-        String ingredientesTexto = etIngredientes.getText().toString().trim();
-        String pasosTexto = etPasos.getText().toString().trim();
-
-        if (nombre.isEmpty()) {
-            etNombre.setError("Campo obligatorio");
-            etNombre.requestFocus();
+        if (!RecipeValidator.validateRecipeForm(etNombre, etIngredientes, etPasos)) {
             return;
         }
 
-        if (ingredientesTexto.isEmpty()) {
-            etIngredientes.setError("Campo obligatorio");
-            etIngredientes.requestFocus();
-            return;
-        }
+        ViewExtensions.setEnabled(btnGuardar, false);
 
-        if (pasosTexto.isEmpty()) {
-            etPasos.setError("Campo obligatorio");
-            etPasos.requestFocus();
-            return;
-        }
-
-        // Deshabilitar botón mientras se guarda
-        btnGuardar.setEnabled(false);
-
-        // Si hay imagen, subirla primero
         if (imagenUri != null) {
-            progressBar.setVisibility(View.VISIBLE);
-            viewModel.guardarImagenLocal(imagenUri, new RecetaViewModel.OnImagenSubidaListener() {
+            ViewExtensions.setVisible(progressBar, true);
+            viewModel.guardarImagenLocal(imagenUri, new com.example.recetarioapp.viewmodels.RecetaViewModel.OnImagenSubidaListener() {
                 @Override
                 public void onImagenSubida(String path) {
-                    // CORREGIDO: Ejecutar en UI Thread
-                    requireActivity().runOnUiThread(() -> {
-                        imagenUrl = path;
-                        crearYGuardarReceta();
-                    });
+                    imagenUrl = path;
+                    crearYGuardarReceta();
                 }
 
                 @Override
                 public void onError(String mensaje) {
-                    // CORREGIDO: Ejecutar en UI Thread
-                    requireActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
-                        btnGuardar.setEnabled(true);
-                        progressBar.setVisibility(View.GONE);
-                    });
+                    showToast(mensaje);
+                    ViewExtensions.setEnabled(btnGuardar, true);
+                    ViewExtensions.setVisible(progressBar, false);
                 }
             });
         } else {
@@ -279,131 +178,48 @@ public class AddRecetasFragment extends Fragment {
     }
 
     private void crearYGuardarReceta() {
-        // Crear o actualizar objeto Receta
-        Receta receta;
+        Receta receta = modoEdicion && recetaEditar != null ? recetaEditar : new Receta();
 
-        if (modoEdicion && recetaEditar != null) {
-            // Modo edición: usar la receta existente
-            receta = recetaEditar;
-        } else {
-            // Modo nuevo: crear receta nueva
-            receta = new Receta();
-        }
-
+        // Datos básicos
         receta.setNombre(etNombre.getText().toString().trim());
         receta.setDescripcion(etDescripcion.getText().toString().trim());
-
-        // Tiempo
-        String tiempoStr = etTiempo.getText().toString().trim();
-        if (!tiempoStr.isEmpty()) {
-            receta.setTiempoPreparacion(Integer.parseInt(tiempoStr));
-        }
-
-        // Porciones
-        String porcionesStr = etPorciones.getText().toString().trim();
-        if (!porcionesStr.isEmpty()) {
-            receta.setPorciones(Integer.parseInt(porcionesStr));
-        }
-
-        // Dificultad y Categoría
+        receta.setTiempoPreparacion(RecipeValidator.parseIntOrDefault(etTiempo, 0));
+        receta.setPorciones(RecipeValidator.parseIntOrDefault(etPorciones, 0));
         receta.setDificultad(etDificultad.getText().toString());
         receta.setCategoria(etCategoria.getText().toString());
         receta.setOrigen(etOrigen.getText().toString().trim());
 
-        // Imagen (si se subió una nueva, o mantener la existente)
+        // Imagen
         if (imagenUrl != null) {
             receta.setImagenPortadaURL(imagenUrl);
         }
 
-        // Parsear ingredientes (separados por líneas)
-        List<Ingrediente> ingredientes = parsearIngredientes(
-                etIngredientes.getText().toString()
-        );
-        receta.setIngredientes(ingredientes);
+        // Ingredientes y pasos
+        receta.setIngredientes(RecipeParser.parseIngredientes(
+                etIngredientes.getText().toString()));
+        receta.setPasos(RecipeParser.parsePasos(
+                etPasos.getText().toString()));
 
-        // Parsear pasos (separados por líneas)
-        List<Paso> pasos = parsearPasos(
-                etPasos.getText().toString()
-        );
-        receta.setPasos(pasos);
-
-        // Guardar o actualizar en ViewModel
+        // Guardar
         if (modoEdicion) {
             viewModel.actualizarReceta(receta);
-            // CORREGIDO: Toast en UI Thread
-            requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getContext(), "Receta actualizada", Toast.LENGTH_SHORT).show();
-            });
         } else {
             viewModel.insertarReceta(receta);
-            // CORREGIDO: Toast en UI Thread
-            requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getContext(), "Receta guardada", Toast.LENGTH_SHORT).show();
-            });
         }
 
-        // Volver atrás (esto debe ejecutarse en UI Thread)
-        requireActivity().runOnUiThread(() -> {
-            Navigation.findNavController(requireView()).navigateUp();
-        });
-    }
-
-    private List<Ingrediente> parsearIngredientes(String texto) {
-        List<Ingrediente> ingredientes = new ArrayList<>();
-        String[] lineas = texto.split("\n");
-
-        for (String linea : lineas) {
-            linea = linea.trim();
-            if (!linea.isEmpty()) {
-                // Intenta separar cantidad y nombre (ej: "200g harina")
-                String[] partes = linea.split(" ", 2);
-                if (partes.length == 2) {
-                    ingredientes.add(new Ingrediente(partes[1], partes[0]));
-                } else {
-                    ingredientes.add(new Ingrediente(linea, ""));
-                }
-            }
-        }
-
-        return ingredientes;
-    }
-
-    private List<Paso> parsearPasos(String texto) {
-        List<Paso> pasos = new ArrayList<>();
-        String[] lineas = texto.split("\n");
-
-        int numero = 1;
-        for (String linea : lineas) {
-            linea = linea.trim();
-            if (!linea.isEmpty()) {
-                // Quitar numeración si existe (ej: "1. Mezclar...")
-                linea = linea.replaceFirst("^\\d+\\.\\s*", "");
-                pasos.add(new Paso(numero++, linea));
-            }
-        }
-
-        return pasos;
+        Navigation.findNavController(requireView()).navigateUp();
     }
 
     private void observeViewModel() {
-        // Observar progreso de subida de imagen
         viewModel.getProgresoSubida().observe(getViewLifecycleOwner(), progreso -> {
             if (progreso != null && progreso > 0) {
                 progressBar.setProgress(progreso);
             }
         });
 
-        // Observar mensajes de éxito
-        viewModel.getMensajeExito().observe(getViewLifecycleOwner(), mensaje -> {
-            if (mensaje != null && !mensaje.isEmpty()) {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+        observeUiState();
     }
 
-    /**
-     * Carga una receta existente para editarla
-     */
     private void cargarRecetaParaEditar() {
         viewModel.getRecetaById(recetaIdEditar).observe(getViewLifecycleOwner(), receta -> {
             if (receta != null) {
@@ -413,202 +229,79 @@ public class AddRecetasFragment extends Fragment {
         });
     }
 
-    /**
-     * Rellena el formulario con los datos de la receta
-     */
-    private void rellenarFormulario(Receta receta) {
-        // Nombre y descripción
-        etNombre.setText(receta.getNombre());
-        etDescripcion.setText(receta.getDescripcion());
+    private void rellenarFormulario(Receta r) {
+        etNombre.setText(r.getNombre());
+        etDescripcion.setText(r.getDescripcion());
 
-        // Tiempo y porciones
-        if (receta.getTiempoPreparacion() > 0) {
-            etTiempo.setText(String.valueOf(receta.getTiempoPreparacion()));
+        if (r.getTiempoPreparacion() > 0) {
+            etTiempo.setText(String.valueOf(r.getTiempoPreparacion()));
         }
-        if (receta.getPorciones() > 0) {
-            etPorciones.setText(String.valueOf(receta.getPorciones()));
+        if (r.getPorciones() > 0) {
+            etPorciones.setText(String.valueOf(r.getPorciones()));
         }
 
-        // Dificultad, categoría y origen
-        if (receta.getDificultad() != null) {
-            etDificultad.setText(receta.getDificultad(), false);
-        }
-        if (receta.getCategoria() != null) {
-            etCategoria.setText(receta.getCategoria(), false);
-        }
-        if (receta.getOrigen() != null) {
-            etOrigen.setText(receta.getOrigen());
+        if (r.getDificultad() != null) etDificultad.setText(r.getDificultad(), false);
+        if (r.getCategoria() != null) etCategoria.setText(r.getCategoria(), false);
+        if (r.getOrigen() != null) etOrigen.setText(r.getOrigen());
+
+        // Imagen
+        if (r.getImagenPortadaURL() != null && !r.getImagenPortadaURL().isEmpty()) {
+            imagenUrl = r.getImagenPortadaURL();
+            ViewExtensions.setVisible(layoutAddImage, false);
+            ViewExtensions.setVisible(ivPreview, true);
+            ImageLoader.loadRecipeImage(requireContext(), r.getImagenPortadaURL(), ivPreview);
         }
 
-        // Imagen existente
-        if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
-            imagenUrl = receta.getImagenPortadaURL();
-            File imageFile = new File(receta.getImagenPortadaURL());
-            layoutAddImage.setVisibility(View.GONE);
-            ivPreview.setVisibility(View.VISIBLE);
-            Glide.with(this)
-                    .load(imageFile)
-                    .centerCrop()
-                    .into(ivPreview);
-        }
-
-        // Ingredientes (convertir lista a texto)
-        StringBuilder ingredientesTexto = new StringBuilder();
-        if (receta.getIngredientes() != null) {
-            for (Ingrediente ing : receta.getIngredientes()) {
-                ingredientesTexto.append(ing.getIngredienteCompleto()).append("\n");
-            }
-        }
-        etIngredientes.setText(ingredientesTexto.toString().trim());
-
-        // Pasos (convertir lista a texto)
-        StringBuilder pasosTexto = new StringBuilder();
-        if (receta.getPasos() != null) {
-            for (Paso paso : receta.getPasos()) {
-                pasosTexto.append(paso.getNumeroPaso()).append(". ")
-                        .append(paso.getDescripcion()).append("\n\n");
-            }
-        }
-        etPasos.setText(pasosTexto.toString().trim());
+        // Ingredientes y pasos
+        etIngredientes.setText(RecipeParser.ingredientesToText(r.getIngredientes()));
+        etPasos.setText(RecipeParser.pasosToText(r.getPasos()));
     }
 
-    /**
-     * Muestra dialog para pegar URL
-     */
-    private void mostrarDialogImportarURL() {
-        View dialogView = LayoutInflater.from(getContext())
-                .inflate(R.layout.dialog_importar_url, null);
+    private void showImportDialog() {
+        ImportDialogHelper.show(requireContext(), (url,dialog) -> {
+            // Mostrar progreso mientras se extrae la receta
+            ViewExtensions.setVisible(progressBar, true);
+            ViewExtensions.setEnabled(btnGuardar, false);
 
-        TextInputEditText etUrl = dialogView.findViewById(R.id.et_url);
-        FrameLayout btnCancelarDialog = dialogView.findViewById(R.id.btn_cancelar_dialog);
-        FrameLayout btnImportarDialog = dialogView.findViewById(R.id.btn_importar_dialog);
-        ProgressBar progressImport = dialogView.findViewById(R.id.progress_import);
-        //Crear el dialog básico
-        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setView(dialogView)
-                .create();
-        //Fondo transparente
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-        //Configurar los botones de layout personalizado
-        btnCancelarDialog.setOnClickListener(v -> dialog.dismiss());
-
-        btnImportarDialog.setOnClickListener(v -> {
-            String url = etUrl.getText().toString().trim();
-
-            if (url.isEmpty()) {
-                etUrl.setError("Introduce una URL");
-                return;
-            }
-
-            if (!url.startsWith("http")) {
-                url = "https://" + url;
-            }
-
-            // Deshabilitar botón y mostrar progreso
-            btnImportarDialog.setClickable(false);
-            btnImportarDialog.setAlpha(0.5f);
-            progressImport.setVisibility(View.VISIBLE);
-
-            final String urlFinal = url;
-
-            // Ejecutar en background
+            // Ejecutar en un hilo background para no bloquear la UI
             new Thread(() -> {
-                WebScraperHelper.RecetaExtraida recetaExtraida =
-                        WebScraperHelper.extraerRecetaDesdeURL(urlFinal);
+                WebScraperHelper.RecetaExtraida recetaExtraida = WebScraperHelper.extraerRecetaDesdeURL(url);
 
+                // Volver al hilo principal para actualizar la UI
                 requireActivity().runOnUiThread(() -> {
-                    progressImport.setVisibility(View.GONE);
-                    btnImportarDialog.setClickable(true);
-                    btnImportarDialog.setAlpha(1.0f);
+                    ViewExtensions.setVisible(progressBar, false);
+                    ViewExtensions.setEnabled(btnGuardar, true);
 
-                    if (recetaExtraida != null && !recetaExtraida.nombre.isEmpty()) {
+                    if (recetaExtraida != null) {
                         rellenarFormularioDesdeWeb(recetaExtraida);
-                        dialog.dismiss();
-                        Toast.makeText(getContext(), "¡Receta importada!", Toast.LENGTH_SHORT).show();
+                        showToast("Receta importada exitosamente");
+
+                        // CERRAR EL DIÁLOGO después de importar exitosamente
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
                     } else {
-                        Toast.makeText(getContext(), "No se pudo extraer la receta", Toast.LENGTH_LONG).show();
+                        showToast("No se pudo extraer la receta de la URL");
                     }
                 });
             }).start();
         });
-
-        dialog.show();
     }
 
-    /**
-     * Importa receta desde URL
-     */
-    private void importarRecetaDesdeURL(String url) {
-        progressBar.setVisibility(View.VISIBLE);
-        btnImportarUrl.setEnabled(false);
+    private void rellenarFormularioDesdeWeb(WebScraperHelper.RecetaExtraida r) {
+        if (r == null) return;
 
-        // Ejecutar en background thread
-        new Thread(() -> {
-            com.example.recetarioapp.utils.WebScraperHelper.RecetaExtraida recetaExtraida =
-                    com.example.recetarioapp.utils.WebScraperHelper.extraerRecetaDesdeURL(url);
+        if (!r.nombre.isEmpty()) etNombre.setText(r.nombre);
+        if (!r.descripcion.isEmpty()) etDescripcion.setText(r.descripcion);
+        if (r.tiempoPreparacion > 0) etTiempo.setText(String.valueOf(r.tiempoPreparacion));
+        if (r.porciones > 0) etPorciones.setText(String.valueOf(r.porciones));
+        if (r.origen != null) etOrigen.setText(r.origen);
 
-            requireActivity().runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-                btnImportarUrl.setEnabled(true);
-
-                if (recetaExtraida != null && !recetaExtraida.nombre.isEmpty()) {
-                    rellenarFormularioDesdeWeb(recetaExtraida);
-                    Toast.makeText(getContext(), "Receta importada correctamente", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "No se pudo extraer la receta. Verifica la URL.", Toast.LENGTH_LONG).show();
-                }
-            });
-        }).start();
-    }
-
-    /**
-     * Rellena el formulario con datos extraídos de la web
-     */
-    private void rellenarFormularioDesdeWeb(com.example.recetarioapp.utils.WebScraperHelper.RecetaExtraida recetaExtraida) {
-        // Nombre
-        if (!recetaExtraida.nombre.isEmpty()) {
-            etNombre.setText(recetaExtraida.nombre);
+        if (!r.ingredientes.isEmpty()) {
+            etIngredientes.setText(RecipeParser.ingredientesToText(r.ingredientes));
         }
-
-        // Descripción
-        if (!recetaExtraida.descripcion.isEmpty()) {
-            etDescripcion.setText(recetaExtraida.descripcion);
-        }
-
-        // Tiempo
-        if (recetaExtraida.tiempoPreparacion > 0) {
-            etTiempo.setText(String.valueOf(recetaExtraida.tiempoPreparacion));
-        }
-
-        // Porciones
-        if (recetaExtraida.porciones > 0) {
-            etPorciones.setText(String.valueOf(recetaExtraida.porciones));
-        }
-
-        // Origen
-        if (recetaExtraida.origen != null) {
-            etOrigen.setText(recetaExtraida.origen);
-        }
-
-        // Ingredientes
-        if (!recetaExtraida.ingredientes.isEmpty()) {
-            StringBuilder ingredientesTexto = new StringBuilder();
-            for (Ingrediente ing : recetaExtraida.ingredientes) {
-                ingredientesTexto.append(ing.getIngredienteCompleto()).append("\n");
-            }
-            etIngredientes.setText(ingredientesTexto.toString().trim());
-        }
-
-        // Pasos
-        if (!recetaExtraida.pasos.isEmpty()) {
-            StringBuilder pasosTexto = new StringBuilder();
-            for (Paso paso : recetaExtraida.pasos) {
-                pasosTexto.append(paso.getNumeroPaso()).append(". ")
-                        .append(paso.getDescripcion()).append("\n\n");
-            }
-            etPasos.setText(pasosTexto.toString().trim());
+        if (!r.pasos.isEmpty()) {
+            etPasos.setText(RecipeParser.pasosToText(r.pasos));
         }
     }
 }

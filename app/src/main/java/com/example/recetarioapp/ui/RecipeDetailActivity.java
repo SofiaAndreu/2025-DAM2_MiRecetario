@@ -1,25 +1,20 @@
 package com.example.recetarioapp.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.Uri;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
-
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -29,13 +24,9 @@ import com.example.recetarioapp.R;
 import com.example.recetarioapp.adapters.IngredienteAdapter;
 import com.example.recetarioapp.adapters.PasoAdapter;
 import com.example.recetarioapp.models.Receta;
+import com.example.recetarioapp.utils.*;
 import com.example.recetarioapp.viewmodels.RecetaViewModel;
 
-import java.io.File;
-
-/**
- * Activity para mostrar el detalle completo de una receta
- */
 public class RecipeDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_RECETA_ID = "receta_id";
@@ -43,37 +34,23 @@ public class RecipeDetailActivity extends AppCompatActivity {
     private RecetaViewModel viewModel;
     private Receta recetaActual;
 
-    // Views
+    // Views principales
     private CollapsingToolbarLayout collapsingToolbar;
     private MaterialToolbar toolbar;
     private ImageView ivRecetaImagen;
-    private TextView tvDescripcion;
-    private TextView tvTiempo;
-    private TextView tvPorciones;
-    private TextView tvDificultad;
-    private Chip chipCategoria;
-    private Chip chipOrigen;
-    private RecyclerView rvIngredientes;
-    private RecyclerView rvPasos;
     private FloatingActionButton fabFavorito;
-    private MaterialButton btnEliminar;
-    private MaterialButton btnEditar;
-    private MaterialButton btnCompartir;
 
-    // Adapters
+    // Adaptadores
     private IngredienteAdapter ingredienteAdapter;
     private PasoAdapter pasoAdapter;
 
-    // Selector de imagen (Photo Picker)
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-        // Obtener ID de la receta
         long recetaId = getIntent().getLongExtra(EXTRA_RECETA_ID, -1);
         if (recetaId == -1) {
             Toast.makeText(this, "Error al cargar receta", Toast.LENGTH_SHORT).show();
@@ -81,40 +58,13 @@ public class RecipeDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Inicializar ViewModel
         viewModel = new ViewModelProvider(this).get(RecetaViewModel.class);
 
-        // Inicializar vistas
         initViews();
-
-        // Configurar toolbar
         setupToolbar();
-
-        // Configurar RecyclerViews
         setupRecyclerViews();
-
-        // Inicializar Photo Picker (nuevo selector de imágenes sin permisos)
-        pickMedia = registerForActivityResult(
-                new ActivityResultContracts.PickVisualMedia(),
-                uri -> {
-                    if (uri != null) {
-                        ivRecetaImagen.setImageURI(uri);
-
-                        // Si quieres guardar la ruta en tu objeto Receta:
-                        if (recetaActual != null) {
-                            recetaActual.setImagenPortadaURL(uri.toString());
-                        }
-                    } else {
-                        Toast.makeText(this, "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
-
-
-        // Configurar listeners
+        setupPhotoPicke();
         setupListeners();
-
-        // Cargar receta
         cargarReceta(recetaId);
     }
 
@@ -122,18 +72,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         toolbar = findViewById(R.id.toolbar);
         ivRecetaImagen = findViewById(R.id.iv_receta_imagen);
-        tvDescripcion = findViewById(R.id.tv_descripcion);
-        tvTiempo = findViewById(R.id.tv_tiempo);
-        tvPorciones = findViewById(R.id.tv_porciones);
-        tvDificultad = findViewById(R.id.tv_dificultad);
-        chipCategoria = findViewById(R.id.detail_chip_categoria);
-        chipOrigen = findViewById(R.id.detail_chip_origen);
-        rvIngredientes = findViewById(R.id.rv_ingredientes);
-        rvPasos = findViewById(R.id.rv_pasos);
         fabFavorito = findViewById(R.id.fab_favorito);
-        btnEliminar = findViewById(R.id.btn_eliminar);
-        btnEditar = findViewById(R.id.btn_editar);
-        btnCompartir = findViewById(R.id.btn_compartir);
     }
 
     private void setupToolbar() {
@@ -141,56 +80,50 @@ public class RecipeDetailActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupRecyclerViews() {
-        // Ingredientes
+        RecyclerView rvIngredientes = findViewById(R.id.rv_ingredientes);
+        RecyclerView rvPasos = findViewById(R.id.rv_pasos);
+
         ingredienteAdapter = new IngredienteAdapter();
         rvIngredientes.setLayoutManager(new LinearLayoutManager(this));
         rvIngredientes.setAdapter(ingredienteAdapter);
 
-        // Pasos
         pasoAdapter = new PasoAdapter();
         rvPasos.setLayoutManager(new LinearLayoutManager(this));
         rvPasos.setAdapter(pasoAdapter);
     }
 
+    private void setupPhotoPicke() {
+        pickMedia = registerForActivityResult(
+                new ActivityResultContracts.PickVisualMedia(),
+                uri -> {
+                    if (uri != null && recetaActual != null) {
+                        ivRecetaImagen.setImageURI(uri);
+                        recetaActual.setImagenPortadaURL(uri.toString());
+                    }
+                }
+        );
+    }
+
     private void setupListeners() {
-        // Favorito
-        fabFavorito.setOnClickListener(v -> {
-            if (recetaActual != null) {
-                boolean nuevoEstado = !recetaActual.isFav();
-                viewModel.marcarFavorita(recetaActual.getId(), nuevoEstado);
-                recetaActual.setFav(nuevoEstado);
-                actualizarIconoFavorito();
-                Toast.makeText(this,
-                        nuevoEstado ? "Añadida a favoritos" : "Quitada de favoritos",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        fabFavorito.setOnClickListener(v -> toggleFavorito());
 
-        // Eliminar
-        btnEliminar.setOnClickListener(v -> mostrarDialogEliminar());
+        findViewById(R.id.btn_eliminar).setOnClickListener(v ->
+                mostrarDialogEliminar());
 
-        // Editar
-        btnEditar.setOnClickListener(v -> {
-            if (recetaActual != null) {
-                abrirEdicion();
-            }
-        });
+        findViewById(R.id.btn_editar).setOnClickListener(v ->
+                abrirEdicion());
 
-        // Compartir
-        btnCompartir.setOnClickListener(v -> mostrarOpcionesCompartir());
+        findViewById(R.id.btn_compartir).setOnClickListener(v ->
+                mostrarOpcionesCompartir());
 
-        // Cambiar imagen de receta
-        ivRecetaImagen.setOnClickListener(v -> {
-            pickMedia.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
-        });
-
+        ivRecetaImagen.setOnClickListener(v ->
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build()));
     }
 
     private void cargarReceta(long recetaId) {
@@ -202,128 +135,87 @@ public class RecipeDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void mostrarReceta(Receta receta) {
-        // Título
-        collapsingToolbar.setTitle(receta.getNombre());
+    private void mostrarReceta(Receta r) {
+        collapsingToolbar.setTitle(r.getNombre());
 
         // Imagen
-        if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
-            Glide.with(this)
-                    .load(Uri.parse(receta.getImagenPortadaURL()))
-                    .placeholder(R.drawable.placeholder_receta)
-                    .error(R.drawable.placeholder_receta)
-                    .centerCrop()
-                    .into(ivRecetaImagen);
-        } else {
-            ivRecetaImagen.setImageResource(R.drawable.placeholder_receta);
-        }
-
+        ImageLoader.loadRecipeImage(this, r.getImagenPortadaURL(), ivRecetaImagen);
 
         // Descripción
-        if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
-            tvDescripcion.setText(receta.getDescripcion());
-            tvDescripcion.setVisibility(View.VISIBLE);
+        TextView tvDescripcion = findViewById(R.id.tv_descripcion);
+        if (r.getDescripcion() != null && !r.getDescripcion().isEmpty()) {
+            tvDescripcion.setText(r.getDescripcion());
+            ViewExtensions.setVisible(tvDescripcion, true);
         } else {
-            tvDescripcion.setVisibility(View.GONE);
+            ViewExtensions.setVisible(tvDescripcion, false);
         }
 
         // Metadata
-        tvTiempo.setText(receta.getTiempoPrepFormateado());
-        tvPorciones.setText(receta.getPorciones() + " porc.");
-        tvDificultad.setText(receta.getDificultad() != null ? receta.getDificultad() : "Media");
+        ((TextView) findViewById(R.id.tv_tiempo)).setText(r.getTiempoPrepFormateado());
+        ((TextView) findViewById(R.id.tv_porciones)).setText(r.getPorciones() + " porc.");
+        ((TextView) findViewById(R.id.tv_dificultad)).setText(
+                r.getDificultad() != null ? r.getDificultad() : "Media");
 
-        // Categoría
-        if (receta.getCategoria() != null && !receta.getCategoria().isEmpty()) {
-            chipCategoria.setText(receta.getCategoria());
-            chipCategoria.setVisibility(View.VISIBLE);
-        } else {
-            chipCategoria.setVisibility(View.GONE);
-        }
+        // Chips
+        setupChip(findViewById(R.id.detail_chip_categoria), r.getCategoria());
+        setupChip(findViewById(R.id.detail_chip_origen), r.getOrigen());
 
-        // Origen
-        if (receta.getOrigen() != null && !receta.getOrigen().isEmpty()) {
-            chipOrigen.setText(receta.getOrigen());
-            chipOrigen.setVisibility(View.VISIBLE);
-        } else {
-            chipOrigen.setVisibility(View.GONE);
-        }
+        // Listas
+        ingredienteAdapter.setIngredientes(r.getIngredientes());
+        pasoAdapter.setPasos(r.getPasos());
 
-        // Ingredientes
-        ingredienteAdapter.setIngredientes(receta.getIngredientes());
-
-        // Pasos
-        pasoAdapter.setPasos(receta.getPasos());
-
-        // Favorito
         actualizarIconoFavorito();
     }
 
-    private void actualizarIconoFavorito() {
-        if (recetaActual != null && recetaActual.isFav()) {
-            fabFavorito.setImageResource(android.R.drawable.star_big_on);
+    private void setupChip(Chip chip, String texto) {
+        if (texto != null && !texto.isEmpty()) {
+            chip.setText(texto);
+            ViewExtensions.setVisible(chip, true);
         } else {
-            fabFavorito.setImageResource(android.R.drawable.star_big_off);
+            ViewExtensions.setVisible(chip, false);
         }
     }
 
-    private void compartirReceta() {
+    private void toggleFavorito() {
         if (recetaActual == null) return;
 
-        StringBuilder texto = new StringBuilder();
-        texto.append("📖 ").append(recetaActual.getNombre()).append("\n\n");
+        boolean nuevoEstado = !recetaActual.isFav();
+        viewModel.marcarFavorita(recetaActual.getId(), nuevoEstado);
+        recetaActual.setFav(nuevoEstado);
+        actualizarIconoFavorito();
 
-        if (recetaActual.getDescripcion() != null) {
-            texto.append(recetaActual.getDescripcion()).append("\n\n");
-        }
+        Toast.makeText(this,
+                nuevoEstado ? "Añadida a favoritos" : "Quitada de favoritos",
+                Toast.LENGTH_SHORT).show();
+    }
 
-        texto.append("⏱️ Tiempo: ").append(recetaActual.getTiempoPrepFormateado()).append("\n");
-        texto.append("👥 Porciones: ").append(recetaActual.getPorciones()).append("\n");
-        texto.append("📊 Dificultad: ").append(recetaActual.getDificultad()).append("\n\n");
-
-        // Ingredientes
-        texto.append("🥘 INGREDIENTES:\n");
-        if (recetaActual.getIngredientes() != null) {
-            for (int i = 0; i < recetaActual.getIngredientes().size(); i++) {
-                texto.append("• ").append(recetaActual.getIngredientes().get(i).getIngredienteCompleto()).append("\n");
-            }
-        }
-
-        // Pasos
-        texto.append("\n👨‍🍳 PREPARACIÓN:\n");
-        if (recetaActual.getPasos() != null) {
-            for (int i = 0; i < recetaActual.getPasos().size(); i++) {
-                texto.append(i + 1).append(". ").append(recetaActual.getPasos().get(i).getDescripcion()).append("\n\n");
-            }
-        }
-
-        texto.append("\n📱 Compartido desde Recetario Clásico");
-
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, recetaActual.getNombre());
-        shareIntent.putExtra(Intent.EXTRA_TEXT, texto.toString());
-
-        startActivity(Intent.createChooser(shareIntent, "Compartir receta"));
+    private void actualizarIconoFavorito() {
+        fabFavorito.setImageResource(
+                recetaActual != null && recetaActual.isFav()
+                        ? android.R.drawable.star_big_on
+                        : android.R.drawable.star_big_off
+        );
     }
 
     private void mostrarDialogEliminar() {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar receta")
-                .setMessage("¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.")
-                .setPositiveButton("Eliminar", (dialog, which) -> eliminarReceta())
+                .setMessage("¿Estás seguro de que quieres eliminar esta receta?")
+                .setPositiveButton("Eliminar", (d, w) -> eliminarReceta())
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
 
     private void eliminarReceta() {
         if (recetaActual == null) return;
-
         viewModel.eliminarReceta(recetaActual);
         Toast.makeText(this, "Receta eliminada", Toast.LENGTH_SHORT).show();
         finish();
     }
 
     private void abrirEdicion() {
+        if (recetaActual == null) return;
+
         Intent intent = new Intent(this, com.example.recetarioapp.MainActivity.class);
         intent.putExtra("editar_receta_id", recetaActual.getId());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -332,18 +224,19 @@ public class RecipeDetailActivity extends AppCompatActivity {
     }
 
     private void mostrarOpcionesCompartir() {
-        String[] opciones = {"Compartir como texto", "Exportar a PDF"};
-
         new AlertDialog.Builder(this)
                 .setTitle("Compartir receta")
-                .setItems(opciones, (dialog, which) -> {
-                    if (which == 0) {
-                        compartirReceta();
-                    } else {
-                        exportarPDF();
-                    }
-                })
+                .setItems(new String[]{"Compartir como texto", "Exportar a PDF"},
+                        (d, which) -> {
+                            if (which == 0) compartirTexto();
+                            else exportarPDF();
+                        })
                 .show();
+    }
+
+    private void compartirTexto() {
+        if (recetaActual == null) return;
+        startActivity(RecipeShareHelper.createShareIntent(recetaActual));
     }
 
     private void exportarPDF() {
@@ -352,41 +245,25 @@ public class RecipeDetailActivity extends AppCompatActivity {
         Toast.makeText(this, "Generando PDF...", Toast.LENGTH_SHORT).show();
 
         new Thread(() -> {
-            String pdfPath = com.example.recetarioapp.utils.PDFHelper
-                    .exportarRecetaToPDF(this, recetaActual);
+            String pdfPath = PDFHelper.exportarRecetaToPDF(this, recetaActual);
 
             runOnUiThread(() -> {
                 if (pdfPath != null) {
-                    Toast.makeText(this, "PDF guardado en: Documentos/RecetasPDF", Toast.LENGTH_LONG).show();
-
-                    new AlertDialog.Builder(this)
-                            .setTitle("PDF creado")
-                            .setMessage("La receta se ha exportado correctamente.\n\nRuta: " + pdfPath)
-                            .setPositiveButton("Abrir", (dialog, which) -> abrirPDF(pdfPath))
-                            .setNegativeButton("Cerrar", null)
-                            .show();
+                    mostrarDialogPDFCreado(pdfPath);
                 } else {
-                    Toast.makeText(this, "Error al crear PDF", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Error al crear PDF",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();
     }
 
-    private void abrirPDF(String pdfPath) {
-        try {
-            File pdfFile = new File(pdfPath);
-            android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(
-                    this,
-                    getApplicationContext().getPackageName() + ".provider",
-                    pdfFile);
-
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri, "application/pdf");
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Abrir PDF"));
-        } catch (Exception e) {
-            Toast.makeText(this, "No se pudo abrir el PDF. Búscalo en: Documentos/RecetasPDF",
-                    Toast.LENGTH_LONG).show();
-        }
+    private void mostrarDialogPDFCreado(String pdfPath) {
+        new AlertDialog.Builder(this)
+                .setTitle("PDF creado")
+                .setMessage("Ruta: " + pdfPath)
+                .setPositiveButton("Abrir", (d, w) -> PDFHelper.abrirPDF(this, pdfPath))
+                .setNegativeButton("Cerrar", null)
+                .show();
     }
 }
