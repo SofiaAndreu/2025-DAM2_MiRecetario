@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Modelo de RECETA con ROOM DATABASE y FIREBASE FIRESTORE
+ * Modelo de RECETA con ROOM DATABASE y FIREBASE FIRESTORE ✓
  */
 @Entity(tableName ="recetas")
 @TypeConverters(Converters.class) //pra conversores personalizados (listas,fechas,etc)

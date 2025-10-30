@@ -19,13 +19,13 @@ import com.google.android.material.chip.Chip;
 
 import java.io.File;
 
-
 /**
- * Adapter para mostrar la lista de recetas en RecyclerView
+ * Adapter para mostrar la lista de recetas en RecyclerView ✓
  * puente entre objetos receta y RecyclerView
  */
 public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewHolder> {
 
+    //Variables para Listeners
     private OnRecetaClickListener listener;
     private OnFavClickListener favListener;
 
@@ -40,12 +40,13 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         public boolean areItemsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
             return oldItem.getId() == newItem.getId();
         }
-        @Override //Compara mismo contenido (nombre y fav)
+        @Override //Compara mismo contenido (nombre y estado de fav)
         public boolean areContentsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
             return oldItem.getNombre().equals(newItem.getNombre()) &&
                     oldItem.isFav() == newItem.isFav();
         }
     };
+    // ---------------------------------------------------------------------------------- //
 
     //Creacion de vista de cada item - item_receta.xml
     @NonNull
@@ -55,6 +56,7 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
                 .inflate(R.layout.item_receta, parent, false);
         return new RecetaViewHolder(view);
     }
+    // ------------------------------------------------------------------------------------ //
 
     //Asignacion datos de receta al ViewHolder correspondiente
     @Override
@@ -62,16 +64,16 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         Receta receta = getItem(position);
         holder.bind(receta);
     }
+    // ---------------------------------------------------------------------- //
 
     public Receta getRecetaEn(int position) {
         return getItem(position);
     }
+    //------------------------------------------------------------------------------------ //
 
-
-    //------------------------------------------------------------------------------------
-    // REFERENCIAS elementos visuales (img, txt, btn) para evitar busqueda en cada actualizacion
+    //REFERENCIAS elementos visuales (img, txt, btn) para evitar busqueda en cada actualizacion
     class RecetaViewHolder extends RecyclerView.ViewHolder {
-
+        //Referencias
         private final ImageView ivImagen;
         private final TextView tvNombre;
         private final TextView tvDescripcion;
@@ -81,9 +83,9 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         private final Chip chipCategoria;
         private final ImageView btnFavorito;
 
+        //Constructor que recibe la vista de item y llama a constructor padre
         public RecetaViewHolder(@NonNull View itemView) {
             super(itemView);
-
             ivImagen = itemView.findViewById(R.id.iv_receta_imagen);
             tvNombre = itemView.findViewById(R.id.tv_receta_nombre);
             tvDescripcion = itemView.findViewById(R.id.tv_receta_descripcion);
@@ -95,27 +97,29 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
 
             // Click en la card completa
             itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition(); //obtiene posicion actual
+                //verifica que existe y es valida
                 if (listener != null && position != RecyclerView.NO_POSITION) {
-                    listener.onRecetaClick(getItem(position));
+                    listener.onRecetaClick(getItem(position)); //ejecuta callback
                 }
             });
 
             // Click en el botón de favorito
             btnFavorito.setOnClickListener(v -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition(); //obtiene posicion y receta
                 if (favListener != null && position != RecyclerView.NO_POSITION) {
+                    //cambia el estado actual al opuesto
                     Receta receta = getItem(position);
                     favListener.onFavClick(receta, !receta.isFav());
                 }
             });
-        }
+        } //------------------------------------------------------------------------------------ //
 
+        //ASIGNAR DATOS - Recibe Receta y muestra sus datos
         public void bind(Receta receta) {
-            // Nombre
-            tvNombre.setText(receta.getNombre());
+            tvNombre.setText(receta.getNombre()); //nombre
 
-            // Descripción
+            // -- Muestra descripción si existe texto --
             if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
                 tvDescripcion.setText(receta.getDescripcion());
                 tvDescripcion.setVisibility(View.VISIBLE);
@@ -123,21 +127,21 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
                 tvDescripcion.setVisibility(View.GONE);
             }
 
-            // Tiempo
+            // -- Tiempo de preparacion formateado --
             tvTiempo.setText(receta.getTiempoPrepFormateado());
 
-            // Dificultad
-            String dificultad = receta.getDificultad() != null ? receta.getDificultad() : "Media";
+            // -- Muestra Dificultad/"-" si es null --
+            String dificultad = receta.getDificultad() != null ? receta.getDificultad() : "-";
             tvDificultad.setText(dificultad);
 
-            // Porciones
+            // -- Muestra porciones/si no hay "-" --
             if (receta.getPorciones() > 0) {
                 tvPorciones.setText(receta.getPorciones() + " porc.");
             } else {
                 tvPorciones.setText("-");
             }
 
-            // Categoría
+            // -- Muestra chip solo si existe categoria --
             if (receta.getCategoria() != null && !receta.getCategoria().isEmpty()) {
                 chipCategoria.setText(receta.getCategoria());
                 chipCategoria.setVisibility(View.VISIBLE);
@@ -145,48 +149,40 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
                 chipCategoria.setVisibility(View.GONE);
             }
 
-            // Imagen
-            if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
-                // Cargar imagen local usando File
-                File imageFile = new File(receta.getImagenPortadaURL());
-
-                Glide.with(itemView.getContext())
-                        .load(imageFile)
-                        .placeholder(R.drawable.placeholder_receta)
-                        .error(R.drawable.placeholder_receta)
-                        .centerCrop()
-                        .into(ivImagen);
+            // -- Carga imagen con GLIDE --
+            if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) { //verificar URL de Imagen
+                File imageFile = new File(receta.getImagenPortadaURL()); //objeto File
+                //Carga imagen
+                Glide.with(itemView.getContext()) //contexto
+                        .load(imageFile)//archivo a cargar
+                        .placeholder(R.drawable.placeholder_receta) //mientras carga...
+                        .error(R.drawable.placeholder_receta)//si falla
+                        .centerCrop() //recorta al centro
+                        .into(ivImagen); //imageView de destino (donde se muestra)
             } else {
-                ivImagen.setImageResource(R.drawable.placeholder_receta);
-            }
+                ivImagen.setImageResource(R.drawable.placeholder_receta); //Si no hay imagen -> placeholder_receta.xml
+            } // ----------------------------------------------------------------- //
 
-            // Favorito
-            if (receta.isFav()) {
+            // -- Botón Favorito -- Cambia icono
+            if (receta.isFav()) { //SI es fav. -> drawable/ic_star_filled.xml
                 btnFavorito.setImageResource(R.drawable.ic_star_filled);
-            } else {
+            } else { //NO es fav. -> drawable/ic_star_outline.xml
                 btnFavorito.setImageResource(R.drawable.ic_star_outline);
             }
-            //Color tema
-            btnFavorito.setColorFilter(itemView.getContext().getColor(R.color.color_accent));
         }
     }
+    // ------------------------------------------------------------------------- //
 
+    // -- INTERFACES PARA CALLBACKS --
 
+    //Click en receta
+    public interface OnRecetaClickListener { void onRecetaClick(Receta receta);}
 
-    // Interfaces para callbacks
-    public interface OnRecetaClickListener {
-        void onRecetaClick(Receta receta);
-    }
+    //Click en favorito
+    public interface OnFavClickListener { void onFavClick(Receta receta, boolean isFav);}
 
-    public interface OnFavClickListener {
-        void onFavClick(Receta receta, boolean isFav);
-    }
-
-    // Setters para listeners
-    public void setOnRecetaClickListener(OnRecetaClickListener listener) {
-        this.listener = listener;
-    }
-
+    // -- SETTERS PARA LISTENERS -- (Receta y Favorto)
+    public void setOnRecetaClickListener(OnRecetaClickListener listener) {this.listener = listener;}
     public void setOnFavClickListener(OnFavClickListener listener) {
         this.favListener = listener;
     }

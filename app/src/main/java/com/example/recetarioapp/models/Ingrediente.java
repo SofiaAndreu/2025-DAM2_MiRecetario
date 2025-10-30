@@ -1,7 +1,7 @@
 package com.example.recetarioapp.models;
 
 /**
- * Modelo INGREDIENTE individual dentro de RECETA
+ * Modelo INGREDIENTE individual dentro de RECETA ✓
  */
 public class Ingrediente {
 

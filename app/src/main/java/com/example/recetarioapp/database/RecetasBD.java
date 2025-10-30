@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Almacenamiento Local con ROOM DB
- * Actua como caché y permite modo offline
+ * Actua como caché y permite modo offline ✓
  */
 @Database(entities = {Receta.class}, version=1, exportSchema = false) //clase=tabla en bd, version de BD, exportar def. exquema = false)
 @TypeConverters({Converters.class}) //Converters personalizados
@@ -30,7 +30,7 @@ public abstract class RecetasBD extends RoomDatabase {
 
     //DAO
     public abstract RecetaDAO recetaDAO();
-    
+
     public static RecetasBD getInstance(Context context){
         if (INSTANCE == null){ //Verificación 1: Si INSTANCE = NULL
             synchronized (RecetasBD.class){ //evita multiples hilos creando la bd

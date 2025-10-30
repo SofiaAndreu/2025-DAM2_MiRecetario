@@ -1,7 +1,7 @@
 package com.example.recetarioapp.models;
 
 /**
-* Modelo de PASO en el proceso de preparacion
+* Modelo de PASO en el proceso de preparacion ✓
 **/
 public class Paso {
 

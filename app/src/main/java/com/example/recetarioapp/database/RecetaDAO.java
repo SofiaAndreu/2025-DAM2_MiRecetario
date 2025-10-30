@@ -13,7 +13,7 @@ import com.example.recetarioapp.models.Receta;
 import java.util.List;
 
 /**
- * RECETAS Data Acces Object - Definicion operaciones BD
+ * RECETAS Data Acces Object - Definicion operaciones BD ✓
  */
 @Dao
 public interface RecetaDAO {

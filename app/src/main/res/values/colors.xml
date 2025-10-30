@@ -12,7 +12,7 @@
     <color name="color_secondary_light">#D7CCC8</color>      <!-- Beige claro luminoso -->
     <color name="color_secondary_variant">#A1887F</color>    <!-- Taupe -->
 
-    <!-- Acentos - Detalles elegantes -->
+    <!-- Acentos - Detalles -->
     <color name="color_accent">#FFB74D</color>               <!-- Naranja cálido (mantequilla tostada) -->
     <color name="color_accent_light">#FFD0B0</color>         <!-- Durazno suave -->
     <color name="color_highlight">#FFA726</color>            <!-- Ámbar brillante -->

@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Converters para Room Database (libreria de BD basada en SQLite).
+ * Converters para Room Database (libreria de BD basada en SQLite). ✓
  * No puede guardar tipos complejos directamente, por eso se usa TypeConverters (""traductor"")
  * Converters.java ->pasa tipos complejos a tipos compatibles para guardar con ROOM
  */

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Tienda Mascotas</string>
+
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">Abrir menú de navegación</string>
+    <string name="navigation_drawer_close">Cerrar menú de navegación</string>
+
+    <!-- Menu items -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_categorias">Categorías</string>
+    <string name="nav_todos_productos">Todos los Productos</string>
+    <string name="nav_favoritos">Favoritos</string>
+    <string name="nav_carrito">Carrito</string>
+    <string name="nav_acerca">Acerca de</string>
+</resources>

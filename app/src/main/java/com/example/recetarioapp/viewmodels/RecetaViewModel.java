@@ -15,7 +15,7 @@ import com.example.recetarioapp.repository.RecetaRepository;
 import java.util.List;
 
 /**
- * ViewModel intermediario entre interfaz <-> datos RecetaRepository
+ * ViewModel intermediario entre interfaz <-> datos RecetaRepository ✓
  */
 public class RecetaViewModel extends AndroidViewModel {
 
