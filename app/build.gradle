@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.example.recetarioapp'
-    compileSdk 36
+    compileSdkVersion 36
 
     defaultConfig {
         applicationId "com.example.recetarioapp"

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:background="@drawable/bg_neumorphic_card"
+    android:background="@drawable/bg_card"
     android:clickable="true"
     android:focusable="true">
 
@@ -22,7 +22,7 @@
         <FrameLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/circle_background">
+            android:background="@drawable/bg_circulo">
 
             <TextView
                 android:id="@+id/tv_numero"

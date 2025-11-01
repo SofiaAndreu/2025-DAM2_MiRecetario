@@ -3,7 +3,6 @@ package com.example.recetarioapp.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -165,9 +164,9 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
 
             // -- Botón Favorito -- Cambia icono
             if (receta.isFav()) { //SI es fav. -> drawable/ic_star_filled.xml
-                btnFavorito.setImageResource(R.drawable.ic_star_filled);
+                btnFavorito.setImageResource(R.drawable.ic_fav);
             } else { //NO es fav. -> drawable/ic_star_outline.xml
-                btnFavorito.setImageResource(R.drawable.ic_star_outline);
+                btnFavorito.setImageResource(R.drawable.ic_fav_no);
             }
         }
     }

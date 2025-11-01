@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_neumorphic_card"
+    android:background="@drawable/bg_card"
     android:padding="4dp">
 
     <LinearLayout
@@ -44,7 +44,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_info_outline"
+                android:src="@drawable/ic_info"
                 app:tint="@color/color_info_icon"
                 android:layout_marginEnd="8dp" />
 
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_neumorphic_search">
+            android:background="@drawable/bg_search">
 
 
             <com.google.android.material.textfield.TextInputEditText
@@ -117,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:background="@drawable/bg_neumorphic"
+                android:background="@drawable/bg_cuadrado"
                 android:clickable="true"
                 android:focusable="true"
                 android:minWidth="120dp"
@@ -141,7 +141,7 @@
                 android:id="@+id/btn_importar_dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_neumorphic_button"
+                android:background="@drawable/bg_button"
                 android:clickable="true"
                 android:focusable="true"
                 android:minWidth="120dp"

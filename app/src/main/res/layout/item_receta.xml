@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
-    android:background="@drawable/bg_neumorphic_card"
+    android:background="@drawable/bg_card"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -47,7 +47,7 @@
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_margin="12dp"
-            android:background="@drawable/bg_neumorphic"
+            android:background="@drawable/bg_cuadrado"
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintEnd_toEndOf="@id/card_imagen"
@@ -58,7 +58,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_star_outline"
+                android:src="@drawable/ic_fav_no"
                 android:contentDescription="@string/nav_favs"
                 app:tint="@color/color_accent" />
 

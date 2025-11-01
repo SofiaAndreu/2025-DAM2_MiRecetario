@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.recetarioapp.R;
@@ -44,6 +45,7 @@ public class AddRecetasFragment extends BaseFragment {
     private ProgressBar progressBar;
 
     private ActivityResultLauncher<Intent> pickImageLauncher;
+    private boolean observadoresConfigurados = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class AddRecetasFragment extends BaseFragment {
         initViews(view);
         setupDropdowns();
         setupListeners();
+        setupObservadoresGuardado(); // Nuevo método para observadores de guardado
         observeViewModel();
 
         if (modoEdicion) cargarRecetaParaEditar();
@@ -137,6 +140,29 @@ public class AddRecetasFragment extends BaseFragment {
         btnImportarUrl.setOnClickListener(v -> showImportDialog());
     }
 
+    private void setupObservadoresGuardado() {
+        if (observadoresConfigurados) return;
+
+        // Observar mensajes de éxito
+        viewModel.getMensajeExito().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null && (mensaje.contains("guardada") || mensaje.contains("actualizada"))) {
+                navegarAtrasSeguro();
+                // No limpiar aquí para que otros fragmentos puedan ver el mensaje si es necesario
+            }
+        });
+
+        // Observar mensajes de error
+        viewModel.getMensajeError().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                ViewExtensions.setEnabled(btnGuardar, true);
+                ViewExtensions.setVisible(progressBar, false);
+                showToast("Error: " + mensaje);
+            }
+        });
+
+        observadoresConfigurados = true;
+    }
+
     private void seleccionarImagen() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -155,9 +181,9 @@ public class AddRecetasFragment extends BaseFragment {
         }
 
         ViewExtensions.setEnabled(btnGuardar, false);
+        ViewExtensions.setVisible(progressBar, true);
 
         if (imagenUri != null) {
-            ViewExtensions.setVisible(progressBar, true);
             viewModel.guardarImagenLocal(imagenUri, new com.example.recetarioapp.viewmodels.RecetaViewModel.OnImagenSubidaListener() {
                 @Override
                 public void onImagenSubida(String path) {
@@ -200,14 +226,35 @@ public class AddRecetasFragment extends BaseFragment {
         receta.setPasos(RecipeParser.parsePasos(
                 etPasos.getText().toString()));
 
-        // Guardar
+        // Guardar - los observadores ya están configurados y manejarán la navegación
         if (modoEdicion) {
             viewModel.actualizarReceta(receta);
         } else {
             viewModel.insertarReceta(receta);
         }
 
-        Navigation.findNavController(requireView()).navigateUp();
+        // NO navegar aquí - los observadores se encargarán de la navegación
+    }
+
+    // MÉTODO HELPER para navegación segura
+    private void navegarAtrasSeguro() {
+        if (!isAdded() || getView() == null) return;
+
+        requireActivity().runOnUiThread(() -> {
+            try {
+                NavController navController = Navigation.findNavController(getView());
+                // Verificar que aún estamos en este fragmento antes de navegar
+                if (navController.getCurrentDestination() != null &&
+                        navController.getCurrentDestination().getId() == R.id.addRecipeFragment) {
+                    navController.popBackStack();
+                }
+            } catch (Exception e) {
+                // Fallback seguro
+                if (!requireActivity().isFinishing()) {
+                    requireActivity().onBackPressed();
+                }
+            }
+        });
     }
 
     private void observeViewModel() {
@@ -303,5 +350,12 @@ public class AddRecetasFragment extends BaseFragment {
         if (!r.pasos.isEmpty()) {
             etPasos.setText(RecipeParser.pasosToText(r.pasos));
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Opcional: limpiar mensajes cuando se destruye el fragmento
+        viewModel.limpiarMensajesE();
     }
 }

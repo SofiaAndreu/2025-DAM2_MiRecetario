@@ -135,7 +135,6 @@
                 app:boxBackgroundColor="@color/color_background"
                 app:hintTextColor="@color/color_primary"
                 app:boxStrokeColor="@color/color_primary"
-                app:startIconDrawable="@drawable/ic_password"
                 app:startIconTint="@color/color_primary"
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/color_primary">

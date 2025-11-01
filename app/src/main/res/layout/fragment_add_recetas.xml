@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_neumorphic"
+            android:background="@drawable/bg_cuadrado"
             android:clickable="true"
             android:focusable="true">
 
@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_neumorphic_card">
+            android:background="@drawable/bg_card">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -88,7 +88,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:background="@drawable/rounded_bg">
+                    android:background="@drawable/bg_white">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -114,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_neumorphic_search">
+            android:background="@drawable/bg_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_nombre"
@@ -135,7 +135,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_neumorphic_search">
+            android:background="@drawable/bg_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_descripcion"
@@ -166,7 +166,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/bg_neumorphic_search">
+                android:background="@drawable/bg_search">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_tiempo"
@@ -188,7 +188,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/bg_neumorphic_search">
+                android:background="@drawable/bg_search">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_porciones"
@@ -245,7 +245,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_neumorphic_search">
+            android:background="@drawable/bg_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_origen"
@@ -276,7 +276,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_neumorphic_search">
+            android:background="@drawable/bg_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_ingredientes"
@@ -308,7 +308,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/bg_neumorphic_search">
+            android:background="@drawable/bg_search">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_pasos"
@@ -339,7 +339,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:background="@drawable/bg_neumorphic"
+                android:background="@drawable/bg_cuadrado"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -360,7 +360,7 @@
                 android:id="@+id/btn_guardar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_neumorphic_button"
+                android:background="@drawable/bg_button"
                 android:clickable="true"
                 android:focusable="true">
 
