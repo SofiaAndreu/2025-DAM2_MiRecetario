@@ -2,6 +2,7 @@ package com.example.recetarioapp.viewmodels;
 
 import android.app.Application;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -189,6 +190,12 @@ public class RecetaViewModel extends AndroidViewModel {
         //Reset mensajes Exito/Error
         msgExito.setValue(null);
         msgError.setValue(null);
+    }
+
+    // MÉTODO DE DIAGNÓSTICO
+    public void debugBuscar(String query) {
+        Log.d("BUSQUEDA", "Buscando: '" + query + "'");
+        buscar(query);
     }
 
     //GETTERS LIVEDATA
