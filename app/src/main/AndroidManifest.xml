@@ -17,15 +17,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RecetarioApp" >
 
+        <!-- SplashActivity como LAUNCHER -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true" >
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.RecetarioApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- RegisterActivity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- MainActivity (ya no es LAUNCHER) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
         <activity
             android:name=".ui.RecipeDetailActivity"
             android:theme="@style/Theme.RecetarioApp"

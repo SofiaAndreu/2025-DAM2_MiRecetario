@@ -188,4 +188,11 @@
         <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
+
+    <!-- Tema para Splash (sin ActionBar, pantalla completa) -->
+        <style name="Theme.RecetarioApp.Splash" parent="Theme.Material3.Light.NoActionBar">
+            <item name="android:windowBackground">@color/color_primary</item>
+            <item name="android:statusBarColor">@color/color_primary</item>
+            <item name="android:navigationBarColor">@color/color_primary</item>
+        </style>
 </resources>

@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.example.recetarioapp.models.Receta;
+import com.example.recetarioapp.models.Usuario;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,7 +17,8 @@ import java.util.concurrent.Executors;
  * Almacenamiento Local con ROOM DB
  * Actua como caché y permite modo offline ✓
  */
-@Database(entities = {Receta.class}, version=1, exportSchema = false) //clase=tabla en bd, version de BD, exportar def. exquema = false)
+@Database(
+        entities = {Receta.class, Usuario .class}, version=2, exportSchema = false) //clase=tabla en bd, version de BD, exportar def. exquema = false)
 @TypeConverters({Converters.class}) //Converters personalizados
 public abstract class RecetasBD extends RoomDatabase {
 
@@ -30,6 +32,7 @@ public abstract class RecetasBD extends RoomDatabase {
 
     //DAO
     public abstract RecetaDAO recetaDAO();
+    public abstract UsuarioDAO usuarioDAO();
 
     public static RecetasBD getInstance(Context context){
         if (INSTANCE == null){ //Verificación 1: Si INSTANCE = NULL
