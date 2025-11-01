@@ -3,7 +3,6 @@ package com.example.recetarioapp.ui.recipes;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +11,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.recetarioapp.utils.RecipeFilterDialog;
+import com.example.recetarioapp.viewmodels.RecetaViewModel;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.example.recetarioapp.R;
 import com.example.recetarioapp.adapters.RecetaAdapter;
@@ -33,6 +35,11 @@ public class RecipesFragment extends BaseFragment {
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout layoutEmpty;
     private RecetaAdapter adapter;
+    private RecetaViewModel viewModel;
+
+    // Empty state views
+    private TextView emptyIcon, emptyTitle, emptySubtitle;
+    private MaterialButton btnLimpiarBusqueda;
 
     // Chips de filtro
     private Chip chipTodas, chipPostres, chipPrincipales, chipRapidas;
@@ -57,6 +64,24 @@ public class RecipesFragment extends BaseFragment {
         setupFilters();
         setupSwipeRefresh();
         observeData();
+        setupFavoritoObserver();
+    }
+
+    private void setupFavoritoObserver() {
+        viewModel.getFavoritoActualizado().observe(getViewLifecycleOwner(), recetaId -> {
+            // Actualizar el item específico en el adapter
+            if (adapter != null) {
+                // Buscar la receta en la lista actual y actualizar su estado
+                for (int i = 0; i < adapter.getItemCount(); i++) {
+                    Receta receta = adapter.getRecetaEn(i);
+                    if (receta != null && receta.getId() == recetaId) {
+                        receta.setFav(!receta.isFav()); // Invertir estado
+                        adapter.notifyItemChanged(i);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void initViews(View view) {
@@ -65,10 +90,24 @@ public class RecipesFragment extends BaseFragment {
         swipeRefresh = view.findViewById(R.id.swipe_refresh);
         layoutEmpty = view.findViewById(R.id.layout_empty);
 
+        // Empty state views
+        emptyIcon = layoutEmpty.findViewById(R.id.empty_icon);
+        emptyTitle = layoutEmpty.findViewById(R.id.empty_title);
+        emptySubtitle = layoutEmpty.findViewById(R.id.empty_subtitle);
+        btnLimpiarBusqueda = layoutEmpty.findViewById(R.id.btn_limpiar_busqueda);
+
+        // Chips
         chipTodas = view.findViewById(R.id.chip_todas);
         chipPostres = view.findViewById(R.id.chip_postres);
         chipPrincipales = view.findViewById(R.id.chip_principales);
         chipRapidas = view.findViewById(R.id.chip_rapidas);
+
+        // Configurar botón de limpiar búsqueda
+        btnLimpiarBusqueda.setOnClickListener(v -> {
+            limpiarBusqueda();
+            etBuscar.clearFocus();
+            hideKeyboard();
+        });
     }
 
     private void setupRecyclerView() {
@@ -76,7 +115,6 @@ public class RecipesFragment extends BaseFragment {
         rvRecetas.setLayoutManager(new LinearLayoutManager(getContext()));
         rvRecetas.setAdapter(adapter);
 
-        // Usar los métodos de esta clase con @Override
         adapter.setOnRecetaClickListener(this::openRecipeDetail);
         adapter.setOnFavClickListener(this::toggleFavorite);
     }
@@ -91,16 +129,12 @@ public class RecipesFragment extends BaseFragment {
                 currentSearchQuery = s.toString();
                 isSearching = !currentSearchQuery.trim().isEmpty();
 
-                Log.d("BUSQUEDA", "Texto cambiado: '" + currentSearchQuery + "', isSearching: " + isSearching);
-
                 if (isSearching) {
-                    // Usar el método de diagnóstico
-                    viewModel.debugBuscar(currentSearchQuery);
+                    viewModel.buscar(currentSearchQuery);
                     desmarcarTodosLosChips();
-                    // Cambiar a observar recetas filtradas
                     switchToSearchMode();
                 } else {
-                    viewModel.debugBuscar("");
+                    viewModel.buscar("");
                     switchToNormalMode();
                 }
             }
@@ -111,29 +145,14 @@ public class RecipesFragment extends BaseFragment {
     }
 
     private void switchToSearchMode() {
-        Log.d("BUSQUEDA", "Cambiando a modo búsqueda");
-        // Remover observadores anteriores
         viewModel.getTodasLasRecetas().removeObservers(getViewLifecycleOwner());
-
-        // Observar recetas filtradas
-        viewModel.getRecetasFiltradas().observe(getViewLifecycleOwner(), recetas -> {
-            Log.d("BUSQUEDA", "Resultados de búsqueda: " + (recetas != null ? recetas.size() : 0) + " recetas");
-            actualizarLista(recetas);
-        });
+        viewModel.getRecetasFiltradas().observe(getViewLifecycleOwner(), this::actualizarLista);
     }
 
     private void switchToNormalMode() {
-        Log.d("BUSQUEDA", "Cambiando a modo normal");
-        // Remover observadores anteriores
         viewModel.getRecetasFiltradas().removeObservers(getViewLifecycleOwner());
-
-        // Observar todas las recetas
-        viewModel.getTodasLasRecetas().observe(getViewLifecycleOwner(), recetas -> {
-            Log.d("BUSQUEDA", "Todas las recetas: " + (recetas != null ? recetas.size() : 0) + " recetas");
-            actualizarLista(recetas);
-        });
+        viewModel.getTodasLasRecetas().observe(getViewLifecycleOwner(), this::actualizarLista);
     }
-
 
     private void setupFilters() {
         chipTodas.setOnCheckedChangeListener((button, isChecked) -> {
@@ -192,7 +211,6 @@ public class RecipesFragment extends BaseFragment {
         if (etBuscar != null) {
             etBuscar.setText("");
         }
-        // También limpiar la búsqueda en el ViewModel
         viewModel.buscar("");
     }
 
@@ -200,11 +218,9 @@ public class RecipesFragment extends BaseFragment {
         swipeRefresh.setColorSchemeResources(R.color.color_primary);
         swipeRefresh.setOnRefreshListener(() -> {
             viewModel.sincronizar();
-            // Recargar datos según el estado actual
             if (isSearching) {
                 viewModel.buscar(currentSearchQuery);
             } else {
-                // Verificar si hay algún chip activo y recargar accordingly
                 if (chipPostres.isChecked()) {
                     filtrarPorCategoria(getString(R.string.categoria_postres));
                 } else if (chipPrincipales.isChecked()) {
@@ -219,13 +235,9 @@ public class RecipesFragment extends BaseFragment {
         });
     }
 
-
     private void observeData() {
-        // Inicialmente en modo normal
         switchToNormalMode();
     }
-
-
 
     private void filtrarPorCategoria(String categoria) {
         viewModel.filtrarPorCategoria(categoria).observe(getViewLifecycleOwner(),
@@ -238,84 +250,66 @@ public class RecipesFragment extends BaseFragment {
     }
 
     private void actualizarLista(List<Receta> recetas) {
-        Log.d("BUSQUEDA", "Actualizando lista con: " + (recetas != null ? recetas.size() : 0) + " recetas");
-
-        if (recetas == null) {
-            Log.d("BUSQUEDA", "Lista de recetas es NULL");
-            return;
-        }
+        if (recetas == null) return;
 
         adapter.submitList(recetas);
         boolean isEmpty = recetas.isEmpty();
 
-        Log.d("BUSQUEDA", "Lista vacía: " + isEmpty);
-
         ViewExtensions.setVisible(rvRecetas, !isEmpty);
         ViewExtensions.setVisible(layoutEmpty, isEmpty);
 
-        actualizarMensajeEmptyState(isEmpty);
-    }
-
-    private void actualizarMensajeEmptyState(boolean isEmpty) {
-        if (!isEmpty) return;
-
-        // Buscar el TextView correcto en tu layout_empty
-        // Si tienes múltiples TextViews, ajusta el ID según tu layout
-        TextView tvEmpty = layoutEmpty.findViewById(android.R.id.text1);
-        if (tvEmpty == null) {
-            // Si no encuentra con ese ID, busca cualquier TextView
-            for (int i = 0; i < layoutEmpty.getChildCount(); i++) {
-                if (layoutEmpty.getChildAt(i) instanceof TextView) {
-                    tvEmpty = (TextView) layoutEmpty.getChildAt(i);
-                    break;
-                }
-            }
-        }
-
-        if (tvEmpty != null) {
-            if (isSearching && !currentSearchQuery.trim().isEmpty()) {
-                tvEmpty.setText("No se encontraron recetas para: \"" + currentSearchQuery + "\"");
-            } else if (chipPostres.isChecked()) {
-                tvEmpty.setText("No hay recetas de postres");
-            } else if (chipPrincipales.isChecked()) {
-                tvEmpty.setText("No hay recetas principales");
-            } else if (chipRapidas.isChecked()) {
-                tvEmpty.setText("No hay recetas rápidas");
-            } else {
-                // Mensaje por defecto
-                tvEmpty.setText(getString(R.string.recetas_sin_resultados));
-            }
+        if (isEmpty) {
+            actualizarEmptyState();
         }
     }
 
-    // SOBRESCRIBIR los métodos de la clase base con el mismo modificador de acceso o más permisivo
+    private void actualizarEmptyState() {
+        // Mostrar/ocultar botón de limpiar según el contexto
+        btnLimpiarBusqueda.setVisibility(isSearching ? View.VISIBLE : View.GONE);
+
+        if (isSearching && !currentSearchQuery.trim().isEmpty()) {
+            // Modo búsqueda con texto
+            emptyTitle.setText(getString(R.string.empty_title_sin_resultados));
+            emptySubtitle.setText(String.format(getString(R.string.empty_subtitle_busqueda), currentSearchQuery));
+        } else if (chipPostres.isChecked()) {
+            emptyTitle.setText(getString(R.string.empty_title_no_postres));
+            emptySubtitle.setText(getString(R.string.empty_subtitle_postres));
+        } else if (chipPrincipales.isChecked()) {
+            emptyTitle.setText(getString(R.string.empty_title_no_principales));
+            emptySubtitle.setText(getString(R.string.empty_subtitle_principales));
+        } else if (chipRapidas.isChecked()) {
+            emptyTitle.setText(getString(R.string.empty_title_no_rapidas));
+            emptySubtitle.setText(getString(R.string.empty_subtitle_rapidas));
+        } else {
+            // Estado por defecto
+            emptyTitle.setText(getString(R.string.recetas_sin_resultados));
+            emptySubtitle.setText(getString(R.string.empty_subtitle_default));
+        }
+    }
+
+    private void hideKeyboard() {
+        if (getContext() != null && etBuscar != null) {
+            android.view.inputmethod.InputMethodManager imm =
+                    (android.view.inputmethod.InputMethodManager) getContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(etBuscar.getWindowToken(), 0);
+        }
+    }
+
     @Override
     protected void openRecipeDetail(Receta receta) {
-        // Navegar al detalle de la receta
-        // Implementa según tu navegación
-        /* Ejemplo:
-        NavController navController = Navigation.findNavController(requireView());
-        Bundle bundle = new Bundle();
-        bundle.putLong("recetaId", receta.getId());
-        navController.navigate(R.id.action_recipesFragment_to_recipeDetailFragment, bundle);
-        */
-
-        // Llama al método de la clase base si es necesario
+        // Tu implementación de navegación al detalle
         super.openRecipeDetail(receta);
     }
 
     @Override
     protected void toggleFavorite(Receta receta, boolean isFav) {
         viewModel.marcarFavorita(receta.getId(), isFav);
-
-        // Llama al método de la clase base si es necesario
-        super.toggleFavorite(receta, isFav);
+        //observer maneja actualizacion
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Asegurarse de que los datos estén actualizados al volver al fragment
         if (isSearching) {
             viewModel.buscar(currentSearchQuery);
         }

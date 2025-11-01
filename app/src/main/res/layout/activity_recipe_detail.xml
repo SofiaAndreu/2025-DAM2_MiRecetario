@@ -307,7 +307,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:src="@android:drawable/star_big_off"
+        android:src="@drawable/ic_fav_no"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:tint="@color/white"

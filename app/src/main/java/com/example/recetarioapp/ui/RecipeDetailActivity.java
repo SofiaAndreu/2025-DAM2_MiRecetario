@@ -66,6 +66,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
         setupPhotoPicke();
         setupListeners();
         cargarReceta(recetaId);
+        setupFavoritoObserver();
+    }
+
+    private void setupFavoritoObserver() {
+        viewModel.getFavoritoActualizado().observe(this, recetaId -> {
+            if (recetaActual != null && recetaId == recetaActual.getId()) {
+                // Actualizar el estado local y el icono
+                recetaActual.setFav(!recetaActual.isFav());
+                actualizarIconoFavorito();
+            }
+        });
     }
 
     private void initViews() {
@@ -181,19 +192,18 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
         boolean nuevoEstado = !recetaActual.isFav();
         viewModel.marcarFavorita(recetaActual.getId(), nuevoEstado);
-        recetaActual.setFav(nuevoEstado);
-        actualizarIconoFavorito();
 
         Toast.makeText(this,
                 nuevoEstado ? "Añadida a favoritos" : "Quitada de favoritos",
                 Toast.LENGTH_SHORT).show();
     }
 
+    // Metodo para iconos personalizados:
     private void actualizarIconoFavorito() {
         fabFavorito.setImageResource(
                 recetaActual != null && recetaActual.isFav()
-                        ? android.R.drawable.star_big_on
-                        : android.R.drawable.star_big_off
+                        ? R.drawable.ic_fav  // Estrella rellena
+                        : R.drawable.ic_fav_no  // Estrella vacía
         );
     }
 

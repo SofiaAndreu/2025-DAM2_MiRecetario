@@ -43,6 +43,12 @@ public class RecetaViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> msgLoading = new MutableLiveData<>();
     private final MutableLiveData<Integer> msgProgresoSubida = new MutableLiveData<>();
 
+    // Añade este LiveData para notificar cambios en favoritos
+    private final MutableLiveData<Long> favoritoActualizado = new MutableLiveData<>();
+    public LiveData<Long> getFavoritoActualizado() {
+        return favoritoActualizado;
+    }
+
     //CONSTRUCTOR
     public RecetaViewModel(@NonNull Application application) {
         super(application);
@@ -119,11 +125,13 @@ public class RecetaViewModel extends AndroidViewModel {
         });
     } // --------------------------------------------------------------------------- //
 
-    //MARCAR/DESMARCAR FAVORITA
+    // MARCAR/DESMARCAR FAVORITA - MODIFICADO
     public void marcarFavorita(long id, boolean isFav){
         //Llama a Repo. para marcar directamente.
         recetaRepository.establecerFavorita(id, isFav);
-    } // --------------------------------------------------------------------------- //
+        // Notificar que este favorito fue actualizado
+        favoritoActualizado.postValue(id);
+    }// --------------------------------------------------------------------------- //
 
     //SUBIR IMAGEN
     public void guardarImagenLocal(Uri imageUri, OnImagenSubidaListener listener) {

@@ -150,6 +150,22 @@
     <string name="registro_ir_login">Iniciar Sesión</string>
     <string name="continuar_sin_cuenta">Continuar sin cuenta</string>
 
+    <!-- Empty State Titles -->
+    <string name="empty_title_sin_resultados">Sin resultados</string>
+    <string name="empty_title_no_postres">No hay postres</string>
+    <string name="empty_title_no_principales">No hay platos principales</string>
+    <string name="empty_title_no_rapidas">No hay recetas rápidas</string>
+
+    <!-- Empty State Subtitles -->
+    <string name="empty_subtitle_busqueda">No encontramos recetas para \"%s\"</string>
+    <string name="empty_subtitle_postres">Prueba con otra categoría o añade alguna receta de postres</string>
+    <string name="empty_subtitle_principales">Explora otras categorías o crea tus propias recetas principales</string>
+    <string name="empty_subtitle_rapidas">Las recetas rápidas aparecerán aquí cuando las añadas</string>
+    <string name="empty_subtitle_default">Comienza añadiendo tu primera receta o sincronizando con la nube</string>
+
+    <!-- Button -->
+    <string name="btn_limpiar_busqueda">Limpiar búsqueda</string>
+
     <!-- Generales -->
     <string name="app_logo">Logo de la aplicación</string>
     <string name="version_app">v1.0.0</string>

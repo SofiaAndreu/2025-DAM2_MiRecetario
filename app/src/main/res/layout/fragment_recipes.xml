@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/fragment_recipes.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE TU ARCHIVO ACTUAL -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -140,14 +138,14 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Empty state -->
+    <!-- Empty state mejorado -->
     <LinearLayout
         android:id="@+id/layout_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="32dp"
+        android:padding="48dp"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -155,18 +153,42 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
+            android:id="@+id/empty_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔍"
-            android:textSize="64sp" />
+            android:textSize="80sp"
+            android:layout_marginBottom="24dp" />
 
         <TextView
+            android:id="@+id/empty_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/recetas_sin_resultados"
-            android:textSize="18sp"
+            android:textSize="20sp"
+            android:textStyle="bold"
             android:textColor="@color/color_text_primary"
-            android:layout_marginTop="16dp" />
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/empty_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Intenta con otros términos o revisa los filtros"
+            android:textSize="16sp"
+            android:textColor="@color/color_text_secondary"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_limpiar_busqueda"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_limpiar_busqueda"
+            android:visibility="gone"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="@color/color_primary" />
 
     </LinearLayout>
 
