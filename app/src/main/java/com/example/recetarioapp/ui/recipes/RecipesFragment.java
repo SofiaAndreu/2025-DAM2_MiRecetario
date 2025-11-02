@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -47,6 +48,11 @@ public class RecipesFragment extends BaseFragment {
     // Para controlar si estamos en modo búsqueda o filtro
     private boolean isSearching = false;
     private String currentSearchQuery = "";
+
+    public void initViewModel() {
+        // INICIALIZAR EL VIEWMODEL - ESTO ES LO QUE FALTA
+        viewModel = new ViewModelProvider(this).get(RecetaViewModel.class);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
