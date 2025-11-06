@@ -1,6 +1,6 @@
 <resources>
     <!-- APP -->
-    <string name="app_name">TusRecetasApp</string>
+    <string name="app_name">MiRecetario</string>
     <string name="tagline">Crea y guarda recetas personalizadas</string>
 
     <!-- ACCIONES GENERALES -->
