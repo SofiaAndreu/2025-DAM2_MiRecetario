@@ -189,10 +189,17 @@
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
 
-    <!-- Tema para Splash (sin ActionBar, pantalla completa) -->
-        <style name="Theme.RecetarioApp.Splash" parent="Theme.Material3.Light.NoActionBar">
-            <item name="android:windowBackground">@color/color_primary</item>
-            <item name="android:statusBarColor">@color/color_primary</item>
-            <item name="android:navigationBarColor">@color/color_primary</item>
-        </style>
+    <!-- Tema para Splash (MODIFICADO para eliminar splash automático) -->
+    <style name="Theme.RecetarioApp.Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Fondo transparente para evitar el splash automático -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowDisablePreview">true</item>
+        <!-- Mantener tus colores -->
+        <item name="android:statusBarColor">@color/color_primary</item>
+        <item name="android:navigationBarColor">@color/color_primary</item>
+    </style>
 </resources>

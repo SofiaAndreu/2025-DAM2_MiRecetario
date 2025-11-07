@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- PERMISOS DE LA APLICACIÓN -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Acceso a Internet-->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />  <!-- Característica de Cámara (no obligatoria) -->
+    <uses-permission android:name="android.permission.CAMERA" />   <!-- Permiso USO de Cámara -->
 
-
+    <!-- CONFIGURACIÓN DE LA APLICACIÓN -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,39 +18,44 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RecetarioApp" >
 
-        <!-- SplashActivity como LAUNCHER -->
+        <!-- ACTIVIDADES -->
+
+        <!-- SplashActivity - Pantalla de presentación/inicio -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.RecetarioApp.Splash">
             <intent-filter>
+                <!-- Actividad principal que se lanza al abrir la app -->
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- LoginActivity -->
+        <!-- LoginActivity - Pantalla de inicio de sesión -->
         <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- RegisterActivity -->
+        <!-- RegisterActivity - Pantalla de registro de usuario -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- MainActivity (ya no es LAUNCHER) -->
+        <!-- MainActivity - Pantalla principal después del login -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
 
+        <!-- RecipeDetailActivity - Pantalla de detalle de recetas -->
         <activity
             android:name=".ui.RecipeDetailActivity"
             android:theme="@style/Theme.RecetarioApp"
             android:parentActivityName=".MainActivity" />
 
+        <!-- FILEPROVIDER PARA COMPARTIR ARCHIVOS -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
