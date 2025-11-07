@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.recetarioapp.R;
 import com.example.recetarioapp.adapters.RecetaAdapter;
+import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.ui.base.BaseFragment;
 import com.example.recetarioapp.utils.ViewExtensions;
 import java.util.List;
@@ -63,10 +64,10 @@ public class FragmentHome extends BaseFragment {
 
             tvTotalRecetas.setText(String.valueOf(recetas.size()));
 
-            List<?> recetasRecientes = recetas.size() > 5
+            List<Receta> recetasRecientes = recetas.size() > 5
                     ? recetas.subList(0, 5)
                     : recetas;
-            adapter.submitList((List) recetasRecientes);
+            adapter.submitList(recetasRecientes);
 
             ViewExtensions.setVisible(rvRecetasRecientes, !recetas.isEmpty());
             ViewExtensions.setVisible(layoutEmptyState, recetas.isEmpty());

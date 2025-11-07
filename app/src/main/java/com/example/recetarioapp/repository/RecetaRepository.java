@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class RecetaRepository {
 
+    private static final String TAG = "RecetaRepository"; //Constante para logs
+
     private final LocalDataSource localDataSource;
     private final FirebaseDataSource firebaseDataSource;
     private final ImageStorage imageManager;
@@ -70,13 +72,13 @@ public class RecetaRepository {
             // Sincronizar con Firebase en segundo plano
             firebaseDataSource.guardarReceta(receta, firebaseId -> {
                 receta.setFirebaseId(firebaseId);
-                // CORRECIÓN: Agregar el OnErrorListener
-                localDataSource.actualizar(receta,
-                        () -> {}, // Runnable onSuccess
-                        error -> android.util.Log.w("Repository", "Error al actualizar Firebase ID: " + error) // OnErrorListener
-                );
+                localDataSource.actualizar(receta, () -> {
+                    // Éxito al actualizar Firebase ID (opcional: podrías omitir si no necesitas hacer nada)
+                }, error -> {
+                    android.util.Log.w(TAG, "Error al actualizar Firebase ID: " + error);
+                });
             }, error -> {
-                android.util.Log.w("Repository", "Modo offline: " + error);
+                android.util.Log.w(TAG, "Modo offline: " + error);
             });
         }, listener::onError);
     }
@@ -85,11 +87,10 @@ public class RecetaRepository {
         localDataSource.actualizar(receta, () -> {
             listener.onSuccess(receta);
 
-            // Sincronizar con Firebase
             if (receta.getFirebaseId() != null) {
                 firebaseDataSource.actualizarReceta(receta,
-                        () -> {},
-                        error -> android.util.Log.w("Repository", "Error sync: " + error)
+                        NOOP_RUNNABLE, //Reemplazamos el lambda vacío
+                        error -> android.util.Log.w(TAG, "Error sync: " + error)
                 );
             }
         }, listener::onError);
@@ -99,11 +100,10 @@ public class RecetaRepository {
         localDataSource.eliminar(receta, () -> {
             listener.onSuccess();
 
-            // Eliminar de Firebase si existe
             if (receta.getFirebaseId() != null) {
                 firebaseDataSource.eliminarReceta(receta.getFirebaseId(),
-                        () -> {},
-                        error -> {}
+                        NOOP_RUNNABLE, //Reemplazamos el lambda vacío
+                        error -> android.util.Log.w(TAG, "Error al eliminar en Firebase: " + error)
                 );
             }
         }, listener::onError);
@@ -123,9 +123,12 @@ public class RecetaRepository {
         firebaseDataSource.obtenerRecetasUsuario(recetas -> {
             localDataSource.insertarVarias(recetas);
         }, error -> {
-            android.util.Log.w("Repository", "Error sincronización: " + error);
+            android.util.Log.w(TAG, "Error sincronización: " + error);
         });
     }
+
+    // ===== UTILIDADES =====
+    private static final Runnable NOOP_RUNNABLE = () -> {}; //Helper para callbacks vacíos
 
     // ===== INTERFACES =====
     public interface OnRecetaGuardadaListener {

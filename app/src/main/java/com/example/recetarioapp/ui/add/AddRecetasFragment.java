@@ -79,6 +79,7 @@ public class AddRecetasFragment extends BaseFragment {
         setupObservadoresGuardado(); // Nuevo método para observadores de guardado
         observeViewModel();
 
+
         if (modoEdicion) cargarRecetaParaEditar();
     }
 

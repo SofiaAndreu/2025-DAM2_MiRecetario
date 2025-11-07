@@ -12,27 +12,27 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Converters para Room Database (libreria de BD basada en SQLite). ✓
+ * Converters para Room Database (libreria de BD basada en SQLite). âœ“
  * No puede guardar tipos complejos directamente, por eso se usa TypeConverters (""traductor"")
  * Converters.java ->pasa tipos complejos a tipos compatibles para guardar con ROOM
  */
 public class Converters {
 
-    private static final Gson gson = new Gson(); //Instancia estática de Gson (evitar multiples instancias)
+    private static final Gson gson = new Gson(); //Instancia estÃ¡tica de Gson (evitar multiples instancias)
 
     @TypeConverter //De DATE -> Long (milisegundos)
-    public static Long dateAtimestamp(Date date){
+    public static Long dateTotimestamp(Date date){
         return date == null ? null :date.getTime();
     }
     @TypeConverter //De Long -> a DATE (contrario al anterior)
-    public static Date deTimestamp(Long value){
+    public static Date timestampToDate(Long value){
         return value == null ? null : new Date(value);
     }
 
     // ------------------------------------------------------------------------------------------ //
 
     @TypeConverter //De List -> cadena JSON
-    public static String ListStringToString(List<String> list){
+    public static String listStringToJson(List<String> list){
         if(list==null){
             return null;
         }
@@ -40,7 +40,7 @@ public class Converters {
     }
 
     @TypeConverter //De cadena JSON -> Lista de String
-    public static List<String> deListString(String value){
+    public static List<String> jsonToListString(String value){
         if(value == null){
             return new ArrayList<>();
         }

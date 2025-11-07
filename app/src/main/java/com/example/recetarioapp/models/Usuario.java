@@ -1,13 +1,9 @@
 package com.example.recetarioapp.models;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.adapters.Converters;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Modelo de Usuario para Room y Firebase

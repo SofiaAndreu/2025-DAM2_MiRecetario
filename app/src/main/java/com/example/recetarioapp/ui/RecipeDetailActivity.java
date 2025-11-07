@@ -200,10 +200,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
     // Metodo para iconos personalizados:
     private void actualizarIconoFavorito() {
+        if (recetaActual == null) return; // Protección null
         fabFavorito.setImageResource(
-                recetaActual != null && recetaActual.isFav()
-                        ? R.drawable.ic_fav  // Estrella rellena
-                        : R.drawable.ic_fav_no  // Estrella vacía
+                recetaActual.isFav() ? R.drawable.ic_fav : R.drawable.ic_fav_no
         );
     }
 

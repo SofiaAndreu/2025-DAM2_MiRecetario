@@ -17,9 +17,10 @@ import com.example.recetarioapp.models.Receta;
 import com.google.android.material.chip.Chip;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
- * Adapter para mostrar la lista de recetas en RecyclerView ✓
+ * Adapter para mostrar la lista de recetas en RecyclerView
  * puente entre objetos receta y RecyclerView
  */
 public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewHolder> {
@@ -39,9 +40,9 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         public boolean areItemsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
             return oldItem.getId() == newItem.getId();
         }
-        @Override //Compara mismo contenido (nombre y estado de fav)
+        @Override
         public boolean areContentsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
-            return oldItem.getNombre().equals(newItem.getNombre()) &&
+            return Objects.equals(oldItem.getNombre(), newItem.getNombre()) &&
                     oldItem.isFav() == newItem.isFav();
         }
     };

@@ -1,6 +1,6 @@
 package com.example.recetarioapp.adapters;
-
-import android.graphics.Paint; //para texto tachado
+// -- IMPORTACIONES --
+import android.graphics.Paint; //para efecto de texto tachado
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,25 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter para mostrar ingredientes con checkbox ✓
+ * IngredienteAdapter - Muestra lista de ingredientes con checkbox.
+ * Permite marcarlos como "comprados"; al hacerlo, el texto se tacha visualmente.
  */
 public class IngredienteAdapter extends RecyclerView.Adapter<IngredienteAdapter.ViewHolder> {
-    //List de datos
-    private List<Ingrediente> ingredientes;
+    private List<Ingrediente> ingredientes; //Lista de ingredientes a mostrar.
 
-    //Constructor Lista vacía
-    public IngredienteAdapter() {
-        this.ingredientes = new ArrayList<>();
-    }
+    //Constructor - Lista vacía por defecto.
+    public IngredienteAdapter() { this.ingredientes = new ArrayList<>(); }
 
-    //Actualizar datos
+    //Actualiza los datos y refresca RecyclerView
     public void setIngredientes(List<Ingrediente> ingredientes) {
-        this.ingredientes = ingredientes != null ? ingredientes : new ArrayList<>(); //si es null -> lista vacía
-        notifyDataSetChanged(); //Notificar a RecyclerView que los datos cambiaron
+        this.ingredientes = ingredientes != null ? ingredientes : new ArrayList<>(); //Si es null -> lista vacía.
+        notifyDataSetChanged(); //Notificar a RecyclerView que los datos cambiaron.
     }
-    // -------------------------------------------------------------------------------- //
 
-    //Crear vistas/items cuando se necesitan
+    //Crear nuevo viewHolder inflando el layout del item.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,34 +42,33 @@ public class IngredienteAdapter extends RecyclerView.Adapter<IngredienteAdapter.
         return new ViewHolder(view);
     }
 
-    //Asigna datos a vista existente
+    //Asigna datos del ingrediente a las vistas del viewHolder.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //obtiene ingrediente + posición -> lo pasa ViewHolder
+        //obtiene ingrediente + posición -> lo pasa ViewHolder.
         Ingrediente ingrediente = ingredientes.get(position);
         holder.bind(ingrediente);
     }
 
-    //Devuelve cuántos items hay en la lista
+    //Devuelve número total de ingredientes en la lista.
     @Override
     public int getItemCount() {
         return ingredientes.size();
     }
 
-    // -------------------------------------------------------------------------------- //
 
-    //Clase interna - ViewHolder
+    // -- VIEWHOLDER INTERNO --
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private final CheckBox cbIngrediente; //checkbox
-        private final TextView tvIngrediente; //TV para texto
+        private final CheckBox cbIngrediente; //checkbox para marcar ingrediente
+        private final TextView tvIngrediente; //TV para texto con nombre y cantidad del ingrediente.
 
-        //Constructor que recibe vista del item
+        //Constructor que enlaza vistas y configura el comportamiento del Checkbox
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             cbIngrediente = itemView.findViewById(R.id.cb_ingrediente);
             tvIngrediente = itemView.findViewById(R.id.tv_ingrediente);
 
-            // Listener para marcar/desmarcar checkbox
+            //Listener para marcar/desmarcar el checkbox (aplica o quita el tachado)
             cbIngrediente.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     // Tachar el texto
@@ -82,7 +78,7 @@ public class IngredienteAdapter extends RecyclerView.Adapter<IngredienteAdapter.
                     tvIngrediente.setPaintFlags(tvIngrediente.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
                 }
             });
-        } // ---------------------------------------------------------------------------------------------- //
+        }
 
         //Asignar datos de ingrediente a vistas
         public void bind(Ingrediente ingrediente) {

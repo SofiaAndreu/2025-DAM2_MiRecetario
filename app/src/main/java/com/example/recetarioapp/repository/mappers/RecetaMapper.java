@@ -50,7 +50,17 @@ public class RecetaMapper {
 
     private int getInt(Map<String, Object> map, String key) {
         Object value = map.get(key);
-        return value != null ? ((Long) value).intValue() : 0;
+        if (value == null) return 0;
+
+        // Maneja tanto Long como Integer
+        if (value instanceof Long) {
+            return ((Long) value).intValue();
+        } else if (value instanceof Integer) {
+            return (Integer) value;
+        } else if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return 0;
     }
 
     private boolean getBoolean(Map<String, Object> map, String key) {

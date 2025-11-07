@@ -104,33 +104,6 @@ public class ImageHelper {
     }
 
     /**
-     * Redimensiona un bitmap si supera el tamaño máximo
-     * @param bitmap Bitmap original
-     * @param maxSize Tamaño máximo en píxeles
-     * @return Bitmap redimensionado
-     */
-    private static Bitmap resizeBitmap(Bitmap bitmap, int maxSize) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        if (width <= maxSize && height <= maxSize) {
-            return bitmap;
-        }
-
-        float scale;
-        if (width > height) {
-            scale = (float) maxSize / width;
-        } else {
-            scale = (float) maxSize / height;
-        }
-
-        int newWidth = Math.round(width * scale);
-        int newHeight = Math.round(height * scale);
-
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
-    }
-
-    /**
      * Verifica si una imagen existe
      * @param imagePath Ruta de la imagen
      * @return true si existe

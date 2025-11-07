@@ -45,7 +45,22 @@ public class RecipeFilterDialog {
                 .create();
 
         dialogView.findViewById(R.id.btn_aplicar).setOnClickListener(v -> {
-            // Aplicar filtros...
+            String categoriaSeleccionada = spinnerCategoria.getText().toString();
+            String dificultadSeleccionada = spinnerDificultad.getText().toString();
+            int tiempoMax = (int) sliderTiempo.getValue();
+
+            // Aplicar filtros según selección
+            if (!categoriaSeleccionada.equals("Todas")) {
+                viewModel.filtrarPorCategoria(categoriaSeleccionada)
+                        .observeForever(listener::onFilterApplied);
+            } else if (!dificultadSeleccionada.equals("Todas")) {
+                viewModel.filtrarPorDificultad(dificultadSeleccionada)
+                        .observeForever(listener::onFilterApplied);
+            } else if (tiempoMax > 0) {
+                viewModel.filtrarPorTiempo(tiempoMax)
+                        .observeForever(listener::onFilterApplied);
+            }
+
             dialog.dismiss();
         });
 

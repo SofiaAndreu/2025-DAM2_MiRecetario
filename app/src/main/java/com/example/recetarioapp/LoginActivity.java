@@ -128,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
      * Valida campos de email y password
      */
     private boolean validarCampos(String email, String password) {
-        boolean esValido = true;  // Bandera validación
+        boolean esValido = true;
 
         // VALIDACIÓN EMAIL
         if (TextUtils.isEmpty(email)) {
@@ -148,7 +148,6 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             binding.tilPassword.setError(null);  // Limpia error
         }
-
         return esValido;  // Retorna resultado
     }
 

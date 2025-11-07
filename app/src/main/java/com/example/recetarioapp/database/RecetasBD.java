@@ -18,7 +18,9 @@ import java.util.concurrent.Executors;
  * Actua como caché y permite modo offline ✓
  */
 @Database(
-        entities = {Receta.class, Usuario .class}, version=2, exportSchema = false) //clase=tabla en bd, version de BD, exportar def. exquema = false)
+        entities = {Receta.class, Usuario.class}, //Clase = tabla en BD
+        version=2, //Version de BD
+        exportSchema = false) //Exportar def. exquema = false)
 @TypeConverters({Converters.class}) //Converters personalizados
 public abstract class RecetasBD extends RoomDatabase {
 
@@ -52,9 +54,11 @@ public abstract class RecetasBD extends RoomDatabase {
         return INSTANCE;
     }
 
-    //RESETEAR INSTANCIA [TESTING]
+/**
+ *  Destruye la instancia de la base de datos.
+ *  ¡¡ SOLO PARA TESTING - No usar en producción !!
+ */
 //    public static void destroyInstance(){
 //        INSTANCE = null;
 //    }
-
 }

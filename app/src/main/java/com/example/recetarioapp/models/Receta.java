@@ -79,16 +79,19 @@ public class Receta {
     }
 
     //MÉTODO CONVERSOR de TIEMPO PREPARACIÓN
-    public String getTiempoPrepFormateado(){
-        if(tiempoPreparacion < 60){ //Si tiempo < 60 = "35 minutos"
-            return tiempoPreparacion + " min";
-
-        } else { //tiempo> 60 = "1h 30min"
-            int horas = tiempoPreparacion /60;
-            int minutos = tiempoPreparacion % 60;
-            return horas + "h " + (minutos> 0 ? minutos + "min" : "");
+    public String getTiempoPrepFormateado() {
+        if (tiempoPreparacion == 0) {
+            return "-";
         }
-    } // ------------------------------------------------------------------- //
+        if (tiempoPreparacion < 60) {
+            return tiempoPreparacion + " min";
+        } else {
+            int horas = tiempoPreparacion / 60;
+            int minutos = tiempoPreparacion % 60;
+            return horas + "h" + (minutos > 0 ? " " + minutos + "min" : "");
+        }
+    }
+
 
     //GETTERS/SETTERS
     public long getId() { return id; }

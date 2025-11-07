@@ -131,8 +131,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Verifica si hay un usuario autenticado - VERSIÓN MEJORADA
-     * Maneja tanto usuarios registrados como modo anónimo
+     * Verifica autenticación del usuario actual.
+     * - Si es modo anónimo: mantiene sesión local sin Firebase
+     * - Si no hay usuario Firebase: crea sesión anónima de Firebase automáticamente
      */
     private void verificarAutenticacion() {
         FirebaseUser currentUser = auth.getCurrentUser();  // Obtiene usuario actual autenticado en Firebase
@@ -147,10 +148,8 @@ public class MainActivity extends AppCompatActivity {
             auth.signInAnonymously()  // Autentica anónimamente en Firebase
                     .addOnSuccessListener(authResult -> {
                         // Usuario autenticado correctamente con Firebase Anónimo
-                        // Puedes agregar lógica adicional aquí si es necesario
                     })
-                    .addOnFailureListener(e -> {
-                        // Error al autenticar anónimamente
+                    .addOnFailureListener(e -> { //Error al autenticar anónimamente
                         Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show();
                     });
         }

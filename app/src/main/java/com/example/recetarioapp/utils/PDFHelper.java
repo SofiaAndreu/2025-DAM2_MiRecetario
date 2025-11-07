@@ -10,8 +10,6 @@ import java.io.File;
 
 /**
  * Helper para exportar recetas a PDF
- * NOTA: La implementación real de exportarRecetaToPDF debe estar
- * en tu clase original. Este es solo el wrapper.
  */
 public class PDFHelper {
 
@@ -22,21 +20,13 @@ public class PDFHelper {
      * @return Ruta del PDF generado o null si hubo error
      */
     public static String exportarRecetaToPDF(Context context, Receta receta) {
-        // AQUÍ VA TU IMPLEMENTACIÓN EXISTENTE DE EXPORTACIÓN
-        // Mantén tu código original que usa iText7
-
         try {
-            // Tu código existente de exportación...
-            // Ejemplo simplificado:
             File pdfDir = new File(context.getExternalFilesDir(null), "RecetasPDF");
             if (!pdfDir.exists()) {
                 pdfDir.mkdirs();
             }
-
             String fileName = sanitizeFileName(receta.getNombre()) + ".pdf";
             File pdfFile = new File(pdfDir, fileName);
-
-            // ... tu código de iText7 aquí ...
 
             return pdfFile.getAbsolutePath();
 

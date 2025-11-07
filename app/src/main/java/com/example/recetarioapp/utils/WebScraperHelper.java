@@ -390,9 +390,8 @@ public class WebScraperHelper {
                 continue;
             }
 
-            if (linea.toLowerCase().contains("preparación") ||
-                    linea.toLowerCase().contains("paso") ||
-                    linea.toLowerCase().contains("instruccion")) {
+            if (linea.toLowerCase().contains("preparación") || linea.toLowerCase().contains("paso") ||
+                    linea.toLowerCase().contains("instruccion") || linea.toLowerCase().contains("instrucción"))  {
                 enIngredientes = false;
                 enPasos = true;
                 continue;

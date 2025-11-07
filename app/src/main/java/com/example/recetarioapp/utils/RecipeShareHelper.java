@@ -26,7 +26,7 @@ public class RecipeShareHelper {
     /**
      * Construye el texto formateado de la receta
      */
-    private static String buildShareText(Receta receta) {
+    private static String buildShareText(Receta receta) { //SUSTITUIR EMOJIS!!
         StringBuilder texto = new StringBuilder();
 
         texto.append("📖 ").append(receta.getNombre()).append("\n\n");
