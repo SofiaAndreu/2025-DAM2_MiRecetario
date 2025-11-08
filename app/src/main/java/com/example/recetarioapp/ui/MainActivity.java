@@ -1,4 +1,4 @@
-package com.example.recetarioapp;
+package com.example.recetarioapp.ui;
 
 // Importaciones de Android y componentes
 import android.content.Intent;              // Para navegación entre actividades
@@ -14,6 +14,7 @@ import androidx.navigation.NavController;          // Controlador de navegación
 import androidx.navigation.fragment.NavHostFragment; // Fragmento host para navegación
 import androidx.navigation.ui.NavigationUI;        // Utilidades UI para navegación
 
+import com.example.recetarioapp.R;
 import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel para autenticación
 import com.google.android.material.bottomnavigation.BottomNavigationView;  // Barra navegación inferior
 import com.google.android.material.navigation.NavigationBarView;           // Interface navegación

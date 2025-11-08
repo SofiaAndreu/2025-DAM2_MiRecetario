@@ -1,4 +1,4 @@
-package com.example.recetarioapp;
+package com.example.recetarioapp.ui;
 
 // -- IMPORTACIONES --
 import android.content.Intent; //Navegación entre actividades
@@ -8,6 +8,8 @@ import android.widget.Toast; //Mensajes breves
 import androidx.appcompat.app.AlertDialog; //Dialogos de Alertas
 import androidx.appcompat.app.AppCompatActivity;  // Activity base
 import androidx.lifecycle.ViewModelProvider;      // Para ViewModel
+
+import com.example.recetarioapp.R;
 import com.example.recetarioapp.databinding.ActivityRegisterBinding;  // ViewBinding
 import com.example.recetarioapp.utils.ViewExtensions;  // Utilidades para vistas
 import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel auth

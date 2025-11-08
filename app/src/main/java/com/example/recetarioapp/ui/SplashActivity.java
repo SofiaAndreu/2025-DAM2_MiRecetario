@@ -1,4 +1,4 @@
-package com.example.recetarioapp;
+package com.example.recetarioapp.ui;
 
 // -- IMPORTACIONES --
 import android.annotation.SuppressLint;  // Para suprimir advertencias específicas
@@ -8,6 +8,8 @@ import android.os.Handler;               // Para ejecutar código después de un
 import android.os.Looper;                // Para asegurar ejecución en hilo principal
 import androidx.appcompat.app.AppCompatActivity;  // Activity base con compatibilidad
 import androidx.lifecycle.ViewModelProvider;      // Para obtener instancias de ViewModel
+
+import com.example.recetarioapp.R;
 import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel para autenticación
 
 /**

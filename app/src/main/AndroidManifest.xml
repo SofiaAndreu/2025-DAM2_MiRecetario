@@ -22,7 +22,7 @@
 
         <!-- SplashActivity - Pantalla de presentación/inicio -->
         <activity
-            android:name=".SplashActivity"
+            android:name=".ui.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.RecetarioApp.Splash">
             <intent-filter>
@@ -34,26 +34,26 @@
 
         <!-- LoginActivity - Pantalla de inicio de sesión -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.LoginActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- RegisterActivity - Pantalla de registro de usuario -->
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ui.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- MainActivity - Pantalla principal después del login -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="false" />
 
         <!-- RecipeDetailActivity - Pantalla de detalle de recetas -->
         <activity
             android:name=".ui.RecipeDetailActivity"
             android:theme="@style/Theme.RecetarioApp"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
 
         <!-- FILEPROVIDER PARA COMPARTIR ARCHIVOS -->
         <provider

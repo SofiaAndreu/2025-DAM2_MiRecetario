@@ -1,9 +1,7 @@
 package com.example.recetarioapp.ui;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.recetarioapp.R;
@@ -225,7 +222,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
     private void abrirEdicion() {
         if (recetaActual == null) return;
 
-        Intent intent = new Intent(this, com.example.recetarioapp.MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("editar_receta_id", recetaActual.getId());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
