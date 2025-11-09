@@ -90,6 +90,15 @@ public class LocalDataSource {
         });
     }
 
+    public Receta getRecetaByFirebaseId(String firebaseId) {
+        try {
+            return dao.getRecetaByFirebaseId(firebaseId);
+        } catch (Exception e) {
+            android.util.Log.e("LocalDataSource", "Error buscando por firebaseId: " + e.getMessage());
+            return null;
+        }
+    }
+
     public void establecerFavorita(long id, boolean isFav) {
         RecetasBD.bdWriteExecutor.execute(() -> dao.actualizarFavorita(id, isFav));
     }

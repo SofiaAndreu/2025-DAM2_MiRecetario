@@ -54,6 +54,8 @@ public interface RecetaDAO {
     //OBTENER X FIREBASE ID
     @Query("SELECT * FROM recetas WHERE firebaseId = :firebaseId")
     Receta getRecetaByFirebaseId(String firebaseId);
+    @Query("DELETE FROM recetas WHERE ingredientes IS NULL OR ingredientes = '' OR pasos IS NULL OR pasos = ''")
+    void eliminarRecetasVacias();
     // ---------------------------------------------------- //
 
     //FAVORITOS

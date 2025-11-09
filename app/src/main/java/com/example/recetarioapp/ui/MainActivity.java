@@ -156,25 +156,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     // ---------------------------------------------------------------------------- //
-
-    /**
-     * Método para cerrar sesión completa (incluyendo modo anónimo)
-     * Limpia toda la información de sesión y redirige al login
-     */
-    public void cerrarSesionCompleta() {
-        // Cerrar sesión de Firebase (elimina autenticación Firebase)
-        auth.signOut();
-
-        // Limpiar modo anónimo (elimina flags de SharedPreferences)
-        authViewModel.limpiarModoAnonimo();
-
-        // Redirigir al login con flags para limpiar el stack
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();  // Cierra MainActivity
-    }
-
     /**
      * Método para verificar si el usuario actual está en modo invitado
      * @return true si es usuario anónimo, false si es usuario registrado

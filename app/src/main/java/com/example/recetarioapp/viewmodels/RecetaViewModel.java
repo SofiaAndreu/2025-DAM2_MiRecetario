@@ -12,6 +12,7 @@ import androidx.lifecycle.Transformations;
 
 import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.repository.RecetaRepository;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ public class RecetaViewModel extends AndroidViewModel {
 
     //ATRIBUTOS PRINCIPALES
     private final RecetaRepository recetaRepository;
+
+    // ✅ NUEVO: ID de instancia para debugging
+    private final String instanciaId = java.util.UUID.randomUUID().toString().substring(0, 8);
 
     //LIVEDATA - Datos que observa la interfaz (se actualiza automaticamente)
     private final LiveData<List<Receta>> todasLasRecetas;
@@ -54,6 +58,9 @@ public class RecetaViewModel extends AndroidViewModel {
         super(application);
         recetaRepository = new RecetaRepository(application);
 
+        // ✅ DEBUG: Log de creación de ViewModel
+        Log.d("VIEWMODEL", "🆕 Nueva Instancia ViewModel: " + instanciaId);
+
         //Obtiene LiveData iniciales
         todasLasRecetas = recetaRepository.getAllRecetas();
         favs = recetaRepository.getFavs();
@@ -79,15 +86,16 @@ public class RecetaViewModel extends AndroidViewModel {
             public void onSuccess(Receta recetaG) {
                 msgLoading.postValue(false);
                 msgExito.postValue("Receta guardada correctamente");
+                Log.d("VIEWMODEL", "✅ Receta insertada - Instancia: " + instanciaId);
             }
             @Override //Error
             public void onError(String mensaje) {
                 msgLoading.postValue(false);
                 msgError.postValue(mensaje);
+                Log.e("VIEWMODEL", "❌ Error insertando receta: " + mensaje);
             }
         });
     } // --------------------------------------------------------------------------- //
-
 
     //ACTUALIZAR RECETA
     public void actualizarReceta(Receta receta){
@@ -157,6 +165,28 @@ public class RecetaViewModel extends AndroidViewModel {
         });
     } // ---------------------------------------------------------------------------------- //
 
+    //SINCRONIZAR CON FIREBASE a LOCAL
+    public void sincronizar(){
+        Log.d("VIEWMODEL", "🔁 Sincronizando - Instancia: " + instanciaId);
+        msgLoading.postValue(true);
+        recetaRepository.sincronizarFBaLocal();
+        msgLoading.postValue(false);
+        msgExito.postValue("Sincronizando...");
+    }
+
+    // ✅ NUEVO: Forzar resincronización
+    public void forzarResincronizacion() {
+        Log.d("VIEWMODEL", "🔄 Forzando resincronización - Instancia: " + instanciaId);
+        recetaRepository.forzarSincronizacion();
+        msgExito.postValue("Resincronizando recetas...");
+    }
+
+    // ✅ NUEVO: Resetear sincronización para testing
+    public void resetearSincronizacion() {
+        RecetaRepository.resetearSincronizacion();
+        Log.d("VIEWMODEL", "🔄 Sincronización reseteada - Instancia: " + instanciaId);
+    }
+
     //BUSCAR/FILTRAR
     public void buscar(String query){
         //Actualiza valor de busqueda - transformación reactiva
@@ -185,14 +215,6 @@ public class RecetaViewModel extends AndroidViewModel {
     }
     // --------------------------------------------------------------------- //
 
-    //SINCRONIZAR CON FIREBASE a LOCAL
-    public void sincronizar(){
-        msgLoading.postValue(true);
-        recetaRepository.sincronizarFBaLocal();
-        msgLoading.postValue(false);
-        msgExito.postValue("Sincronizando...");
-    }
-
     //LIMPIAR MENSAJES EXITO/ERROR
     public void limpiarMensajesE(){
         //Reset mensajes Exito/Error
@@ -202,7 +224,7 @@ public class RecetaViewModel extends AndroidViewModel {
 
     // MÉTODO DE DIAGNÓSTICO
     public void debugBuscar(String query) {
-        Log.d("BUSQUEDA", "Buscando: '" + query + "'");
+        Log.d("BUSQUEDA", "Buscando: '" + query + "' - Instancia: " + instanciaId);
         buscar(query);
     }
 
@@ -233,11 +255,14 @@ public class RecetaViewModel extends AndroidViewModel {
         return recetaRepository.getRecetaById(id);
     }
 
+    // ✅ NUEVO: Getter para debugging
+    public String getInstanciaId() {
+        return instanciaId;
+    }
 
     //INTERFACE
     public interface OnImagenSubidaListener{
         void onImagenSubida(String url);
         void onError(String mensaje);
     }
-
 }

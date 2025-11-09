@@ -177,8 +177,7 @@ public class LoginActivity extends AppCompatActivity {
             if (state.isSuccess()) {
                 Toast.makeText(this, state.mensaje, Toast.LENGTH_SHORT).show();  // Mensaje
                 authViewModel.limpiarEstado();  // Limpia estado
-
-                // ✅ CORREGIDO: Sincronizar recetas después del login exitoso
+                //Sincronizar recetas después del login exitoso
                 sincronizarRecetas();
                 irAMain();  // Navega a main
             }
@@ -190,7 +189,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // ✅ NUEVO MÉTODO: Sincronizar recetas después del login
+    //NUEVO MÉTODO: Sincronizar recetas después del login
     private void sincronizarRecetas() {
         recetaViewModel.sincronizar();
         Toast.makeText(this, "Sincronizando recetas...", Toast.LENGTH_SHORT).show();
