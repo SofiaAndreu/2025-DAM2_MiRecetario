@@ -14,6 +14,7 @@ import com.example.recetarioapp.R;
 import com.example.recetarioapp.databinding.ActivityLoginBinding;  // ViewBinding
 import com.example.recetarioapp.utils.ViewExtensions;  // Extensiones vistas
 import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel auth
+import com.example.recetarioapp.viewmodels.RecetaViewModel;  // ✅ NUEVO: Para sincronizar recetas
 import com.google.android.material.textfield.TextInputEditText;  // Campo texto
 
 /**
@@ -23,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;    // Binding para vistas
     private AuthViewModel authViewModel;     // ViewModel autenticación
+    private RecetaViewModel recetaViewModel; // ✅ NUEVO: ViewModel para recetas
     private SharedPreferences prefs;         // Preferencias persistentes
 
     @Override
@@ -34,11 +36,15 @@ public class LoginActivity extends AppCompatActivity {
 
         // Inicializa ViewModel para autenticación
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        // ✅ NUEVO: Inicializa ViewModel para recetas
+        recetaViewModel = new ViewModelProvider(this).get(RecetaViewModel.class);
         // Obtiene SharedPreferences para datos persistentes
         prefs = getSharedPreferences("RecetarioPrefs", MODE_PRIVATE);
 
         // Verifica si usuario ya tiene sesión (normal o anónima)
         if (authViewModel.isUserLoggedInOrAnonymous()) {
+            // ✅ CORREGIDO: Sincronizar recetas antes de ir a Main
+            sincronizarRecetas();
             irAMain();  // Si ya está logueado, va directo a main
             return;     // Termina onCreate aquí
         }
@@ -74,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
     private void continuarSinCuenta() {
         // Usa ViewModel para activar modo anónimo
         authViewModel.activarModoAnonimo();
+        // ✅ CORREGIDO: No sincronizar en modo anónimo (no hay recetas en Firebase)
         irAMain();  // Navega a pantalla principal
     }
 
@@ -170,6 +177,9 @@ public class LoginActivity extends AppCompatActivity {
             if (state.isSuccess()) {
                 Toast.makeText(this, state.mensaje, Toast.LENGTH_SHORT).show();  // Mensaje
                 authViewModel.limpiarEstado();  // Limpia estado
+
+                // ✅ CORREGIDO: Sincronizar recetas después del login exitoso
+                sincronizarRecetas();
                 irAMain();  // Navega a main
             }
             // Maneja estado error
@@ -178,6 +188,12 @@ public class LoginActivity extends AppCompatActivity {
                 authViewModel.limpiarEstado();  // Limpia estado
             }
         });
+    }
+
+    // ✅ NUEVO MÉTODO: Sincronizar recetas después del login
+    private void sincronizarRecetas() {
+        recetaViewModel.sincronizar();
+        Toast.makeText(this, "Sincronizando recetas...", Toast.LENGTH_SHORT).show();
     }
 
     // ===== MÉTODOS DE NAVEGACIÓN =====

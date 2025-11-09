@@ -7,6 +7,7 @@ import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.repository.local.LocalDataSource;
 import com.example.recetarioapp.repository.remote.FirebaseDataSource;
 import com.example.recetarioapp.repository.storage.ImageStorage;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -26,8 +27,10 @@ public class RecetaRepository {
         this.firebaseDataSource = new FirebaseDataSource();
         this.imageManager = new ImageStorage(app);
 
-        // Sincronización inicial
-        sincronizarFBaLocal();
+        // ✅ CORREGIDO: Sincronizar solo si hay usuario logueado
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            sincronizarFBaLocal();
+        }
     }
 
     // ===== OPERACIONES DE LECTURA =====
@@ -69,17 +72,19 @@ public class RecetaRepository {
             receta.setId(localId);
             listener.onSuccess(receta);
 
-            // Sincronizar con Firebase en segundo plano
-            firebaseDataSource.guardarReceta(receta, firebaseId -> {
-                receta.setFirebaseId(firebaseId);
-                localDataSource.actualizar(receta, () -> {
-                    // Éxito al actualizar Firebase ID (opcional: podrías omitir si no necesitas hacer nada)
+            // ✅ CORREGIDO: Solo sincronizar con Firebase si hay usuario logueado
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                firebaseDataSource.guardarReceta(receta, firebaseId -> {
+                    receta.setFirebaseId(firebaseId);
+                    localDataSource.actualizar(receta, () -> {
+                        // Éxito al actualizar Firebase ID
+                    }, error -> {
+                        android.util.Log.w(TAG, "Error al actualizar Firebase ID: " + error);
+                    });
                 }, error -> {
-                    android.util.Log.w(TAG, "Error al actualizar Firebase ID: " + error);
+                    android.util.Log.w(TAG, "Modo offline: " + error);
                 });
-            }, error -> {
-                android.util.Log.w(TAG, "Modo offline: " + error);
-            });
+            }
         }, listener::onError);
     }
 
@@ -87,9 +92,10 @@ public class RecetaRepository {
         localDataSource.actualizar(receta, () -> {
             listener.onSuccess(receta);
 
-            if (receta.getFirebaseId() != null) {
+            // ✅ CORREGIDO: Solo sincronizar con Firebase si hay usuario logueado y tiene FirebaseId
+            if (FirebaseAuth.getInstance().getCurrentUser() != null && receta.getFirebaseId() != null) {
                 firebaseDataSource.actualizarReceta(receta,
-                        NOOP_RUNNABLE, //Reemplazamos el lambda vacío
+                        NOOP_RUNNABLE,
                         error -> android.util.Log.w(TAG, "Error sync: " + error)
                 );
             }
@@ -100,9 +106,10 @@ public class RecetaRepository {
         localDataSource.eliminar(receta, () -> {
             listener.onSuccess();
 
-            if (receta.getFirebaseId() != null) {
+            // ✅ CORREGIDO: Solo sincronizar con Firebase si hay usuario logueado y tiene FirebaseId
+            if (FirebaseAuth.getInstance().getCurrentUser() != null && receta.getFirebaseId() != null) {
                 firebaseDataSource.eliminarReceta(receta.getFirebaseId(),
-                        NOOP_RUNNABLE, //Reemplazamos el lambda vacío
+                        NOOP_RUNNABLE,
                         error -> android.util.Log.w(TAG, "Error al eliminar en Firebase: " + error)
                 );
             }
@@ -120,11 +127,19 @@ public class RecetaRepository {
 
     // ===== SINCRONIZACIÓN =====
     public void sincronizarFBaLocal() {
-        firebaseDataSource.obtenerRecetasUsuario(recetas -> {
-            localDataSource.insertarVarias(recetas);
-        }, error -> {
-            android.util.Log.w(TAG, "Error sincronización: " + error);
-        });
+        // ✅ CORREGIDO: Verificar que hay usuario logueado antes de sincronizar
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            firebaseDataSource.obtenerRecetasUsuario(recetas -> {
+                localDataSource.insertarVarias(recetas);
+            }, error -> {
+                android.util.Log.w(TAG, "Error sincronización: " + error);
+            });
+        }
+    }
+
+    // ✅ NUEVO MÉTODO: Forzar sincronización manual
+    public void forzarSincronizacion() {
+        sincronizarFBaLocal();
     }
 
     // ===== UTILIDADES =====
