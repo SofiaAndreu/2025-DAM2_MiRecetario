@@ -46,7 +46,8 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -55,7 +56,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingBottom="100dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -85,7 +87,7 @@
                         android:textSize="16sp"
                         android:textColor="@color/color_text_primary"
                         android:lineSpacingExtra="4dp"
-                        tools:text="Un arroz reconfortante con pollo, chalotas y setas..." />
+                        tools:text="Ejemplo de descripcion de la receta..." />
 
                     <!-- Metadata -->
                     <LinearLayout

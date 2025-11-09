@@ -55,6 +55,12 @@
             android:theme="@style/Theme.RecetarioApp"
             android:parentActivityName=".ui.MainActivity" />
 
+        <!-- AboutActivity - CORREGIDO: usa el mismo tema que tu app -->
+        <activity
+            android:name=".ui.AboutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RecetarioApp" />
+
         <!-- FILEPROVIDER PARA COMPARTIR ARCHIVOS -->
         <provider
             android:name="androidx.core.content.FileProvider"

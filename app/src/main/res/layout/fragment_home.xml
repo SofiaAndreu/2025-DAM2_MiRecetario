@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/fragment_home.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE TU ARCHIVO ACTUAL -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_background">
+    android:background="@color/color_background"
+    android:paddingTop="24dp">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -55,21 +54,26 @@
 
             </FrameLayout>
 
-            <!-- Estadísticas rápidas -->
+            <!-- Estadísticas rápidas - SOLO 2 CONTADORES CENTRADOS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="24dp"
-                android:weightSum="3">
+                android:weightSum="2"
+                android:gravity="center">
 
-                <!-- Total de recetas -->
+                <!-- Total de recetas - MÁS ANCHO -->
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_card">
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@drawable/bg_card"
+                    android:minHeight="90dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -83,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="36sp"
+                            android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/color_primary" />
 
@@ -93,18 +97,22 @@
                             android:text="Recetas"
                             android:textSize="13sp"
                             android:textColor="@color/color_text_secondary"
-                            android:layout_marginTop="4dp" />
+                            android:layout_marginTop="6dp" />
 
                     </LinearLayout>
                 </FrameLayout>
 
-                <!-- Favoritas -->
+                <!-- Favoritas - MÁS ANCHO -->
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_card">
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@drawable/bg_card"
+                    android:minHeight="90dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -118,7 +126,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="36sp"
+                            android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/color_secondary" />
 
@@ -128,42 +136,7 @@
                             android:text="Favoritas"
                             android:textSize="13sp"
                             android:textColor="@color/color_text_secondary"
-                            android:layout_marginTop="4dp" />
-
-                    </LinearLayout>
-                </FrameLayout>
-
-                <!-- Categorías -->
-                <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_card">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="20dp"
-                        android:gravity="center">
-
-                        <TextView
-                            android:id="@+id/tv_total_categorias"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="36sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/color_accent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Categorías"
-                            android:textSize="13sp"
-                            android:textColor="@color/color_text_secondary"
-                            android:layout_marginTop="4dp" />
+                            android:layout_marginTop="6dp" />
 
                     </LinearLayout>
                 </FrameLayout>
@@ -226,6 +199,42 @@
                     android:layout_marginTop="8dp" />
 
             </LinearLayout>
+
+            <!-- Botón sutil "Acerca de" -->
+            <FrameLayout
+                android:id="@+id/btn_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/bg_cuadrado"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ℹ️"
+                        android:textSize="16sp"
+                        android:layout_marginEnd="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Acerca de"
+                        android:textSize="12sp"
+                        android:textColor="@color/color_text_secondary" />
+                </LinearLayout>
+            </FrameLayout>
 
         </LinearLayout>
     </ScrollView>
