@@ -1,50 +1,64 @@
 package com.example.recetarioapp.ui;
 
-// -- IMPORTACIONES --
-import android.annotation.SuppressLint;  // Para suprimir advertencias específicas
-import android.content.Intent;           // Para navegar entre actividades
-import android.os.Bundle;                // Para pasar datos entre actividades
-import android.os.Handler;               // Para ejecutar código después de un delay
-import android.os.Looper;                // Para asegurar ejecución en hilo principal
-import androidx.appcompat.app.AppCompatActivity;  // Activity base con compatibilidad
-import androidx.lifecycle.ViewModelProvider;      // Para obtener instancias de ViewModel
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.recetarioapp.R;
-import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel para autenticación
+import com.example.recetarioapp.viewmodels.AuthViewModel;
 
 /**
- * SplashActivity - Pantalla de presentación que verifica autenticación
- * Muestra logo/app durante 2 segundos y redirige según estado de login
+ * SplashActivity - Pantalla de presentación que verifica el estado de autenticación.
+ *
+ * Funcionalidades principales:
+ * - Muestra el logo de la aplicación durante un período breve
+ * - Verifica el estado de autenticación del usuario
+ * - Redirige automáticamente a la pantalla principal o de login
+ * - Implementa el patrón de splash screen nativo de Android
  */
-@SuppressLint("CustomSplashScreen")  // Suprime warning de splash screen personalizado
+@SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
 
-    // Constante para duración del splash screen (2 segundos)
+    /**
+     * Duración en milisegundos que se mostrará la pantalla de splash.
+     * Valor optimizado para permitir carga inicial sin hacer esperar al usuario.
+     */
     private static final long SPLASH_DELAY = 2000;
 
+    /**
+     * Método principal del ciclo de vida que se ejecuta al crear la Activity.
+     * Configura el layout y programa la redirección después del delay.
+     *
+     * @param savedInstanceState Estado previo de la Activity para restaurar estado
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  // Llama al método padre
-        setContentView(R.layout.activity_splash);  // Establece el layout XML
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
 
-        // Obtiene instancia del ViewModel para gestionar autenticación
+        // Obtener instancia del ViewModel para gestión de autenticación
         AuthViewModel authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
-        // Handler para ejecutar código después del delay especificado
+        // Programar la redirección después del delay especificado
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent;  // Variable para la actividad destino
+            Intent intentDestino;
 
-            // Verifica si el usuario ya está logueado
+            // Decidir la Activity destino según el estado de autenticación
             if (authViewModel.isUserLoggedIn()) {
-                // Usuario autenticado -> va a MainActivity
-                intent = new Intent(this, MainActivity.class);
+                // Usuario autenticado - redirigir a la pantalla principal
+                intentDestino = new Intent(this, MainActivity.class);
             } else {
-                // Usuario no autenticado -> va a LoginActivity
-                intent = new Intent(this, LoginActivity.class);
+                // Usuario no autenticado - redirigir a pantalla de login
+                intentDestino = new Intent(this, LoginActivity.class);
             }
 
-            startActivity(intent);  // Inicia la actividad destino
-            finish();               // Cierra SplashActivity para evitar volver atrás
-        }, SPLASH_DELAY);  // Delay de 2 segundos antes de ejecutar
+            // Iniciar la Activity destino y cerrar esta para evitar volver atrás
+            startActivity(intentDestino);
+            finish();
+        }, SPLASH_DELAY);
     }
 }

@@ -17,124 +17,185 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * Repository para operaciones de autenticación
+ * Repository especializado en operaciones de autenticación y gestión de usuarios.
+ *
+ * Coordina la autenticación con Firebase Auth, el almacenamiento de perfiles en
+ * Firestore y la caché local de datos de usuario en Room Database.
+ * Proporciona una API unificada para registro, login, logout y gestión de sesiones.
  */
 public class AuthRepository {
 
+    // Constantes para logging y configuración
     private static final String TAG = "AuthRepository";
-    private static final String USUARIOS_COLLECTION = "usuarios";
+    private static final String COLECCION_USUARIOS = "usuarios";
 
-    private final FirebaseAuth auth;
+    // Dependencias de Firebase y Room
+    private final FirebaseAuth autenticacion;
     private final FirebaseFirestore firestore;
     private final UsuarioDAO usuarioDAO;
+
+    // Estado observable del usuario actual
     private final MutableLiveData<Usuario> usuarioActual = new MutableLiveData<>();
 
+    /**
+     * Constructor que inicializa todas las dependencias y carga el usuario actual.
+     *
+     * @param app Contexto de la aplicación para inicializar dependencias
+     */
     public AuthRepository(Application app) {
-        this.auth = FirebaseAuth.getInstance();
+        this.autenticacion = FirebaseAuth.getInstance();
         this.firestore = FirebaseFirestore.getInstance();
 
-        RecetasBD bd = RecetasBD.getInstance(app);
-        this.usuarioDAO = bd.usuarioDAO();
+        // Inicializar acceso a base de datos local
+        RecetasBD baseDatos = RecetasBD.getInstance(app);
+        this.usuarioDAO = baseDatos.usuarioDAO();
 
-        // Cargar usuario actual si existe
+        // Cargar usuario actual si existe una sesión activa
         cargarUsuarioActual();
     }
 
-    // ===== REGISTRO =====
+    // ==================== OPERACIONES DE AUTENTICACIÓN ====================
+
+    /**
+     * Registra un nuevo usuario en el sistema.
+     * Crea cuenta en Firebase Auth, actualiza perfil y guarda datos en Firestore/Room.
+     *
+     * @param nombre Nombre display del usuario
+     * @param email Email para autenticación
+     * @param password Contraseña del usuario
+     * @param listener Callback para resultado de la operación
+     */
     public void registrarUsuario(String nombre, String email, String password,
                                  OnAuthListener listener) {
 
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnSuccessListener(authResult -> {
-                    FirebaseUser firebaseUser = authResult.getUser();
-                    if (firebaseUser == null) {
-                        listener.onError("Error al crear usuario");
+        autenticacion.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(resultadoAuth -> {
+                    FirebaseUser usuarioFirebase = resultadoAuth.getUser();
+                    if (usuarioFirebase == null) {
+                        listener.onError("Error al crear usuario en Firebase");
                         return;
                     }
 
-                    // Actualizar perfil con nombre
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(nombre)
-                            .build();
+                    // Actualizar perfil de Firebase con el nombre
+                    UserProfileChangeRequest actualizacionPerfil =
+                            new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(nombre)
+                                    .build();
 
-                    firebaseUser.updateProfile(profileUpdates)
+                    usuarioFirebase.updateProfile(actualizacionPerfil)
                             .addOnSuccessListener(aVoid -> {
-                                // Crear usuario en Firestore y Room
+                                // Crear objeto usuario y guardar en bases de datos
                                 Usuario usuario = new Usuario(
-                                        firebaseUser.getUid(),
+                                        usuarioFirebase.getUid(),
                                         nombre,
                                         email
                                 );
 
                                 guardarUsuarioEnFirestore(usuario, listener);
                             })
-                            .addOnFailureListener(e -> {
-                                listener.onError("Error al actualizar perfil: " + e.getMessage());
+                            .addOnFailureListener(error -> {
+                                listener.onError("Error al actualizar perfil: " + error.getMessage());
                             });
                 })
-                .addOnFailureListener(e -> {
-                    listener.onError(parseAuthError(e.getMessage()));
+                .addOnFailureListener(error -> {
+                    listener.onError(parsearErrorAutenticacion(error.getMessage()));
                 });
     }
 
-    // ===== LOGIN =====
+    /**
+     * Inicia sesión con email y password.
+     * Carga los datos del usuario desde Firestore y actualiza la caché local.
+     *
+     * @param email Email del usuario
+     * @param password Contraseña del usuario
+     * @param listener Callback para resultado del login
+     */
     public void loginUsuario(String email, String password, OnAuthListener listener) {
 
-        auth.signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener(authResult -> {
-                    FirebaseUser firebaseUser = authResult.getUser();
-                    if (firebaseUser == null) {
+        autenticacion.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(resultadoAuth -> {
+                    FirebaseUser usuarioFirebase = resultadoAuth.getUser();
+                    if (usuarioFirebase == null) {
                         listener.onError("Error al iniciar sesión");
                         return;
                     }
 
-                    // Cargar datos del usuario desde Firestore
-                    cargarUsuarioDesdeFirestore(firebaseUser.getUid(), listener);
+                    // Cargar datos completos del usuario desde Firestore
+                    cargarUsuarioDesdeFirestore(usuarioFirebase.getUid(), listener);
                 })
-                .addOnFailureListener(e -> {
-                    listener.onError(parseAuthError(e.getMessage()));
+                .addOnFailureListener(error -> {
+                    listener.onError(parsearErrorAutenticacion(error.getMessage()));
                 });
     }
 
-    // ===== LOGOUT =====
+    /**
+     * Cierra la sesión actual del usuario.
+     * Limpia Firebase Auth y los datos locales del usuario.
+     */
     public void logout() {
-        auth.signOut();
+        autenticacion.signOut();
         usuarioActual.setValue(null);
 
-        // Opcional: Limpiar datos locales
+        // Limpiar datos de usuario de la base de datos local
         RecetasBD.bdWriteExecutor.execute(() -> {
             usuarioDAO.eliminarTodos();
         });
     }
 
-    // ===== RECUPERAR CONTRASEÑA =====
+    /**
+     * Envia email para recuperación de contraseña.
+     *
+     * @param email Email del usuario que solicita recuperación
+     * @param listener Callback para resultado de la operación
+     */
     public void recuperarPassword(String email, OnPasswordResetListener listener) {
-        auth.sendPasswordResetEmail(email)
+        autenticacion.sendPasswordResetEmail(email)
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
-                .addOnFailureListener(e -> listener.onError(parseAuthError(e.getMessage())));
+                .addOnFailureListener(error ->
+                        listener.onError(parsearErrorAutenticacion(error.getMessage()))
+                );
     }
 
-    // ===== VERIFICAR SESIÓN =====
+    // ==================== CONSULTAS DE ESTADO ====================
+
+    /**
+     * Verifica si hay un usuario con sesión activa.
+     *
+     * @return true si hay usuario autenticado, false en caso contrario
+     */
     public boolean isUserLoggedIn() {
-        return auth.getCurrentUser() != null;
+        return autenticacion.getCurrentUser() != null;
     }
 
+    /**
+     * Obtiene el usuario actual de Firebase Auth.
+     *
+     * @return FirebaseUser actual o null si no hay sesión
+     */
     public FirebaseUser getCurrentFirebaseUser() {
-        return auth.getCurrentUser();
+        return autenticacion.getCurrentUser();
     }
 
+    /**
+     * Obtiene el usuario actual como LiveData observable.
+     *
+     * @return LiveData con el usuario actual o null
+     */
     public LiveData<Usuario> getUsuarioActual() {
         return usuarioActual;
     }
 
-    // ===== HELPERS PRIVADOS =====
+    // ==================== MÉTODOS PRIVADOS DE APOYO ====================
 
+    /**
+     * Carga el usuario actual si existe una sesión activa.
+     * Se ejecuta automáticamente al inicializar el repository.
+     */
     private void cargarUsuarioActual() {
-        FirebaseUser firebaseUser = auth.getCurrentUser();
-        if (firebaseUser != null) {
-            cargarUsuarioDesdeFirestore(firebaseUser.getUid(), new OnAuthListener() {
+        FirebaseUser usuarioFirebase = autenticacion.getCurrentUser();
+        if (usuarioFirebase != null) {
+            cargarUsuarioDesdeFirestore(usuarioFirebase.getUid(), new OnAuthListener() {
                 @Override
                 public void onSuccess(Usuario usuario) {
                     usuarioActual.postValue(usuario);
@@ -142,47 +203,59 @@ public class AuthRepository {
 
                 @Override
                 public void onError(String mensaje) {
-                    Log.e(TAG, "Error al cargar usuario: " + mensaje);
+                    Log.e(TAG, "Error al cargar usuario actual: " + mensaje);
                 }
             });
         }
     }
 
+    /**
+     * Guarda un usuario en Firestore y Room Database.
+     *
+     * @param usuario Usuario a guardar
+     * @param listener Callback para resultado de la operación
+     */
     private void guardarUsuarioEnFirestore(Usuario usuario, OnAuthListener listener) {
         Map<String, Object> usuarioMap = usuarioToMap(usuario);
 
-        firestore.collection(USUARIOS_COLLECTION)
+        firestore.collection(COLECCION_USUARIOS)
                 .document(usuario.getUid())
                 .set(usuarioMap)
                 .addOnSuccessListener(aVoid -> {
-                    // Guardar en Room
+                    // Guardar también en base de datos local
                     RecetasBD.bdWriteExecutor.execute(() -> {
                         usuarioDAO.insertar(usuario);
                     });
 
                     usuarioActual.postValue(usuario);
                     listener.onSuccess(usuario);
-                    Log.d(TAG, "Usuario guardado: " + usuario.getUid());
+                    Log.d(TAG, "Usuario guardado exitosamente: " + usuario.getUid());
                 })
-                .addOnFailureListener(e -> {
-                    listener.onError("Error al guardar datos: " + e.getMessage());
+                .addOnFailureListener(error -> {
+                    listener.onError("Error al guardar datos de usuario: " + error.getMessage());
                 });
     }
 
+    /**
+     * Carga un usuario desde Firestore por su UID.
+     *
+     * @param uid ID único del usuario en Firebase
+     * @param listener Callback para resultado de la operación
+     */
     private void cargarUsuarioDesdeFirestore(String uid, OnAuthListener listener) {
-        firestore.collection(USUARIOS_COLLECTION)
+        firestore.collection(COLECCION_USUARIOS)
                 .document(uid)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Usuario usuario = mapToUsuario(documentSnapshot.getData());
+                .addOnSuccessListener(documento -> {
+                    if (documento.exists()) {
+                        Usuario usuario = mapToUsuario(documento.getData());
                         usuario.setUid(uid);
 
-                        // Actualizar última conexión
+                        // Actualizar timestamp de última conexión
                         usuario.setUltimaConexion(new Date());
                         actualizarUltimaConexion(uid);
 
-                        // Guardar en Room
+                        // Guardar en base de datos local
                         RecetasBD.bdWriteExecutor.execute(() -> {
                             usuarioDAO.insertar(usuario);
                         });
@@ -193,72 +266,100 @@ public class AuthRepository {
                         listener.onError("Usuario no encontrado en base de datos");
                     }
                 })
-                .addOnFailureListener(e -> {
-                    listener.onError("Error al cargar datos: " + e.getMessage());
+                .addOnFailureListener(error -> {
+                    listener.onError("Error al cargar datos de usuario: " + error.getMessage());
                 });
     }
 
+    /**
+     * Actualiza la última conexión del usuario en Firestore.
+     *
+     * @param uid ID único del usuario a actualizar
+     */
     private void actualizarUltimaConexion(String uid) {
-        firestore.collection(USUARIOS_COLLECTION)
+        firestore.collection(COLECCION_USUARIOS)
                 .document(uid)
                 .update("ultimaConexion", new Date())
-                .addOnFailureListener(e ->
-                        Log.w(TAG, "Error al actualizar última conexión: " + e.getMessage())
+                .addOnFailureListener(error ->
+                        Log.w(TAG, "Error al actualizar última conexión: " + error.getMessage())
                 );
     }
 
-    // ===== MAPPERS =====
+    // ==================== CONVERSORES ====================
 
-    private Map<String, Object> usuarioToMap(Usuario u) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("nombre", u.getNombre());
-        map.put("email", u.getEmail());
-        map.put("fechaRegistro", u.getFechaRegistro());
-        map.put("ultimaConexion", u.getUltimaConexion());
-        return map;
+    /**
+     * Convierte objeto Usuario a Map para Firestore.
+     *
+     * @param usuario Usuario a convertir
+     * @return Map con los datos del usuario
+     */
+    private Map<String, Object> usuarioToMap(Usuario usuario) {
+        Map<String, Object> mapa = new HashMap<>();
+        mapa.put("nombre", usuario.getNombre());
+        mapa.put("email", usuario.getEmail());
+        mapa.put("fechaRegistro", usuario.getFechaRegistro());
+        mapa.put("ultimaConexion", usuario.getUltimaConexion());
+        return mapa;
     }
 
-    private Usuario mapToUsuario(Map<String, Object> map) {
-        Usuario u = new Usuario();
-        u.setNombre((String) map.get("nombre"));
-        u.setEmail((String) map.get("email"));
-        return u;
+    /**
+     * Convierte Map de Firestore a objeto Usuario.
+     *
+     * @param mapa Map con datos de Firestore
+     * @return Objeto Usuario reconstruido
+     */
+    private Usuario mapToUsuario(Map<String, Object> mapa) {
+        Usuario usuario = new Usuario();
+        usuario.setNombre((String) mapa.get("nombre"));
+        usuario.setEmail((String) mapa.get("email"));
+        return usuario;
     }
 
-    // ===== PARSEO DE ERRORES =====
+    // ==================== MANEJO DE ERRORES ====================
 
-    private String parseAuthError(String errorMessage) {
-        if (errorMessage == null) return "Error desconocido";
+    /**
+     * Parsea y traduce mensajes de error de Firebase a español.
+     *
+     * @param mensajeError Mensaje de error original de Firebase
+     * @return Mensaje de error traducido y amigable para el usuario
+     */
+    private String parsearErrorAutenticacion(String mensajeError) {
+        if (mensajeError == null) return "Error desconocido";
 
-        if (errorMessage.contains("email address is already in use")) {
+        if (mensajeError.contains("email address is already in use")) {
             return "Este email ya está registrado";
-        } else if (errorMessage.contains("password is invalid")) {
+        } else if (mensajeError.contains("password is invalid")) {
             return "Contraseña incorrecta";
-        } else if (errorMessage.contains("no user record")) {
+        } else if (mensajeError.contains("no user record")) {
             return "Usuario no encontrado";
-        } else if (errorMessage.contains("network error")) {
+        } else if (mensajeError.contains("network error")) {
             return "Error de conexión. Verifica tu internet";
-        } else if (errorMessage.contains("too many requests")) {
+        } else if (mensajeError.contains("too many requests")) {
             return "Demasiados intentos. Intenta más tarde";
-        } else if (errorMessage.contains("weak password")) {
+        } else if (mensajeError.contains("weak password")) {
             return "La contraseña debe tener al menos 6 caracteres";
-        } else if (errorMessage.contains("badly formatted")) {
+        } else if (mensajeError.contains("badly formatted")) {
             return "Email inválido";
         }
 
-        return "Error: " + errorMessage;
+        return "Error: " + mensajeError;
     }
 
-    // ===== INTERFACES =====
+    // ==================== INTERFACES DE CALLBACK ====================
 
+    /**
+     * Interfaz para recibir resultados de operaciones de autenticación.
+     */
     public interface OnAuthListener {
         void onSuccess(Usuario usuario);
         void onError(String mensaje);
     }
 
+    /**
+     * Interfaz para recibir resultados de recuperación de contraseña.
+     */
     public interface OnPasswordResetListener {
         void onSuccess();
         void onError(String mensaje);
     }
 }
-

@@ -12,257 +12,410 @@ import androidx.lifecycle.Transformations;
 
 import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.repository.RecetaRepository;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
 /**
- * ViewModel intermediario entre interfaz <-> datos RecetaRepository ✓
+ * ViewModel principal para gestionar todas las operaciones con recetas.
+ *
+ * Actúa como intermediario entre la interfaz de usuario y el Repository,
+ * proporcionando datos observables y gestionando el ciclo de vida de las operaciones.
+ * Implementa búsqueda reactiva, filtros y gestión de estado de la UI.
  */
 public class RecetaViewModel extends AndroidViewModel {
 
-    //ATRIBUTOS PRINCIPALES
-    private final RecetaRepository recetaRepository;
+    // ==================== DEPENDENCIAS Y CONFIGURACIÓN ====================
 
-    // ✅ NUEVO: ID de instancia para debugging
-    private final String instanciaId = java.util.UUID.randomUUID().toString().substring(0, 8);
+    private final RecetaRepository repositorioRecetas;
 
-    //LIVEDATA - Datos que observa la interfaz (se actualiza automaticamente)
+    // Identificador único para debugging de instancias ViewModel
+    private final String idInstancia = java.util.UUID.randomUUID().toString().substring(0, 8);
+
+    // ==================== LIVE DATA PARA DATOS OBSERVABLES ====================
+
+    // Datos principales observables desde el Repository
     private final LiveData<List<Receta>> todasLasRecetas;
-    private final LiveData<List<Receta>> favs;
-    private final LiveData<List<String>> categorias;
+    private final LiveData<List<Receta>> recetasFavoritas;
+    private final LiveData<List<String>> categoriasDisponibles;
 
-    //Filtros + Busqueda
-    private final MutableLiveData<String> busquedaQuery = new MutableLiveData<>();
+    // Controles de búsqueda y filtrado
+    private final MutableLiveData<String> queryBusqueda = new MutableLiveData<>();
     private final MutableLiveData<String> filtroCategoria = new MutableLiveData<>();
     private final MutableLiveData<String> filtroDificultad = new MutableLiveData<>();
     private final MutableLiveData<Integer> filtroTiempo = new MutableLiveData<>();
 
-    //Lista Recetas - resultante de la búsqueda/filtros
+    // LiveData reactivo que combina búsqueda con datos base
     private final LiveData<List<Receta>> recetasFiltradas;
 
-    //Estados/Mensajes UI
-    private final MutableLiveData<String> msgError = new MutableLiveData<>();
-    private final MutableLiveData<String> msgExito = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> msgLoading = new MutableLiveData<>();
-    private final MutableLiveData<Integer> msgProgresoSubida = new MutableLiveData<>();
+    // ==================== ESTADOS DE UI OBSERVABLES ====================
 
-    // Añade este LiveData para notificar cambios en favoritos
+    private final MutableLiveData<String> mensajeError = new MutableLiveData<>();
+    private final MutableLiveData<String> mensajeExito = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> estadoCargando = new MutableLiveData<>();
+    private final MutableLiveData<Integer> progresoSubida = new MutableLiveData<>();
+
+    // Notificador específico para cambios en favoritos
     private final MutableLiveData<Long> favoritoActualizado = new MutableLiveData<>();
-    public LiveData<Long> getFavoritoActualizado() {
-        return favoritoActualizado;
-    }
 
-    //CONSTRUCTOR
+    /**
+     * Constructor que inicializa todas las dependencias y configuraciones reactivas.
+     *
+     * @param application Contexto de la aplicación para inicializar el Repository
+     */
     public RecetaViewModel(@NonNull Application application) {
         super(application);
-        recetaRepository = new RecetaRepository(application);
+        repositorioRecetas = new RecetaRepository(application);
 
-        // ✅ DEBUG: Log de creación de ViewModel
-        Log.d("VIEWMODEL", "🆕 Nueva Instancia ViewModel: " + instanciaId);
+        // Log de creación para debugging de ciclo de vida
+        Log.d("VIEWMODEL", "Nueva Instancia ViewModel: " + idInstancia);
 
-        //Obtiene LiveData iniciales
-        todasLasRecetas = recetaRepository.getAllRecetas();
-        favs = recetaRepository.getFavs();
-        categorias = recetaRepository.getCategorias();
+        // Inicializar LiveData desde el Repository
+        todasLasRecetas = repositorioRecetas.getAllRecetas();
+        recetasFavoritas = repositorioRecetas.getFavs();
+        categoriasDisponibles = repositorioRecetas.getCategorias();
 
-        //LiveData derivado de otro LiveData -> BUSQUEDA REACTIVA
-        //switchMap -> reacciona cada vez que cambia el valor de busqueda
-        recetasFiltradas = Transformations.switchMap(busquedaQuery, query ->{
-            if(query == null || query.trim().isEmpty()) { //si esta vacio -> ver todas
+        // Configurar transformación reactiva para búsqueda en tiempo real
+        recetasFiltradas = Transformations.switchMap(queryBusqueda, query -> {
+            if (query == null || query.trim().isEmpty()) {
+                // Query vacía - mostrar todas las recetas
                 return todasLasRecetas;
-            } else { // si tiene texto -> buscar por nombre
-                return recetaRepository.buscarPorNombre(query);
+            } else {
+                // Query con texto - buscar recetas que coincidan
+                return repositorioRecetas.buscarPorNombre(query);
             }
         });
-    } // --------------------------------------------------------------------------- //
+    }
 
-    //INSERTAR NUEVA RECETA
-    public void insertarReceta(Receta receta){
-        //Llama a Repo. para insertar
-        msgLoading.postValue(true);
-        recetaRepository.insertarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
-            @Override //Éxito
-            public void onSuccess(Receta recetaG) {
-                msgLoading.postValue(false);
-                msgExito.postValue("Receta guardada correctamente");
-                Log.d("VIEWMODEL", "✅ Receta insertada - Instancia: " + instanciaId);
+    // ==================== OPERACIONES CRUD CON RECETAS ====================
+
+    /**
+     * Inserta una nueva receta en el sistema.
+     * Gestiona el estado de carga y notifica el resultado.
+     *
+     * @param receta Receta a insertar
+     */
+    public void insertarReceta(Receta receta) {
+        estadoCargando.postValue(true);
+        repositorioRecetas.insertarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
+            @Override
+            public void onSuccess(Receta recetaGuardada) {
+                estadoCargando.postValue(false);
+                mensajeExito.postValue("Receta guardada correctamente");
+                Log.d("VIEWMODEL", "Receta insertada - Instancia: " + idInstancia);
             }
-            @Override //Error
+
+            @Override
             public void onError(String mensaje) {
-                msgLoading.postValue(false);
-                msgError.postValue(mensaje);
-                Log.e("VIEWMODEL", "❌ Error insertando receta: " + mensaje);
+                estadoCargando.postValue(false);
+                mensajeError.postValue(mensaje);
+                Log.e("VIEWMODEL", "Error insertando receta: " + mensaje);
             }
         });
-    } // --------------------------------------------------------------------------- //
+    }
 
-    //ACTUALIZAR RECETA
-    public void actualizarReceta(Receta receta){
-        //Llama a Repo. para actualizar
-        msgLoading.postValue(true);
-        recetaRepository.actualizarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
-            @Override //Éxito
-            public void onSuccess(Receta recetaA) {
-                msgLoading.postValue(false);
-                msgExito.postValue("Receta actualizada correctamente");
+    /**
+     * Actualiza una receta existente.
+     *
+     * @param receta Receta con datos actualizados
+     */
+    public void actualizarReceta(Receta receta) {
+        estadoCargando.postValue(true);
+        repositorioRecetas.actualizarReceta(receta, new RecetaRepository.OnRecetaGuardadaListener() {
+            @Override
+            public void onSuccess(Receta recetaActualizada) {
+                estadoCargando.postValue(false);
+                mensajeExito.postValue("Receta actualizada correctamente");
             }
-            @Override //Error
+
+            @Override
             public void onError(String mensaje) {
-                msgLoading.postValue(false);
-                msgError.postValue(mensaje);
+                estadoCargando.postValue(false);
+                mensajeError.postValue(mensaje);
             }
         });
-    } // --------------------------------------------------------------------------- //
+    }
 
-    //ELIMINAR RECETA
-    public void eliminarReceta(Receta receta){
-        //Llama a Repo. para eliminar
-        msgLoading.postValue(true);
-        recetaRepository.eliminarReceta(receta, new RecetaRepository.OnRecetaEliminadaListener() {
-            @Override //Éxito
+    /**
+     * Elimina una receta del sistema.
+     *
+     * @param receta Receta a eliminar
+     */
+    public void eliminarReceta(Receta receta) {
+        estadoCargando.postValue(true);
+        repositorioRecetas.eliminarReceta(receta, new RecetaRepository.OnRecetaEliminadaListener() {
+            @Override
             public void onSuccess() {
-                msgLoading.postValue(false);
-                msgExito.postValue("Receta eliminada correctamente");
+                estadoCargando.postValue(false);
+                mensajeExito.postValue("Receta eliminada correctamente");
             }
-            @Override //Error
+
+            @Override
             public void onError(String mensaje) {
-                msgLoading.postValue(false);
-                msgError.postValue(mensaje);
+                estadoCargando.postValue(false);
+                mensajeError.postValue(mensaje);
             }
         });
-    } // --------------------------------------------------------------------------- //
+    }
 
-    // MARCAR/DESMARCAR FAVORITA - MODIFICADO
-    public void marcarFavorita(long id, boolean isFav){
-        //Llama a Repo. para marcar directamente.
-        recetaRepository.establecerFavorita(id, isFav);
-        // Notificar que este favorito fue actualizado
+    /**
+     * Marca o desmarca una receta como favorita.
+     * Operación inmediata con notificación específica.
+     *
+     * @param id ID de la receta a modificar
+     * @param esFavorito Nuevo estado de favorito
+     */
+    public void marcarFavorita(long id, boolean esFavorito) {
+        repositorioRecetas.establecerFavorita(id, esFavorito);
+        // Notificar específicamente que este favorito fue actualizado
         favoritoActualizado.postValue(id);
-    }// --------------------------------------------------------------------------- //
+    }
 
-    //SUBIR IMAGEN
-    public void guardarImagenLocal(Uri imageUri, OnImagenSubidaListener listener) {
-        //Sube img. actualizando progreso
-        msgProgresoSubida.postValue(0); //Inicia msg en 0
-        recetaRepository.guardarImagenLocal(imageUri, new RecetaRepository.OnImagenSubidaListener() {
-            @Override //Éxito
-            public void onSuccess(String path) {
-                msgProgresoSubida.postValue(100);
-                listener.onImagenSubida(path);
+    // ==================== GESTIÓN DE IMÁGENES ====================
+
+    /**
+     * Guarda una imagen localmente y devuelve la ruta.
+     * Proporciona feedback de progreso durante la operación.
+     *
+     * @param uriImagen URI de la imagen a guardar
+     * @param listener Callback para resultado de la operación
+     */
+    public void guardarImagenLocal(Uri uriImagen, OnImagenSubidaListener listener) {
+        progresoSubida.postValue(0); // Iniciar progreso
+        repositorioRecetas.guardarImagenLocal(uriImagen, new RecetaRepository.OnImagenSubidaListener() {
+            @Override
+            public void onSuccess(String ruta) {
+                progresoSubida.postValue(100); // Completado
+                listener.onImagenSubida(ruta);
             }
-            @Override //Progreso
+
+            @Override
             public void onProgress(int porcentaje) {
-                msgProgresoSubida.postValue(porcentaje);
+                progresoSubida.postValue(porcentaje);
             }
-            @Override //Error
+
+            @Override
             public void onError(String mensaje) {
-                msgError.postValue(mensaje);
+                mensajeError.postValue(mensaje);
+                // Ejecutar en main thread para seguridad
                 new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                     listener.onError(mensaje);
                 });
             }
         });
-    } // ---------------------------------------------------------------------------------- //
-
-    //SINCRONIZAR CON FIREBASE a LOCAL
-    public void sincronizar(){
-        Log.d("VIEWMODEL", "🔁 Sincronizando - Instancia: " + instanciaId);
-        msgLoading.postValue(true);
-        recetaRepository.sincronizarFBaLocal();
-        msgLoading.postValue(false);
-        msgExito.postValue("Sincronizando...");
     }
 
-    // ✅ NUEVO: Forzar resincronización
+    // ==================== SINCRONIZACIÓN Y RESINCROZACIÓN ====================
+
+    /**
+     * Ejecuta sincronización de recetas desde Firebase a local.
+     */
+    public void sincronizar() {
+        Log.d("VIEWMODEL", "Sincronizando - Instancia: " + idInstancia);
+        estadoCargando.postValue(true);
+        repositorioRecetas.sincronizarFBaLocal();
+        estadoCargando.postValue(false);
+        mensajeExito.postValue("Sincronizando...");
+    }
+
+    /**
+     * Fuerza una resincronización manual ignorando el control de ejecución única.
+     */
     public void forzarResincronizacion() {
-        Log.d("VIEWMODEL", "🔄 Forzando resincronización - Instancia: " + instanciaId);
-        recetaRepository.forzarSincronizacion();
-        msgExito.postValue("Resincronizando recetas...");
+        Log.d("VIEWMODEL", "Forzando resincronización - Instancia: " + idInstancia);
+        repositorioRecetas.forzarSincronizacion();
+        mensajeExito.postValue("Resincronizando recetas...");
     }
 
-    // ✅ NUEVO: Resetear sincronización para testing
+    /**
+     * Resetea el estado de sincronización (principalmente para testing).
+     */
     public void resetearSincronizacion() {
         RecetaRepository.resetearSincronizacion();
-        Log.d("VIEWMODEL", "🔄 Sincronización reseteada - Instancia: " + instanciaId);
+        Log.d("VIEWMODEL", "Sincronización reseteada - Instancia: " + idInstancia);
     }
 
-    //BUSCAR/FILTRAR
-    public void buscar(String query){
-        //Actualiza valor de busqueda - transformación reactiva
-        busquedaQuery.setValue(query);
-    }
-    // --------------------------------------------------------------------- //
+    // ==================== BÚSQUEDA Y FILTRADO ====================
 
-    //FILTRAR CATEGORIA
-    public LiveData<List<Receta>> filtrarPorCategoria(String categoria){
-        //Livedata con filtro x categoria seleccionada
-        return recetaRepository.getRecetasPorCategoria(categoria);
-    }
-    // --------------------------------------------------------------------- //
-
-    //FILTRAR DIFICULTAD
-    public LiveData<List<Receta>> filtrarPorDificultad(String dificultad){
-        //Livedata con filtro x dificultad seleccionada
-        return recetaRepository.getRecetasPorDificultad(dificultad);
-    }
-    // --------------------------------------------------------------------- //
-
-    //FILTRAR POR TIEMPO PREPARACION
-    public LiveData<List<Receta>> filtrarPorTiempo(int tiempo){
-        //Livedata con filtro x tiempo seleccionado
-        return recetaRepository.getRecetasPorTiempo(tiempo);
-    }
-    // --------------------------------------------------------------------- //
-
-    //LIMPIAR MENSAJES EXITO/ERROR
-    public void limpiarMensajesE(){
-        //Reset mensajes Exito/Error
-        msgExito.setValue(null);
-        msgError.setValue(null);
+    /**
+     * Ejecuta búsqueda en tiempo real de recetas por nombre.
+     * La transformación reactiva se encarga de actualizar recetasFiltradas.
+     *
+     * @param query Texto de búsqueda
+     */
+    public void buscar(String query) {
+        queryBusqueda.setValue(query);
     }
 
-    // MÉTODO DE DIAGNÓSTICO
+    /**
+     * Obtiene recetas filtradas por categoría específica.
+     *
+     * @param categoria Categoría a filtrar
+     * @return LiveData con recetas de la categoría
+     */
+    public LiveData<List<Receta>> filtrarPorCategoria(String categoria) {
+        return repositorioRecetas.getRecetasPorCategoria(categoria);
+    }
+
+    /**
+     * Obtiene recetas filtradas por nivel de dificultad.
+     *
+     * @param dificultad Nivel de dificultad a filtrar
+     * @return LiveData con recetas de la dificultad
+     */
+    public LiveData<List<Receta>> filtrarPorDificultad(String dificultad) {
+        return repositorioRecetas.getRecetasPorDificultad(dificultad);
+    }
+
+    /**
+     * Obtiene recetas filtradas por tiempo máximo de preparación.
+     *
+     * @param tiempoMax Tiempo máximo en minutos
+     * @return LiveData con recetas dentro del tiempo
+     */
+    public LiveData<List<Receta>> filtrarPorTiempo(int tiempoMax) {
+        return repositorioRecetas.getRecetasPorTiempo(tiempoMax);
+    }
+
+    // ==================== UTILIDADES Y MÉTODOS DE APOYO ====================
+
+    /**
+     * Limpia los mensajes de éxito y error de la UI.
+     */
+    public void limpiarMensajesE() {
+        mensajeExito.setValue(null);
+        mensajeError.setValue(null);
+    }
+
+    /**
+     * Método de diagnóstico para debugging de búsquedas.
+     *
+     * @param query Texto de búsqueda a debuggear
+     */
     public void debugBuscar(String query) {
-        Log.d("BUSQUEDA", "Buscando: '" + query + "' - Instancia: " + instanciaId);
+        Log.d("BUSQUEDA", "Buscando: '" + query + "' - Instancia: " + idInstancia);
         buscar(query);
     }
 
-    //GETTERS LIVEDATA
+    // ==================== GETTERS PARA LIVE DATA ====================
+
+    /**
+     * Obtiene todas las recetas disponibles.
+     *
+     * @return LiveData con lista de todas las recetas
+     */
     public LiveData<List<Receta>> getTodasLasRecetas() {
         return todasLasRecetas;
     }
+
+    /**
+     * Obtiene las recetas marcadas como favoritas.
+     *
+     * @return LiveData con lista de recetas favoritas
+     */
     public LiveData<List<Receta>> getFavs() {
-        return favs;
+        return recetasFavoritas;
     }
+
+    /**
+     * Obtiene las categorías únicas disponibles.
+     *
+     * @return LiveData con lista de categorías
+     */
     public LiveData<List<String>> getCategorias() {
-        return categorias;
+        return categoriasDisponibles;
     }
+
+    /**
+     * Obtiene recetas filtradas según la búsqueda actual.
+     *
+     * @return LiveData con lista de recetas filtradas
+     */
     public LiveData<List<Receta>> getRecetasFiltradas() {
         return recetasFiltradas;
     }
+
+    /**
+     * Obtiene mensajes de error para mostrar en la UI.
+     *
+     * @return LiveData con mensajes de error
+     */
     public LiveData<String> getMensajeError() {
-        return msgError;
+        return mensajeError;
     }
+
+    /**
+     * Obtiene progreso de subida de imágenes.
+     *
+     * @return LiveData con porcentaje de progreso
+     */
     public LiveData<Integer> getProgresoSubida() {
-        return msgProgresoSubida;
+        return progresoSubida;
     }
+
+    /**
+     * Obtiene mensajes de éxito para mostrar en la UI.
+     *
+     * @return LiveData con mensajes de éxito
+     */
     public LiveData<String> getMensajeExito() {
-        return msgExito;
+        return mensajeExito;
     }
 
+    /**
+     * Obtiene una receta específica por su ID.
+     *
+     * @param id ID de la receta a obtener
+     * @return LiveData con la receta solicitada
+     */
     public LiveData<Receta> getRecetaById(long id) {
-        return recetaRepository.getRecetaById(id);
+        return repositorioRecetas.getRecetaById(id);
     }
 
-    // ✅ NUEVO: Getter para debugging
+    /**
+     * Obtiene notificaciones de actualización de favoritos.
+     *
+     * @return LiveData con ID de receta actualizada
+     */
+    public LiveData<Long> getFavoritoActualizado() {
+        return favoritoActualizado;
+    }
+
+    /**
+     * Obtiene el estado de carga actual.
+     *
+     * @return LiveData con estado de carga
+     */
+    public LiveData<Boolean> getEstadoCargando() {
+        return estadoCargando;
+    }
+
+    /**
+     * Obtiene el ID de instancia para debugging.
+     *
+     * @return ID único de esta instancia ViewModel
+     */
     public String getInstanciaId() {
-        return instanciaId;
+        return idInstancia;
     }
 
-    //INTERFACE
-    public interface OnImagenSubidaListener{
+    // ==================== INTERFACE PARA CALLBACKS DE IMAGEN ====================
+
+    /**
+     * Interfaz para recibir resultados de operaciones con imágenes.
+     */
+    public interface OnImagenSubidaListener {
+        /**
+         * Se ejecuta cuando la imagen se sube exitosamente.
+         *
+         * @param url Ruta local de la imagen guardada
+         */
         void onImagenSubida(String url);
+
+        /**
+         * Se ejecuta cuando ocurre un error en la subida.
+         *
+         * @param mensaje Mensaje de error descriptivo
+         */
         void onError(String mensaje);
     }
 }

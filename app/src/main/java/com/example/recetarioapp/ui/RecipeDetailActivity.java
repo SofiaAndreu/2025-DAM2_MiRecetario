@@ -1,6 +1,7 @@
 package com.example.recetarioapp.ui;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,66 +25,103 @@ import com.example.recetarioapp.models.Receta;
 import com.example.recetarioapp.utils.*;
 import com.example.recetarioapp.viewmodels.RecetaViewModel;
 
+/**
+ * Activity para mostrar los detalles completos de una receta.
+ *
+ * Proporciona una interfaz rica e interactiva que incluye:
+ * - Visualización completa de todos los datos de la receta
+ * - Gestión de favoritos
+ * - Edición y eliminación de recetas
+ * - Compartir recetas en diferentes formatos
+ * - Selector de imágenes para la receta
+ * - Navegación intuitiva con Collapsing Toolbar
+ */
 public class RecipeDetailActivity extends AppCompatActivity {
 
+    /**
+     * Clave para pasar el ID de la receta entre actividades
+     */
     public static final String EXTRA_RECETA_ID = "receta_id";
 
+    // ViewModel para operaciones con recetas
     private RecetaViewModel viewModel;
+
+    // Receta actual siendo mostrada
     private Receta recetaActual;
 
-    // Views principales
+    // Componentes de UI
     private CollapsingToolbarLayout collapsingToolbar;
     private MaterialToolbar toolbar;
-    private ImageView ivRecetaImagen;
-    private FloatingActionButton fabFavorito;
+    private ImageView imagenReceta;
+    private FloatingActionButton botonFavorito;
 
-    // Adaptadores
-    private IngredienteAdapter ingredienteAdapter;
-    private PasoAdapter pasoAdapter;
+    // Adaptadores para las listas
+    private IngredienteAdapter adaptadorIngredientes;
+    private PasoAdapter adaptadorPasos;
 
-    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+    // Launcher para selección de imágenes
+    private ActivityResultLauncher<PickVisualMediaRequest> selectorMedia;
 
+    /**
+     * Método principal de inicialización de la Activity.
+     *
+     * @param savedInstanceState Estado previo de la Activity para restaurar estado
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-        long recetaId = getIntent().getLongExtra(EXTRA_RECETA_ID, -1);
-        if (recetaId == -1) {
+        // Obtener ID de la receta desde el Intent
+        long idReceta = getIntent().getLongExtra(EXTRA_RECETA_ID, -1);
+        if (idReceta == -1) {
             Toast.makeText(this, "Error al cargar receta", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
+        // Inicializar ViewModel
         viewModel = new ViewModelProvider(this).get(RecetaViewModel.class);
 
-        initViews();
-        setupToolbar();
-        setupRecyclerViews();
-        setupPhotoPicke();
-        setupListeners();
-        cargarReceta(recetaId);
-        setupFavoritoObserver();
+        // Configurar todos los componentes
+        inicializarVistas();
+        configurarToolbar();
+        configurarRecyclerViews();
+        configurarSelectorFoto();
+        configurarListeners();
+        cargarReceta(idReceta);
+        observarCambiosFavoritos();
     }
 
-    private void setupFavoritoObserver() {
-        viewModel.getFavoritoActualizado().observe(this, recetaId -> {
-            if (recetaActual != null && recetaId == recetaActual.getId()) {
-                // Actualizar el estado local y el icono
+    /**
+     * Observa cambios en el estado de favoritos para actualizar la UI.
+     * Actualiza el icono de favorito cuando cambia el estado de una receta.
+     */
+    private void observarCambiosFavoritos() {
+        viewModel.getFavoritoActualizado().observe(this, idReceta -> {
+            if (recetaActual != null && idReceta == recetaActual.getId()) {
+                // Actualizar estado local y icono
                 recetaActual.setFav(!recetaActual.isFav());
                 actualizarIconoFavorito();
             }
         });
     }
 
-    private void initViews() {
+    /**
+     * Inicializa las referencias a las vistas del layout.
+     */
+    private void inicializarVistas() {
         collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         toolbar = findViewById(R.id.toolbar);
-        ivRecetaImagen = findViewById(R.id.iv_receta_imagen);
-        fabFavorito = findViewById(R.id.fab_favorito);
+        imagenReceta = findViewById(R.id.iv_receta_imagen);
+        botonFavorito = findViewById(R.id.fab_favorito);
     }
 
-    private void setupToolbar() {
+    /**
+     * Configura la toolbar con navegación y título.
+     * Establece el botón de retroceso y el comportamiento del collapsing toolbar.
+     */
+    private void configurarToolbar() {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -91,51 +129,77 @@ public class RecipeDetailActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
-    private void setupRecyclerViews() {
-        RecyclerView rvIngredientes = findViewById(R.id.rv_ingredientes);
-        RecyclerView rvPasos = findViewById(R.id.rv_pasos);
+    /**
+     * Configura los RecyclerViews para ingredientes y pasos.
+     * Establece los adaptadores y layout managers para ambas listas.
+     */
+    private void configurarRecyclerViews() {
+        RecyclerView recyclerIngredientes = findViewById(R.id.rv_ingredientes);
+        RecyclerView recyclerPasos = findViewById(R.id.rv_pasos);
 
-        ingredienteAdapter = new IngredienteAdapter();
-        rvIngredientes.setLayoutManager(new LinearLayoutManager(this));
-        rvIngredientes.setAdapter(ingredienteAdapter);
+        // Configurar RecyclerView para ingredientes
+        adaptadorIngredientes = new IngredienteAdapter();
+        recyclerIngredientes.setLayoutManager(new LinearLayoutManager(this));
+        recyclerIngredientes.setAdapter(adaptadorIngredientes);
 
-        pasoAdapter = new PasoAdapter();
-        rvPasos.setLayoutManager(new LinearLayoutManager(this));
-        rvPasos.setAdapter(pasoAdapter);
+        // Configurar RecyclerView para pasos
+        adaptadorPasos = new PasoAdapter();
+        recyclerPasos.setLayoutManager(new LinearLayoutManager(this));
+        recyclerPasos.setAdapter(adaptadorPasos);
     }
 
-    private void setupPhotoPicke() {
-        pickMedia = registerForActivityResult(
+    /**
+     * Configura el selector de imágenes desde la galería.
+     * Permite al usuario cambiar la imagen de la receta.
+     */
+    private void configurarSelectorFoto() {
+        selectorMedia = registerForActivityResult(
                 new ActivityResultContracts.PickVisualMedia(),
                 uri -> {
+                    // Manejar imagen seleccionada
                     if (uri != null && recetaActual != null) {
-                        ivRecetaImagen.setImageURI(uri);
+                        imagenReceta.setImageURI(uri);
                         recetaActual.setImagenPortadaURL(uri.toString());
                     }
                 }
         );
     }
 
-    private void setupListeners() {
-        fabFavorito.setOnClickListener(v -> toggleFavorito());
+    /**
+     * Configura todos los listeners de interacción del usuario.
+     * Incluye favoritos, edición, eliminación, compartir y cambio de imagen.
+     */
+    private void configurarListeners() {
+        // Favoritos - alternar estado de favorito
+        botonFavorito.setOnClickListener(v -> alternarFavorito());
 
+        // Eliminar receta - mostrar diálogo de confirmación
         findViewById(R.id.btn_eliminar).setOnClickListener(v ->
-                mostrarDialogEliminar());
+                mostrarDialogoEliminar());
 
+        // Editar receta - navegar a pantalla de edición
         findViewById(R.id.btn_editar).setOnClickListener(v ->
                 abrirEdicion());
 
+        // Compartir receta - mostrar opciones de compartir
         findViewById(R.id.btn_compartir).setOnClickListener(v ->
                 mostrarOpcionesCompartir());
 
-        ivRecetaImagen.setOnClickListener(v ->
-                pickMedia.launch(new PickVisualMediaRequest.Builder()
+        // Cambiar imagen - abrir selector de imágenes
+        imagenReceta.setOnClickListener(v ->
+                selectorMedia.launch(new PickVisualMediaRequest.Builder()
                         .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                         .build()));
     }
 
-    private void cargarReceta(long recetaId) {
-        viewModel.getRecetaById(recetaId).observe(this, receta -> {
+    /**
+     * Carga los datos de la receta desde el ViewModel.
+     * Observa los cambios en la receta y actualiza la UI cuando está disponible.
+     *
+     * @param idReceta ID de la receta a cargar
+     */
+    private void cargarReceta(long idReceta) {
+        viewModel.getRecetaById(idReceta).observe(this, receta -> {
             if (receta != null) {
                 recetaActual = receta;
                 mostrarReceta(receta);
@@ -143,39 +207,53 @@ public class RecipeDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void mostrarReceta(Receta r) {
-        collapsingToolbar.setTitle(r.getNombre());
+    /**
+     * Muestra todos los datos de la receta en la UI.
+     * Actualiza todos los elementos visuales con la información de la receta.
+     *
+     * @param receta Receta a mostrar en la interfaz
+     */
+    private void mostrarReceta(Receta receta) {
+        // Título en collapsing toolbar
+        collapsingToolbar.setTitle(receta.getNombre());
 
-        // Imagen
-        ImageLoader.loadRecipeImage(this, r.getImagenPortadaURL(), ivRecetaImagen);
+        // Imagen de portada
+        ImageLoader.loadRecipeImage(this, receta.getImagenPortadaURL(), imagenReceta);
 
-        // Descripción
-        TextView tvDescripcion = findViewById(R.id.tv_descripcion);
-        if (r.getDescripcion() != null && !r.getDescripcion().isEmpty()) {
-            tvDescripcion.setText(r.getDescripcion());
-            ViewExtensions.setVisible(tvDescripcion, true);
+        // Descripción - mostrar u ocultar según contenido
+        TextView textoDescripcion = findViewById(R.id.tv_descripcion);
+        if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
+            textoDescripcion.setText(receta.getDescripcion());
+            ViewExtensions.setVisible(textoDescripcion, true);
         } else {
-            ViewExtensions.setVisible(tvDescripcion, false);
+            ViewExtensions.setVisible(textoDescripcion, false);
         }
 
-        // Metadata
-        ((TextView) findViewById(R.id.tv_tiempo)).setText(r.getTiempoPrepFormateado());
-        ((TextView) findViewById(R.id.tv_porciones)).setText(r.getPorciones() + " porc.");
+        // Metadatos - tiempo, porciones y dificultad
+        ((TextView) findViewById(R.id.tv_tiempo)).setText(receta.getTiempoPrepFormateado());
+        ((TextView) findViewById(R.id.tv_porciones)).setText(receta.getPorciones() + " porc.");
         ((TextView) findViewById(R.id.tv_dificultad)).setText(
-                r.getDificultad() != null ? r.getDificultad() : "Media");
+                receta.getDificultad() != null ? receta.getDificultad() : "Media");
 
-        // Chips
-        setupChip(findViewById(R.id.detail_chip_categoria), r.getCategoria());
-        setupChip(findViewById(R.id.detail_chip_origen), r.getOrigen());
+        // Chips de categoría y origen
+        configurarChip(findViewById(R.id.detail_chip_categoria), receta.getCategoria());
+        configurarChip(findViewById(R.id.detail_chip_origen), receta.getOrigen());
 
-        // Listas
-        ingredienteAdapter.setIngredientes(r.getIngredientes());
-        pasoAdapter.setPasos(r.getPasos());
+        // Listas de ingredientes y pasos
+        adaptadorIngredientes.setIngredientes(receta.getIngredientes());
+        adaptadorPasos.setPasos(receta.getPasos());
 
         actualizarIconoFavorito();
     }
 
-    private void setupChip(Chip chip, String texto) {
+    /**
+     * Configura un chip mostrándolo u ocultándolo según el contenido.
+     * Solo muestra el chip si el texto no está vacío.
+     *
+     * @param chip Chip a configurar
+     * @param texto Texto a mostrar en el chip
+     */
+    private void configurarChip(Chip chip, String texto) {
         if (texto != null && !texto.isEmpty()) {
             chip.setText(texto);
             ViewExtensions.setVisible(chip, true);
@@ -184,7 +262,11 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void toggleFavorito() {
+    /**
+     * Alterna el estado de favorito de la receta actual.
+     * Actualiza la base de datos y muestra feedback al usuario.
+     */
+    private void alternarFavorito() {
         if (recetaActual == null) return;
 
         boolean nuevoEstado = !recetaActual.isFav();
@@ -195,23 +277,34 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT).show();
     }
 
-    // Metodo para iconos personalizados:
+    /**
+     * Actualiza el icono del botón de favoritos según el estado actual.
+     * Muestra icono de favorito lleno o vacío según el estado.
+     */
     private void actualizarIconoFavorito() {
-        if (recetaActual == null) return; // Protección null
-        fabFavorito.setImageResource(
+        if (recetaActual == null) return;
+        botonFavorito.setImageResource(
                 recetaActual.isFav() ? R.drawable.ic_fav : R.drawable.ic_fav_no
         );
     }
 
-    private void mostrarDialogEliminar() {
+    /**
+     * Muestra diálogo de confirmación para eliminar la receta.
+     * Previene eliminaciones accidentales.
+     */
+    private void mostrarDialogoEliminar() {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar receta")
                 .setMessage("¿Estás seguro de que quieres eliminar esta receta?")
-                .setPositiveButton("Eliminar", (d, w) -> eliminarReceta())
+                .setPositiveButton("Eliminar", (dialog, which) -> eliminarReceta())
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
 
+    /**
+     * Elimina la receta actual del sistema.
+     * Navega atrás después de la eliminación exitosa.
+     */
     private void eliminarReceta() {
         if (recetaActual == null) return;
         viewModel.eliminarReceta(recetaActual);
@@ -219,6 +312,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Abre la actividad de edición para la receta actual.
+     * Pasa el ID de la receta a la MainActivity para que navegue al fragmento de edición.
+     */
     private void abrirEdicion() {
         if (recetaActual == null) return;
 
@@ -229,33 +326,46 @@ public class RecipeDetailActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Muestra las opciones disponibles para compartir la receta.
+     * Ofrece compartir como texto o exportar a PDF.
+     */
     private void mostrarOpcionesCompartir() {
         new AlertDialog.Builder(this)
                 .setTitle("Compartir receta")
                 .setItems(new String[]{"Compartir como texto", "Exportar a PDF"},
-                        (d, which) -> {
-                            if (which == 0) compartirTexto();
-                            else exportarPDF();
+                        (dialog, which) -> {
+                            if (which == 0) compartirComoTexto();
+                            else exportarAPDF();
                         })
                 .show();
     }
 
-    private void compartirTexto() {
+    /**
+     * Comparte la receta como texto mediante el selector de apps.
+     * Crea un intent de compartir con el texto formateado de la receta.
+     */
+    private void compartirComoTexto() {
         if (recetaActual == null) return;
         startActivity(RecipeShareHelper.createShareIntent(recetaActual));
     }
 
-    private void exportarPDF() {
+    /**
+     * Exporta la receta a formato PDF en segundo plano.
+     * Muestra progreso y notifica cuando está listo.
+     */
+    private void exportarAPDF() {
         if (recetaActual == null) return;
 
         Toast.makeText(this, "Generando PDF...", Toast.LENGTH_SHORT).show();
 
+        // Generar PDF en hilo secundario
         new Thread(() -> {
-            String pdfPath = PDFHelper.exportarRecetaToPDF(this, recetaActual);
+            String rutaPDF = PDFHelper.exportarRecetaToPDF(this, recetaActual);
 
             runOnUiThread(() -> {
-                if (pdfPath != null) {
-                    mostrarDialogPDFCreado(pdfPath);
+                if (rutaPDF != null) {
+                    mostrarDialogoPDFCreado(rutaPDF);
                 } else {
                     Toast.makeText(this, "Error al crear PDF",
                             Toast.LENGTH_SHORT).show();
@@ -264,11 +374,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void mostrarDialogPDFCreado(String pdfPath) {
+    /**
+     * Muestra diálogo informativo cuando el PDF ha sido creado.
+     * Ofrece opción para abrir el PDF directamente.
+     *
+     * @param rutaPDF Ruta del archivo PDF creado
+     */
+    private void mostrarDialogoPDFCreado(String rutaPDF) {
         new AlertDialog.Builder(this)
                 .setTitle("PDF creado")
-                .setMessage("Ruta: " + pdfPath)
-                .setPositiveButton("Abrir", (d, w) -> PDFHelper.abrirPDF(this, pdfPath))
+                .setMessage("Ruta: " + rutaPDF)
+                .setPositiveButton("Abrir", (dialog, which) -> PDFHelper.abrirPDF(this, rutaPDF))
                 .setNegativeButton("Cerrar", null)
                 .show();
     }

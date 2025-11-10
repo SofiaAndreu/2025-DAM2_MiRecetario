@@ -10,45 +10,65 @@ import com.example.recetarioapp.R;
 import java.io.File;
 
 /**
- * Utilidad para cargar imágenes con Glide
+ * Utilidad para cargar y mostrar imágenes de forma eficiente usando Glide.
+ *
+ * Funcionalidades principales:
+ * - Carga optimizada de imágenes desde rutas locales o URIs
+ * - Manejo automático de placeholders y errores
+ * - Recorte centrado para mantener proporciones
+ * - Soporte para diferentes fuentes de imagen (archivos, URIs)
  */
 public class ImageLoader {
 
     /**
-     * Carga una imagen desde un path/URI
+     * Carga una imagen de receta desde una ruta o URI con configuración completa.
+     * Maneja automáticamente diferentes tipos de rutas y muestra placeholders en caso de error.
+     *
+     * @param context Contexto para la carga de la imagen
+     * @param imagePath Ruta del archivo local o URI de la imagen
+     * @param imageView ImageView donde se mostrará la imagen
      */
     public static void loadRecipeImage(Context context, String imagePath, ImageView imageView) {
+        // Verificar si la ruta de imagen es nula o vacía
         if (imagePath == null || imagePath.isEmpty()) {
+            // Mostrar imagen placeholder por defecto
             imageView.setImageResource(R.drawable.placeholder_receta);
             return;
         }
 
-        // Si es un path local
+        // Determinar si es una ruta local (archivo) o URI
         if (imagePath.startsWith("/")) {
+            // Es una ruta local de archivo
             File imageFile = new File(imagePath);
             Glide.with(context)
-                    .load(imageFile)
-                    .placeholder(R.drawable.placeholder_receta)
-                    .error(R.drawable.placeholder_receta)
-                    .centerCrop()
-                    .into(imageView);
+                    .load(imageFile) // Cargar desde archivo
+                    .placeholder(R.drawable.placeholder_receta) // Imagen mientras carga
+                    .error(R.drawable.placeholder_receta) // Imagen si hay error
+                    .centerCrop() // Recortar al centro manteniendo proporciones
+                    .into(imageView); // ImageView destino
         } else {
-            // Si es una URI
+            // Es una URI (posiblemente web o content URI)
             Glide.with(context)
-                    .load(Uri.parse(imagePath))
-                    .placeholder(R.drawable.placeholder_receta)
-                    .error(R.drawable.placeholder_receta)
-                    .centerCrop()
-                    .into(imageView);
+                    .load(Uri.parse(imagePath)) // Cargar desde URI
+                    .placeholder(R.drawable.placeholder_receta) // Imagen mientras carga
+                    .error(R.drawable.placeholder_receta) // Imagen si hay error
+                    .centerCrop() // Recortar al centro manteniendo proporciones
+                    .into(imageView); // ImageView destino
         }
     }
+
     /**
-     * Carga una imagen desde un URI
+     * Carga una imagen directamente desde un URI sin placeholders.
+     * Versión simplificada para casos donde no se necesitan estados de carga/error.
+     *
+     * @param context Contexto para la carga de la imagen
+     * @param uri URI de la imagen a cargar
+     * @param imageView ImageView donde se mostrará la imagen
      */
     public static void loadImage(Context context, Uri uri, ImageView imageView) {
         Glide.with(context)
-                .load(uri)
-                .centerCrop()
-                .into(imageView);
+                .load(uri) // Cargar desde URI
+                .centerCrop() // Recortar al centro manteniendo proporciones
+                .into(imageView); // ImageView destino
     }
 }

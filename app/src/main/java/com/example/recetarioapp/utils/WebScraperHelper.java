@@ -1,5 +1,6 @@
 package com.example.recetarioapp.utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.recetarioapp.models.Ingrediente;
@@ -21,34 +22,53 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * Helper para extraer recetas desde URLs
- * Compatible con webs de recetas, YouTube, blogs, etc.
+ * Helper para extraer recetas desde URLs web mediante web scraping.
+ *
+ * Funcionalidades principales:
+ * - Extracción de recetas desde sitios web genéricos y YouTube
+ * - Normalización automática de categorías usando CategoryHelper
+ * - Soporte para Schema.org y estructuras HTML comunes
+ * - Descarga y parseo robusto de contenido web
+ * - Manejo de errores con logging detallado
  */
 public class WebScraperHelper {
 
+    // Tag para logging de operaciones de web scraping
     private static final String TAG = "WebScraperHelper";
 
     /**
-     * Extrae una receta desde una URL
+     * Extrae una receta desde una URL web usando técnicas de web scraping.
+     * Soporta sitios web genéricos y YouTube, con normalización automática de categorías.
+     *
+     * @param url URL de la receta a extraer
+     * @param context Contexto para normalización de categorías (requerido)
+     * @return Objeto RecetaExtraida con los datos parseados, o null si falla
      */
-    public static RecetaExtraida extraerRecetaDesdeURL(String url) {
+    public static RecetaExtraida extraerRecetaDesdeURL(String url, Context context) {
         try {
-            // Descargar HTML
+            // Descargar contenido HTML de la URL
             String html = descargarHTML(url);
             if (html == null) {
                 return null;
             }
 
-            // Parsear HTML
+            // Parsear HTML con JSoup
             Document doc = Jsoup.parse(html);
+            RecetaExtraida receta;
 
-            RecetaExtraida receta = new RecetaExtraida();
-
-            // Detectar tipo de sitio
+            // Determinar estrategia de extracción según el tipo de URL
             if (url.contains("youtube.com") || url.contains("youtu.be")) {
                 receta = extraerDeYouTube(doc, url);
             } else {
                 receta = extraerDeWebGenerica(doc);
+            }
+
+            // Normalizar categoría usando CategoryHelper
+            if (receta != null && context != null) {
+                receta.categoria = CategoryHelper.normalizarCategoria(
+                        receta.categoria != null ? receta.categoria : receta.origen,
+                        context
+                );
             }
 
             return receta;
@@ -60,12 +80,16 @@ public class WebScraperHelper {
     }
 
     /**
-     * Descarga el HTML de una URL
+     * Descarga el contenido HTML de una URL usando OkHttp.
+     * Incluye configuración de user agent y seguimiento de redirecciones.
+     *
+     * @param url URL a descargar
+     * @return Contenido HTML como String, o null si falla
      */
     private static String descargarHTML(String url) {
         try {
             OkHttpClient client = new OkHttpClient.Builder()
-                    .followRedirects(true)
+                    .followRedirects(true) // Seguir redirecciones automáticamente
                     .build();
 
             Request request = new Request.Builder()
@@ -85,124 +109,132 @@ public class WebScraperHelper {
     }
 
     /**
-     * Extrae receta de YouTube (desde descripción)
+     * Extrae información de receta desde una página de YouTube.
+     * Utiliza meta tags Open Graph para obtener título, descripción e imagen.
+     *
+     * @param doc Documento JSoup parseado
+     * @param url URL original de YouTube
+     * @return RecetaExtraida con datos de YouTube
      */
     private static RecetaExtraida extraerDeYouTube(Document doc, String url) {
         RecetaExtraida receta = new RecetaExtraida();
 
-        // Título
+        // Extraer título desde meta tags Open Graph
         Element titulo = doc.selectFirst("meta[property=og:title]");
         if (titulo != null) {
             receta.nombre = titulo.attr("content");
         }
 
-        // Descripción (contiene la receta)
+        // Extraer descripción desde meta tags Open Graph
         Element descripcion = doc.selectFirst("meta[property=og:description]");
         if (descripcion != null) {
             String texto = descripcion.attr("content");
             receta.descripcion = texto;
-
-            // Intentar extraer ingredientes y pasos del texto
+            // Intentar extraer ingredientes y pasos del texto de descripción
             extraerIngredientesYPasosDeTexto(texto, receta);
         }
 
-        // Imagen
+        // Extraer imagen miniatura desde meta tags Open Graph
         Element imagen = doc.selectFirst("meta[property=og:image]");
         if (imagen != null) {
             receta.imagenUrl = imagen.attr("content");
         }
 
         receta.origen = "YouTube";
+        receta.categoria = "Otros"; // Se normalizará después
 
         return receta;
     }
 
     /**
-     * Extrae receta de web genérica
+     * Extrae información de receta desde sitios web genéricos.
+     * Utiliza múltiples estrategias (Schema.org, selectores CSS, meta tags).
+     *
+     * @param doc Documento JSoup parseado
+     * @return RecetaExtraida con datos del sitio web
      */
     private static RecetaExtraida extraerDeWebGenerica(Document doc) {
         RecetaExtraida receta = new RecetaExtraida();
 
-        // TÍTULO
+        // Extraer todos los componentes de la receta
         receta.nombre = extraerTitulo(doc);
-
-        // DESCRIPCIÓN
         receta.descripcion = extraerDescripcion(doc);
-
-        // INGREDIENTES
         receta.ingredientes = extraerIngredientes(doc);
-
-        // PASOS
         receta.pasos = extraerPasos(doc);
-
-        // TIEMPO
         receta.tiempoPreparacion = extraerTiempo(doc);
-
-        // PORCIONES
         receta.porciones = extraerPorciones(doc);
-
-        // IMAGEN
         receta.imagenUrl = extraerImagen(doc);
+
+        // Extraer categoría raw (se normalizará después)
+        receta.categoria = extraerCategoria(doc);
+        receta.origen = "Web";
 
         return receta;
     }
 
     /**
-     * Extrae el título de la receta
+     * Extrae categoría de receta desde el documento HTML.
+     * Intenta múltiples fuentes: Schema.org, meta tags, clases CSS.
+     *
+     * @param doc Documento JSoup parseado
+     * @return Categoría extraída, o null si no se encuentra
      */
-    private static String extraerTitulo(Document doc) {
-        // Intentar Schema.org
-        Element schemaName = doc.selectFirst("[itemtype*=Recipe] [itemprop=name]");
-        if (schemaName != null) {
-            return schemaName.text();
+    private static String extraerCategoria(Document doc) {
+        // Intentar Schema.org primero
+        Element schemaCategoria = doc.selectFirst("[itemprop=recipeCategory]");
+        if (schemaCategoria != null) {
+            return schemaCategoria.text();
         }
 
         // Intentar meta tags
-        Element ogTitle = doc.selectFirst("meta[property=og:title]");
-        if (ogTitle != null) {
-            return ogTitle.attr("content");
+        Element metaCategoria = doc.selectFirst("meta[property=article:section]");
+        if (metaCategoria != null) {
+            return metaCategoria.attr("content");
         }
 
-        // Intentar h1
-        Element h1 = doc.selectFirst("h1");
-        if (h1 != null) {
-            return h1.text();
+        // Buscar en clases CSS comunes
+        Element categoriaElement = doc.selectFirst(".category, .recipe-category, [class*=category]");
+        if (categoriaElement != null) {
+            return categoriaElement.text();
         }
 
-        // Título de la página
-        return doc.title();
+        return null;
     }
 
-    /**
-     * Extrae la descripción
-     */
+    // Métodos auxiliares para extracción específica de componentes...
+
+    private static String extraerTitulo(Document doc) {
+        // Múltiples estrategias para extraer título
+        Element schemaName = doc.selectFirst("[itemtype*=Recipe] [itemprop=name]");
+        if (schemaName != null) return schemaName.text();
+
+        Element ogTitle = doc.selectFirst("meta[property=og:title]");
+        if (ogTitle != null) return ogTitle.attr("content");
+
+        Element h1 = doc.selectFirst("h1");
+        if (h1 != null) return h1.text();
+
+        return doc.title(); // Fallback al título de la página
+    }
+
     private static String extraerDescripcion(Document doc) {
+        // Múltiples estrategias para extraer descripción
         Element schemaDesc = doc.selectFirst("[itemprop=description]");
-        if (schemaDesc != null) {
-            return schemaDesc.text();
-        }
+        if (schemaDesc != null) return schemaDesc.text();
 
         Element metaDesc = doc.selectFirst("meta[name=description]");
-        if (metaDesc != null) {
-            return metaDesc.attr("content");
-        }
+        if (metaDesc != null) return metaDesc.attr("content");
 
-        // Buscar primer párrafo
         Element primerP = doc.selectFirst("p");
-        if (primerP != null) {
-            return primerP.text();
-        }
+        if (primerP != null) return primerP.text();
 
-        return "";
+        return ""; // Fallback a string vacío
     }
 
-    /**
-     * Extrae ingredientes
-     */
     private static List<Ingrediente> extraerIngredientes(Document doc) {
         List<Ingrediente> ingredientes = new ArrayList<>();
 
-        // Selectores comunes para ingredientes
+        // Múltiples selectores CSS para ingredientes
         String[] selectores = {
                 "[itemprop=recipeIngredient]",
                 ".ingredient",
@@ -221,20 +253,15 @@ public class WebScraperHelper {
                         ingredientes.add(parsearIngrediente(texto));
                     }
                 }
-                if (!ingredientes.isEmpty()) {
-                    break;
-                }
+                if (!ingredientes.isEmpty()) break;
             }
         }
 
         return ingredientes;
     }
 
-    /**
-     * Parsea un ingrediente separando cantidad y nombre
-     */
     private static Ingrediente parsearIngrediente(String texto) {
-        // Patrón: "200g de harina" o "2 tazas de leche"
+        // Regex para separar cantidad y nombre
         Pattern pattern = Pattern.compile("^([\\d.,]+\\s*[a-zA-Z]*)?\\s*(.+)$");
         Matcher matcher = pattern.matcher(texto);
 
@@ -247,16 +274,13 @@ public class WebScraperHelper {
             }
         }
 
-        return new Ingrediente(texto, "");
+        return new Ingrediente(texto, ""); // Fallback a ingrediente sin cantidad
     }
 
-    /**
-     * Extrae pasos de preparación
-     */
     private static List<Paso> extraerPasos(Document doc) {
         List<Paso> pasos = new ArrayList<>();
 
-        // Selectores comunes para pasos
+        // Múltiples selectores CSS para pasos
         String[] selectores = {
                 "[itemprop=recipeInstructions] li",
                 "[itemprop=recipeInstructions] p",
@@ -273,31 +297,26 @@ public class WebScraperHelper {
                 for (Element elem : elementos) {
                     String texto = elem.text().trim();
                     if (!texto.isEmpty() && texto.length() > 10) {
-                        // Limpiar numeración si existe
-                        texto = texto.replaceFirst("^\\d+\\.?\\s*", "");
+                        texto = texto.replaceFirst("^\\d+\\.?\\s*", ""); // Quitar numeración existente
                         pasos.add(new Paso(numero++, texto));
                     }
                 }
-                if (!pasos.isEmpty()) {
-                    break;
-                }
+                if (!pasos.isEmpty()) break;
             }
         }
 
         return pasos;
     }
 
-    /**
-     * Extrae tiempo de preparación
-     */
     private static int extraerTiempo(Document doc) {
+        // Extraer tiempo desde Schema.org
         Element tiempo = doc.selectFirst("[itemprop=totalTime], [itemprop=cookTime]");
         if (tiempo != null) {
             String valor = tiempo.attr("content");
             return parsearTiempo(valor);
         }
 
-        // Buscar en texto
+        // Búsqueda por regex en texto completo
         String textoCompleto = doc.text();
         Pattern pattern = Pattern.compile("(\\d+)\\s*(minuto|min|hora)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(textoCompleto);
@@ -305,19 +324,17 @@ public class WebScraperHelper {
         if (matcher.find()) {
             int valor = Integer.parseInt(matcher.group(1));
             if (matcher.group(2).toLowerCase().contains("hora")) {
-                valor *= 60;
+                valor *= 60; // Convertir horas a minutos
             }
             return valor;
         }
 
-        return 0;
+        return 0; // Fallback a 0 minutos
     }
 
-    /**
-     * Parsea tiempo en formato ISO8601 (PT30M)
-     */
     private static int parsearTiempo(String iso) {
         try {
+            // Parsear formato ISO 8601 para duraciones (PT1H30M)
             Pattern pattern = Pattern.compile("PT(?:(\\d+)H)?(?:(\\d+)M)?");
             Matcher matcher = pattern.matcher(iso);
 
@@ -332,9 +349,6 @@ public class WebScraperHelper {
         return 0;
     }
 
-    /**
-     * Extrae número de porciones
-     */
     private static int extraerPorciones(Document doc) {
         Element porciones = doc.selectFirst("[itemprop=recipeYield]");
         if (porciones != null) {
@@ -348,10 +362,8 @@ public class WebScraperHelper {
         return 0;
     }
 
-    /**
-     * Extrae URL de imagen
-     */
     private static String extraerImagen(Document doc) {
+        // Extraer imagen desde Schema.org
         Element imagen = doc.selectFirst("[itemprop=image]");
         if (imagen != null) {
             if (imagen.tagName().equals("img")) {
@@ -363,6 +375,7 @@ public class WebScraperHelper {
             }
         }
 
+        // Extraer imagen desde Open Graph
         Element ogImage = doc.selectFirst("meta[property=og:image]");
         if (ogImage != null) {
             return ogImage.attr("content");
@@ -371,9 +384,6 @@ public class WebScraperHelper {
         return null;
     }
 
-    /**
-     * Extrae ingredientes y pasos de texto plano
-     */
     private static void extraerIngredientesYPasosDeTexto(String texto, RecetaExtraida receta) {
         String[] lineas = texto.split("\n");
 
@@ -384,6 +394,7 @@ public class WebScraperHelper {
         for (String linea : lineas) {
             linea = linea.trim();
 
+            // Detectar secciones por palabras clave
             if (linea.toLowerCase().contains("ingrediente")) {
                 enIngredientes = true;
                 enPasos = false;
@@ -391,12 +402,13 @@ public class WebScraperHelper {
             }
 
             if (linea.toLowerCase().contains("preparación") || linea.toLowerCase().contains("paso") ||
-                    linea.toLowerCase().contains("instruccion") || linea.toLowerCase().contains("instrucción"))  {
+                    linea.toLowerCase().contains("instruccion") || linea.toLowerCase().contains("instrucción")) {
                 enIngredientes = false;
                 enPasos = true;
                 continue;
             }
 
+            // Extraer ingredientes y pasos según la sección actual
             if (enIngredientes && !linea.isEmpty()) {
                 receta.ingredientes.add(parsearIngrediente(linea));
             }
@@ -409,7 +421,8 @@ public class WebScraperHelper {
     }
 
     /**
-     * Clase para almacenar datos extraídos
+     * Clase contenedora para almacenar datos de receta extraídos.
+     * Utilizada para transferir datos entre métodos de extracción.
      */
     public static class RecetaExtraida {
         public String nombre = "";
@@ -420,5 +433,6 @@ public class WebScraperHelper {
         public int porciones = 0;
         public String imagenUrl = null;
         public String origen = "Web";
+        public String categoria = null; // Categoría extraída (se normalizará)
     }
 }

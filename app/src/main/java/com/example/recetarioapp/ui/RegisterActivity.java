@@ -1,230 +1,260 @@
 package com.example.recetarioapp.ui;
 
-// -- IMPORTACIONES --
-import android.content.Intent; //Navegación entre actividades
-import android.os.Bundle; //Manejo de estado
-import android.text.TextUtils; //Utils para texto
-import android.widget.Toast; //Mensajes breves
-import androidx.appcompat.app.AlertDialog; //Dialogos de Alertas
-import androidx.appcompat.app.AppCompatActivity;  // Activity base
-import androidx.lifecycle.ViewModelProvider;      // Para ViewModel
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.recetarioapp.R;
-import com.example.recetarioapp.databinding.ActivityRegisterBinding;  // ViewBinding
-import com.example.recetarioapp.utils.ViewExtensions;  // Utilidades para vistas
-import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel auth
-import com.google.android.material.textfield.TextInputEditText;  // Campo texto material
+import com.example.recetarioapp.databinding.ActivityRegisterBinding;
+import com.example.recetarioapp.utils.ViewExtensions;
+import com.example.recetarioapp.viewmodels.AuthViewModel;
+import com.google.android.material.textfield.TextInputEditText;
 
 /**
- * Activity para registro de nuevos usuarios con validaciones completas
+ * Activity para registro de nuevos usuarios con validaciones completas.
+ *
+ * Implementa un formulario de registro robusto con:
+ * - Validación en tiempo real de todos los campos
+ * - Verificación de seguridad de contraseña
+ * - Aceptación de términos y condiciones
+ * - Integración con Firebase Authentication
+ * - Redirección automática al completar registro
  */
 public class RegisterActivity extends AppCompatActivity {
 
-    // Binding para acceso seguro a vistas del layout
+    // Binding para acceso type-safe a las vistas del layout
     private ActivityRegisterBinding binding;
-    // ViewModel para gestionar lógica de autenticación
+
+    // ViewModel para gestión de autenticación y registro
     private AuthViewModel authViewModel;
 
+    /**
+     * Método de inicialización de la Activity.
+     * Configura el layout, inicializa ViewModel y configura listeners.
+     *
+     * @param savedInstanceState Estado previo de la Activity para restaurar estado
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  // Llama método padre
-        // Infla el layout usando ViewBinding
+        super.onCreate(savedInstanceState);
+
+        // Inflar layout usando ViewBinding
         binding = ActivityRegisterBinding.inflate(getLayoutInflater());
-        // Establece la vista raíz del binding
         setContentView(binding.getRoot());
 
-        // Obtiene instancia del ViewModel
+        // Inicializar ViewModel para autenticación
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
-        setupListeners();    // Configura listeners de botones
-        observeAuthState();  // Observa cambios en estado de auth
+        configurarListeners();
+        observarEstadoAutenticacion();
     }
 
     /**
-     * Configura todos los listeners de la interfaz de usuario
+     * Configura los listeners de interacción del usuario.
+     * Incluye botones de registro, navegación y acción del teclado.
      */
-    private void setupListeners() {
-        // Botón volver - cierra esta actividad
+    private void configurarListeners() {
+        // Botón para volver atrás
         binding.btnVolver.setOnClickListener(v -> finish());
 
-        // Botón registrarse - inicia proceso de registro
+        // Botón principal de registro
         binding.btnRegistrarse.setOnClickListener(v -> intentarRegistro());
 
-        // Botón ir a login - cierra esta actividad (volverá a login)
+        // Enlace para ir a login
         binding.btnIrLogin.setOnClickListener(v -> finish());
 
-        // Listener para tecla Enter en confirmar password
+        // Acción de teclado para confirmar contraseña
         binding.etConfirmPassword.setOnEditorActionListener((v, actionId, event) -> {
-            intentarRegistro();  // Intenta registrar al presionar Enter
-            return true;         // Indica que el evento fue manejado
+            intentarRegistro();
+            return true;
         });
     }
 
     /**
-     * Intenta realizar el registro después de validar todos los campos
+     * Intenta realizar el registro después de validar todos los campos.
+     * Ejecuta las validaciones y, si son exitosas, inicia el proceso de registro.
      */
     private void intentarRegistro() {
-        // Obtiene y limpia texto de todos los campos
-        String nombre = getText(binding.etNombre);
-        String email = getText(binding.etEmailRegistro);
-        String password = getText(binding.etPasswordRegistro);
-        String confirmPassword = getText(binding.etConfirmPassword);
+        String nombre = obtenerTexto(binding.etNombre);
+        String email = obtenerTexto(binding.etEmailRegistro);
+        String password = obtenerTexto(binding.etPasswordRegistro);
+        String confirmPassword = obtenerTexto(binding.etConfirmPassword);
 
-        // Valida campos, si hay error se detiene aquí
+        // Validar campos antes de proceder con el registro
         if (!validarCampos(nombre, email, password, confirmPassword)) {
-            return;  // Sale si validación falla
+            return;
         }
 
-        // Verifica si checkbox de términos está marcado
+        // Verificar aceptación de términos y condiciones
         if (!binding.cbTerminos.isChecked()) {
-            // Muestra toast si no aceptó términos
-            Toast.makeText(this, "Debes aceptar los términos y condiciones",
-                    Toast.LENGTH_SHORT).show();
-            return;  // Sale si no aceptó términos
+            Toast.makeText(this, "Debes aceptar los términos y condiciones", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // Llama al ViewModel para realizar registro
+        // Iniciar proceso de registro con el ViewModel
         authViewModel.registrar(nombre, email, password);
     }
 
     /**
-     * Valida todos los campos del formulario de registro
+     * Valida todos los campos del formulario de registro.
+     * Realiza validaciones individuales y muestra errores específicos.
+     *
+     * @param nombre Nombre completo del usuario
+     * @param email Dirección de correo electrónico
+     * @param password Contraseña del usuario
+     * @param confirmPassword Confirmación de la contraseña
+     * @return true si todos los campos son válidos, false en caso contrario
      */
     private boolean validarCampos(String nombre, String email, String password, String confirmPassword) {
-        boolean esValido = true;  // Bandera de validación general
+        boolean esValido = true;
 
-        // VALIDACIÓN NOMBRE
+        // Validación de nombre - debe tener al menos 2 caracteres
         if (TextUtils.isEmpty(nombre)) {
-            binding.tilNombre.setError("Ingresa tu nombre");  // Error campo vacío
-            esValido = false;  // Marca como inválido
+            binding.tilNombre.setError("Ingresa tu nombre");
+            esValido = false;
         } else if (nombre.length() < 2) {
-            binding.tilNombre.setError("Nombre muy corto");   // Error longitud
-            esValido = false;  // Marca como inválido
+            binding.tilNombre.setError("Nombre muy corto");
+            esValido = false;
         } else {
-            binding.tilNombre.setError(null);  // Limpia error si es válido
+            binding.tilNombre.setError(null);
         }
 
-        // VALIDACIÓN EMAIL
+        // Validación de email - formato de correo electrónico válido
         if (TextUtils.isEmpty(email)) {
             binding.tilEmailRegistro.setError("Ingresa tu email");
             esValido = false;
         } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.tilEmailRegistro.setError("Email inválido");  // Patrón email
+            binding.tilEmailRegistro.setError("Email inválido");
             esValido = false;
         } else {
             binding.tilEmailRegistro.setError(null);
         }
 
-        // VALIDACIÓN PASSWORD
+        // Validación de password - mínimo 6 caracteres y segura
         if (TextUtils.isEmpty(password)) {
             binding.tilPasswordRegistro.setError("Ingresa una contraseña");
             esValido = false;
         } else if (password.length() < 6) {
-            binding.tilPasswordRegistro.setError("Mínimo 6 caracteres");  // Longitud
+            binding.tilPasswordRegistro.setError("Mínimo 6 caracteres");
             esValido = false;
         } else if (!esPasswordSeguro(password)) {
-            binding.tilPasswordRegistro.setError("Usa letras y números");  // Seguridad
+            binding.tilPasswordRegistro.setError("Usa letras y números");
             esValido = false;
         } else {
             binding.tilPasswordRegistro.setError(null);
         }
 
-        // VALIDACIÓN CONFIRMACIÓN PASSWORD
+        // Validación de confirmación de password - debe coincidir
         if (TextUtils.isEmpty(confirmPassword)) {
             binding.tilConfirmPassword.setError("Confirma tu contraseña");
             esValido = false;
         } else if (!password.equals(confirmPassword)) {
-            binding.tilConfirmPassword.setError("Las contraseñas no coinciden");  // Match
+            binding.tilConfirmPassword.setError("Las contraseñas no coinciden");
             esValido = false;
         } else {
             binding.tilConfirmPassword.setError(null);
         }
 
-        return esValido;  // Retorna resultado de validación
+        return esValido;
     }
 
     /**
-     * Verifica seguridad básica de contraseña
+     * Verifica que la contraseña cumpla con requisitos básicos de seguridad.
+     * Debe contener al menos una letra y un número.
+     *
+     * @param password Contraseña a validar
+     * @return true si la contraseña es segura, false en caso contrario
      */
     private boolean esPasswordSeguro(String password) {
-        // Regex: debe contener al menos una letra y un número
         return password.matches(".*[a-zA-Z].*") && password.matches(".*\\d.*");
     }
 
     /**
-     * Observa cambios en el estado de autenticación del ViewModel
+     * Observa los cambios en el estado de autenticación del ViewModel.
+     * Actualiza la UI según el estado actual (loading, success, error).
      */
-    private void observeAuthState() {
-        authViewModel.getAuthState().observe(this, state -> {
-            if (state == null) return;  // Sale si estado es nulo
+    private void observarEstadoAutenticacion() {
+        authViewModel.getAuthState().observe(this, estado -> {
+            if (estado == null) return;
 
-            // Controla visibilidad del progress bar
-            ViewExtensions.setVisible(findViewById(R.id.progress_bar), state.isLoading());
-            // Habilita/deshabilita botones según loading state
-            ViewExtensions.setEnabled(binding.btnRegistrarse, !state.isLoading());
-            ViewExtensions.setEnabled(binding.btnIrLogin, !state.isLoading());
+            // Actualizar UI según estado de carga
+            ViewExtensions.setVisible(findViewById(R.id.progress_bar), estado.isLoading());
+            ViewExtensions.setEnabled(binding.btnRegistrarse, !estado.isLoading());
+            ViewExtensions.setEnabled(binding.btnIrLogin, !estado.isLoading());
 
-            // Maneja estado de éxito
-            if (state.isSuccess()) {
-                mostrarDialogExito();    // Muestra diálogo éxito
-                authViewModel.limpiarEstado();  // Limpia estado del ViewModel
+            // Manejar estado de éxito - mostrar diálogo de confirmación
+            if (estado.isSuccess()) {
+                mostrarDialogExito();
+                authViewModel.limpiarEstado();
             }
-            // Maneja estado de error
-            else if (state.hasError()) {
-                mostrarError(state.mensaje);    // Muestra error
-                authViewModel.limpiarEstado();  // Limpia estado
+            // Manejar estado de error - mostrar mensaje de error
+            else if (estado.hasError()) {
+                mostrarError(estado.mensaje);
+                authViewModel.limpiarEstado();
             }
         });
     }
 
     /**
-     * Muestra diálogo de registro exitoso
+     * Muestra diálogo de registro exitoso.
+     * Informa al usuario que su cuenta ha sido creada correctamente.
      */
     private void mostrarDialogExito() {
         new AlertDialog.Builder(this)
-                .setTitle("¡Registro Exitoso!")  // Título del diálogo
+                .setTitle("¡Registro Exitoso!")
                 .setMessage("Tu cuenta ha sido creada correctamente. " +
-                        "Ahora puedes empezar a crear y compartir recetas.")  // Mensaje
-                .setPositiveButton("Continuar", (dialog, which) -> {
-                    irAMain();  // Navega a Main al hacer clic
-                })
-                .setCancelable(false)  // Evita que usuario cierre con back button
-                .show();  // Muestra el diálogo
+                        "Ahora puedes empezar a crear y compartir recetas.")
+                .setPositiveButton("Continuar", (dialog, which) -> irAMainActivity())
+                .setCancelable(false)
+                .show();
     }
 
     /**
-     * Navega a MainActivity limpiando el stack de actividades
+     * Navega a la Activity principal de la aplicación.
+     * Limpia el stack de actividades para evitar volver al registro.
      */
-    private void irAMain() {
-        Intent intent = new Intent(this, MainActivity.class);  // Crea intent
-        // Flags para limpiar stack y crear nueva tarea
+    private void irAMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);  // Inicia actividad
-        finish();               // Cierra esta actividad
+        startActivity(intent);
+        finish();
     }
 
     /**
-     * Obtiene texto de forma segura de un EditText
+     * Obtiene texto de forma segura de un EditText.
+     * Maneja casos donde el texto puede ser null.
+     *
+     * @param editText Campo de texto del que obtener el contenido
+     * @return Texto contenido o string vacío si es null
      */
-    private String getText(TextInputEditText editText) {
-        // Retorna texto trimmeado o string vacío si es null
+    private String obtenerTexto(TextInputEditText editText) {
         return editText.getText() != null ? editText.getText().toString().trim() : "";
     }
 
     /**
-     * Muestra diálogo de error
+     * Muestra diálogo de error con el mensaje proporcionado.
+     *
+     * @param mensaje Mensaje de error a mostrar al usuario
      */
     private void mostrarError(String mensaje) {
         new AlertDialog.Builder(this)
-                .setTitle("Error en Registro")  // Título error
-                .setMessage(mensaje)            // Mensaje del error
-                .setPositiveButton("OK", null)  // Botón OK sin acción
-                .show();  // Muestra diálogo
+                .setTitle("Error en Registro")
+                .setMessage(mensaje)
+                .setPositiveButton("OK", null)
+                .show();
     }
 
+    /**
+     * Limpieza de recursos al destruir la Activity.
+     * Libera la referencia al binding para evitar memory leaks.
+     */
     @Override
     protected void onDestroy() {
-        super.onDestroy();  // Llama método padre
-        binding = null;     // Libera referencia del binding para evitar memory leaks
+        super.onDestroy();
+        binding = null;
     }
 }

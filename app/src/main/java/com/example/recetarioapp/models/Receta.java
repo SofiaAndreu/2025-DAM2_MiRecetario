@@ -11,39 +11,48 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Modelo de RECETA con ROOM DATABASE y FIREBASE FIRESTORE ✓
+ * Modelo principal que representa una receta completa en el sistema.
+ *
+ * Esta entidad está mapeada para Room Database (@Entity) y es compatible con
+ * Firebase Firestore. Utiliza conversores personalizados para manejar tipos
+ * complejos como listas y fechas.
+ *
+ * Contiene toda la información de una receta: información básica, ingredientes,
+ * pasos de preparación, metadatos y relaciones con el usuario.
  */
-@Entity(tableName ="recetas")
-@TypeConverters(Converters.class) //pra conversores personalizados (listas,fechas,etc)
+@Entity(tableName = "recetas")
+@TypeConverters(Converters.class)
 public class Receta {
 
-    //ATRIBUTOS PRINCIPALES
+    // ATRIBUTOS PRINCIPALES
     @PrimaryKey(autoGenerate = true)
-    private long id;
-    private String firebaseId;
-    private String nombre;
-    private String descripcion;
-    private String imagenPortadaURL;
-    private int tiempoPreparacion; //minutos
-    private int porciones;
-    private String dificultad;
-    private String categoria;
-    private String origen;
+    private long id;                    // ID local auto-generado por Room
+    private String firebaseId;          // ID remoto en Firebase (sincronización)
+    private String nombre;              // Nombre de la receta
+    private String descripcion;         // Descripción breve
+    private String imagenPortadaURL;    // URL de la imagen principal
+    private int tiempoPreparacion;      // Tiempo en minutos
+    private int porciones;              // Número de porciones
+    private String dificultad;          // Nivel de dificultad (Fácil, Media, Difícil)
+    private String categoria;           // Categoría culinaria
+    private String origen;              // Origen geográfico o cultural
 
-    //LISTAS
-    private List<Ingrediente> ingredientes;
-    private List<Paso> pasos;
-    private List<String> tags;
+    // LISTAS DE COMPONENTES
+    private List<Ingrediente> ingredientes; // Lista de ingredientes necesarios
+    private List<Paso> pasos;               // Pasos de preparación ordenados
+    private List<String> tags;              // Etiquetas para búsqueda y filtrado
 
-    //METADATOS
-    private Date fechaCreacion;
-    private Date fechaModificacion;
-    private boolean isFav;
-    private String usuarioId;
+    // METADATOS Y AUDITORÍA
+    private Date fechaCreacion;         // Fecha de creación del registro
+    private Date fechaModificacion;     // Fecha de última modificación
+    private boolean isFav;              // Indicador de favorito del usuario
+    private String usuarioId;           // ID del usuario propietario
 
-    //CONSTRUCTOR VACIO - para Room/Firebase
+    /**
+     * Constructor vacío requerido para Room y Firebase.
+     * Inicializa las listas y valores por defecto.
+     */
     public Receta() {
-        //inicializar campos por defecto
         this.ingredientes = new ArrayList<>();
         this.pasos = new ArrayList<>();
         this.tags = new ArrayList<>();
@@ -52,33 +61,54 @@ public class Receta {
         this.isFav = false;
     }
 
-    //CONSTRUCTOR SIMPLE - Receta con nombre y descripción
+    /**
+     * Constructor simple para creación rápida de recetas básicas.
+     * Marcado con @Ignore para que Room no lo use en el mapeo.
+     *
+     * @param nombre Nombre de la receta
+     * @param descripcion Descripción breve
+     */
     @Ignore
-    public Receta(String nombre, String descripcion){
+    public Receta(String nombre, String descripcion) {
         this();
         this.nombre = nombre;
         this.descripcion = descripcion;
     }
-    // ------------------------------------------------------------------------- //
 
-    //MÉTODO para AÑADIR NUEVO INGREDIENTE a LISTA
-    public void addIngrediente(Ingrediente ingrediente){ // + INGREDIENTE
+    /**
+     * Agrega un ingrediente a la lista de ingredientes de la receta.
+     *
+     * @param ingrediente Objeto Ingrediente a agregar
+     */
+    public void addIngrediente(Ingrediente ingrediente) {
         this.ingredientes.add(ingrediente);
     }
 
-    //MÉTODO para AÑADIR NUEVO PASO a LISTA
-    public void addPaso(Paso paso){ // + PASO
+    /**
+     * Agrega un paso a la lista de pasos de preparación.
+     *
+     * @param paso Objeto Paso a agregar
+     */
+    public void addPaso(Paso paso) {
         this.pasos.add(paso);
     }
 
-    //MÉTODO para AÑADIR NUEVO TAG a LISTA (si no existe)
-    public void addTag(String tag){ // + ETIQUETA/TAG
-        if (!this.tags.contains(tag)){
+    /**
+     * Agrega una etiqueta a la lista de tags, evitando duplicados.
+     *
+     * @param tag Etiqueta a agregar
+     */
+    public void addTag(String tag) {
+        if (!this.tags.contains(tag)) {
             this.tags.add(tag);
         }
     }
 
-    //MÉTODO CONVERSOR de TIEMPO PREPARACIÓN
+    /**
+     * Convierte el tiempo de preparación en minutos a un formato legible.
+     *
+     * @return String formateado (ej: "45 min", "1h 30min", "-" si es 0)
+     */
     public String getTiempoPrepFormateado() {
         if (tiempoPreparacion == 0) {
             return "-";
@@ -92,8 +122,7 @@ public class Receta {
         }
     }
 
-
-    //GETTERS/SETTERS
+    // GETTERS Y SETTERS
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 

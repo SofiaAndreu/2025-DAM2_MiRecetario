@@ -1,77 +1,93 @@
 package com.example.recetarioapp.models;
 
 /**
- * Modelo INGREDIENTE individual dentro de RECETA ✓
+ * Modelo que representa un ingrediente individual dentro de una receta.
+ *
+ * Almacena la información básica de un ingrediente: nombre, cantidad
+ * y notas opcionales. Incluye métodos utilitarios para formatear la información
+ * de manera legible para el usuario.
+ *
+ * Compatible con Room Database y Firebase Firestore mediante constructores vacíos.
  */
 public class Ingrediente {
 
-    //ATRIBUTOS
-    private String nombre;
-    private String cantidad;
-    private String notasOpcionales;
+    // ATRIBUTOS PRINCIPALES
+    private String nombre;           // Nombre del ingrediente (ej: "Harina")
+    private String cantidad;         // Cantidad requerida (ej: "200 gramos")
+    private String notasOpcionales;  // Notas adicionales (ej: "Tamizada")
 
-    //CONSTRUCTOR VACIO - para Firebase/Room
-    public Ingrediente() {
-    }
+    /**
+     * Constructor vacío requerido para la deserialización de Firebase y Room.
+     */
+    public Ingrediente() {}
 
-    //CONSTRUCTOR CON PARÁMETROS - Solo los minimos necesarios
+    /**
+     * Constructor básico con parámetros mínimos requeridos.
+     *
+     * @param nombre Nombre del ingrediente
+     * @param cantidad Cantidad necesaria para la receta
+     */
     public Ingrediente(String nombre, String cantidad) {
         this.nombre = nombre;
         this.cantidad = cantidad;
     }
 
-    //CONSTRUCTOR COMPLETO - Todos los campos
+    /**
+     * Constructor completo con todos los campos disponibles.
+     *
+     * @param nombre Nombre del ingrediente
+     * @param cantidad Cantidad necesaria
+     * @param notasOpcionales Notas adicionales sobre el ingrediente
+     */
     public Ingrediente(String nombre, String cantidad, String notasOpcionales) {
         this.nombre = nombre;
         this.cantidad = cantidad;
         this.notasOpcionales = notasOpcionales;
     }
-    // ------------------------------------------------------------------------------ //
 
-    //MÉTODO para CONSTRUIR un TEXTO completo con la INFO del INGREDIENTE (nombre + cantidad + notaOpcional)
-    public String getIngredienteCompleto(){
-        //StringBuilder para oncatenar cadenas de texto
+    /**
+     * Genera una representación completa del ingrediente formateada para mostrar al usuario.
+     * Combina cantidad, nombre y notas opcionales en un string legible.
+     *
+     * @return String formateado con la información completa del ingrediente
+     *
+     * Ejemplo: "200 gramos de Harina (Tamizada)"
+     */
+    public String getIngredienteCompleto() {
         StringBuilder ingredienteCompleto = new StringBuilder();
 
-        //Si cantidad NO vacia -> añadir a texto con espacio
-        if(cantidad != null && !cantidad.isEmpty()){
+        // Agregar cantidad si está disponible
+        if (cantidad != null && !cantidad.isEmpty()) {
             ingredienteCompleto.append(cantidad).append(" ");
         }
-        ingredienteCompleto.append(nombre); //añadir nombre de ingrediente
 
-        //Si hay notasOpcionales -> agregar entre paréntesis
-        if(notasOpcionales!= null && !notasOpcionales.isEmpty()) {
+        // Agregar nombre del ingrediente
+        ingredienteCompleto.append(nombre);
+
+        // Agregar notas opcionales entre paréntesis si existen
+        if (notasOpcionales != null && !notasOpcionales.isEmpty()) {
             ingredienteCompleto.append(" (").append(notasOpcionales).append(")");
         }
-        return ingredienteCompleto.toString(); //devuelve texto completo como String
-    } // ------------------------------------------------------------------------------ //
+        return ingredienteCompleto.toString();
+    }
 
-    //Sobreescribe toString para mostrar texto de ingrediente completo
+    /**
+     * Sobrescribe toString() para devolver la representación completa del ingrediente.
+     *
+     * @return String con la información formateada del ingrediente
+     */
     @Override
-    public String toString(){
+    public String toString() {
         return getIngredienteCompleto();
     }
-    // ------------------------------------------------------- //
 
+    // GETTERS Y SETTERS
+    public String getNombre() {return nombre;}
+    public void setNombre(String nombre) {this.nombre = nombre;}
 
-    //GETTERS Y SETTERS
-    public String getNombre() {
-        return nombre;
-    }
+    public String getCantidad() { return cantidad;}
+    public void setCantidad(String cantidad) {this.cantidad = cantidad;}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public String getCantidad() {
-        return cantidad;
-    }
-    public void setCantidad(String cantidad) {
-        this.cantidad = cantidad;
-    }
-    public String getNotasOpcionales() {
-        return notasOpcionales;
-    }
-    public void setNotasOpcionales(String notasOpcionales) {
-        this.notasOpcionales = notasOpcionales;
-    }
+    public String getNotasOpcionales() {return notasOpcionales;}
+    public void setNotasOpcionales(String notasOpcionales) {this.notasOpcionales = notasOpcionales;}
 }

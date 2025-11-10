@@ -1,275 +1,311 @@
 package com.example.recetarioapp.ui;
 
-// -- IMPORTACIONES --
-import android.content.Intent;              // Para navegación
-import android.content.SharedPreferences;   // Para almacenamiento persistente
-import android.os.Bundle;                   // Para estado
-import android.text.TextUtils;              // Utilidades texto
-import android.widget.Toast;                // Mensajes breves
-import androidx.appcompat.app.AlertDialog;  // Diálogos
-import androidx.appcompat.app.AppCompatActivity;  // Activity base
-import androidx.lifecycle.ViewModelProvider;      // ViewModel
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.recetarioapp.R;
-import com.example.recetarioapp.databinding.ActivityLoginBinding;  // ViewBinding
-import com.example.recetarioapp.utils.ViewExtensions;  // Extensiones vistas
-import com.example.recetarioapp.viewmodels.AuthViewModel;  // ViewModel auth
-import com.example.recetarioapp.viewmodels.RecetaViewModel;  // ✅ NUEVO: Para sincronizar recetas
-import com.google.android.material.textfield.TextInputEditText;  // Campo texto
+import com.example.recetarioapp.databinding.ActivityLoginBinding;
+import com.example.recetarioapp.utils.ViewExtensions;
+import com.example.recetarioapp.viewmodels.AuthViewModel;
+import com.example.recetarioapp.viewmodels.RecetaViewModel;
+import com.google.android.material.textfield.TextInputEditText;
 
 /**
- * Activity para inicio de sesión con validaciones y modo anónimo
+ * Activity para inicio de sesión con validaciones completas y soporte para modo anónimo.
+ *
+ * Proporciona un flujo de autenticación robusto con:
+ * - Login tradicional con email/password
+ * - Modo invitado (continuar sin cuenta)
+ * - Recordar credenciales
+ * - Validación en tiempo real
+ * - Sincronización automática de datos después del login
  */
 public class LoginActivity extends AppCompatActivity {
 
-    private ActivityLoginBinding binding;    // Binding para vistas
-    private AuthViewModel authViewModel;     // ViewModel autenticación
-    private RecetaViewModel recetaViewModel; // ✅ NUEVO: ViewModel para recetas
-    private SharedPreferences prefs;         // Preferencias persistentes
+    // ViewBinding para acceso type-safe a las vistas del layout
+    private ActivityLoginBinding binding;
 
+    // ViewModels para gestión de autenticación y datos
+    private AuthViewModel authViewModel;
+    private RecetaViewModel recetaViewModel;
+
+    // Preferencias para persistencia de datos de usuario
+    private SharedPreferences preferencias;
+
+    /**
+     * Método principal de inicialización de la Activity.
+     * Configura el layout, inicializa ViewModels y verifica sesiones existentes.
+     *
+     * @param savedInstanceState Estado previo de la Activity para restaurar estado
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  // Llama método padre
-        // Infla layout con ViewBinding
+        super.onCreate(savedInstanceState);
+
+        // Inflar el layout usando ViewBinding
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());  // Establece vista
+        setContentView(binding.getRoot());
 
-        // Inicializa ViewModel para autenticación
+        // Inicializar ViewModels y preferencias
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        // ✅ NUEVO: Inicializa ViewModel para recetas
         recetaViewModel = new ViewModelProvider(this).get(RecetaViewModel.class);
-        // Obtiene SharedPreferences para datos persistentes
-        prefs = getSharedPreferences("RecetarioPrefs", MODE_PRIVATE);
+        preferencias = getSharedPreferences("RecetarioPrefs", MODE_PRIVATE);
 
-        // Verifica si usuario ya tiene sesión (normal o anónima)
+        // Verificar si ya existe una sesión (autenticada o anónima)
         if (authViewModel.isUserLoggedInOrAnonymous()) {
-            // ✅ CORREGIDO: Sincronizar recetas antes de ir a Main
             sincronizarRecetas();
-            irAMain();  // Si ya está logueado, va directo a main
-            return;     // Termina onCreate aquí
+            irAMainActivity();
+            return;
         }
 
-        cargarEmailGuardado();  // Carga email guardado si existe
-        setupListeners();       // Configura listeners
-        observeAuthState();     // Observa cambios auth
+        // Configurar componentes de la UI
+        cargarEmailGuardado();
+        configurarListeners();
+        observarEstadoAutenticacion();
     }
 
     /**
-     * Configura todos los listeners de la UI
+     * Configura todos los listeners de interacción del usuario.
+     * Incluye botones de login, registro y modo invitado.
      */
-    private void setupListeners() {
-        // Botón Login - inicia proceso de login
+    private void configurarListeners() {
+        // Botón de login tradicional
         binding.btnLogin.setOnClickListener(v -> intentarLogin());
 
-        // Botón Registro - navega a pantalla de registro
-        binding.btnIrRegistro.setOnClickListener(v -> irARegistro());
+        // Navegación a pantalla de registro
+        binding.btnIrRegistro.setOnClickListener(v -> irARegistroActivity());
 
-        // Texto "Continuar sin cuenta" - activa modo anónimo
-        binding.tvContinuarSinCuenta.setOnClickListener(v -> continuarSinCuenta());
+        // Opción de modo invitado
+        binding.tvContinuarSinCuenta.setOnClickListener(v -> activarModoAnonimo());
 
-        // Listener para tecla Enter en password
+        // Login con tecla Enter en campo de password
         binding.etPassword.setOnEditorActionListener((v, actionId, event) -> {
-            intentarLogin();  // Intenta login al presionar Enter
-            return true;      // Evento manejado
+            intentarLogin();
+            return true;
         });
     }
 
     /**
-     * Activa modo anónimo y navega a Main
+     * Activa el modo anónimo/invitado y navega a la pantalla principal.
+     * No requiere credenciales pero tiene funcionalidades limitadas.
      */
-    private void continuarSinCuenta() {
-        // Usa ViewModel para activar modo anónimo
+    private void activarModoAnonimo() {
         authViewModel.activarModoAnonimo();
-        // ✅ CORREGIDO: No sincronizar en modo anónimo (no hay recetas en Firebase)
-        irAMain();  // Navega a pantalla principal
+        irAMainActivity();
     }
 
     /**
-     * Verifica si el usuario actual es anónimo
-     */
-    private boolean esUsuarioAnonimo() {
-        // Lee preferencia que indica modo anónimo
-        return prefs.getBoolean("es_usuario_anonimo", false);
-    }
-
-    /**
-     * Intenta realizar login después de validar campos
+     * Intenta realizar el proceso de login después de validar los campos.
+     * Ejecuta validaciones y, si son exitosas, inicia el proceso de autenticación.
      */
     private void intentarLogin() {
-        // Obtiene y limpia texto de campos
-        String email = getText(binding.etEmail);
-        String password = getText(binding.etPassword);
+        String email = obtenerTexto(binding.etEmail);
+        String password = obtenerTexto(binding.etPassword);
 
-        // Valida campos, si hay error se detiene
+        // Validar campos antes de proceder con el login
         if (!validarCampos(email, password)) {
             return;
         }
 
-        // Gestiona "recordar email" según estado del checkbox
+        // Gestionar "recordar email" según preferencia del usuario
         if (binding.cbRecordar.isChecked()) {
-            guardarEmail(email);   // Guarda email si está marcado
+            guardarEmail(email);
         } else {
-            limpiarEmail();        // Limpia email si no está marcado
+            limpiarEmailGuardado();
         }
 
-        // Limpia modo anónimo previo si existe
+        // Limpiar modo anónimo previo si existe
         limpiarModoAnonimo();
 
-        // Llama al ViewModel para realizar login
+        // Delegar autenticación al ViewModel
         authViewModel.login(email, password);
     }
 
     /**
-     * Limpia preferencias de modo anónimo
+     * Limpia las preferencias de modo anónimo al iniciar sesión tradicional.
+     * Previene conflictos entre sesiones anónimas y autenticadas.
      */
     private void limpiarModoAnonimo() {
-        // Solo limpia si actualmente es usuario anónimo
         if (esUsuarioAnonimo()) {
-            SharedPreferences.Editor editor = prefs.edit();  // Editor para modificar
-            editor.remove("es_usuario_anonimo");  // Elimina flag anónimo
-            editor.remove("user_mode");           // Elimina modo usuario
-            editor.remove("fecha_anonimo");       // Elimina fecha anónimo
-            editor.apply();  // Aplica cambios
+            SharedPreferences.Editor editor = preferencias.edit();
+            editor.remove("es_usuario_anonimo");
+            editor.remove("user_mode");
+            editor.remove("fecha_anonimo");
+            editor.apply();
         }
     }
 
     /**
-     * Valida campos de email y password
+     * Verifica si el usuario actual está en modo anónimo.
+     *
+     * @return true si es usuario anónimo, false en caso contrario
+     */
+    private boolean esUsuarioAnonimo() {
+        return preferencias.getBoolean("es_usuario_anonimo", false);
+    }
+
+    /**
+     * Valida los campos de email y password en tiempo real.
+     * Muestra errores específicos para cada campo inválido.
+     *
+     * @param email Email a validar
+     * @param password Password a validar
+     * @return true si todos los campos son válidos, false en caso contrario
      */
     private boolean validarCampos(String email, String password) {
         boolean esValido = true;
 
-        // VALIDACIÓN EMAIL
+        // Validación de email - formato de correo electrónico válido
         if (TextUtils.isEmpty(email)) {
-            binding.tilEmail.setError("Ingresa tu email");  // Error vacío
+            binding.tilEmail.setError("Ingresa tu email");
             esValido = false;
         } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.tilEmail.setError("Email inválido");  // Error formato
+            binding.tilEmail.setError("Email inválido");
             esValido = false;
         } else {
-            binding.tilEmail.setError(null);  // Limpia error
+            binding.tilEmail.setError(null);
         }
 
-        // VALIDACIÓN PASSWORD
+        // Validación de password - no vacío
         if (TextUtils.isEmpty(password)) {
-            binding.tilPassword.setError("Ingresa tu contraseña");  // Error vacío
+            binding.tilPassword.setError("Ingresa tu contraseña");
             esValido = false;
         } else {
-            binding.tilPassword.setError(null);  // Limpia error
+            binding.tilPassword.setError(null);
         }
-        return esValido;  // Retorna resultado
+
+        return esValido;
     }
 
     /**
-     * Observa cambios en estado de autenticación
+     * Observa los cambios en el estado de autenticación del ViewModel.
+     * Actualiza la UI según el estado actual (loading, success, error).
      */
-    private void observeAuthState() {
-        authViewModel.getAuthState().observe(this, state -> {
-            if (state == null) return;  // Sale si estado nulo
+    private void observarEstadoAutenticacion() {
+        authViewModel.getAuthState().observe(this, estado -> {
+            if (estado == null) return;
 
-            // Controla UI según estado loading
-            ViewExtensions.setVisible(findViewById(R.id.progress_bar), state.isLoading());
-            ViewExtensions.setEnabled(binding.btnLogin, !state.isLoading());
-            ViewExtensions.setEnabled(binding.btnIrRegistro, !state.isLoading());
-            ViewExtensions.setEnabled(binding.tvContinuarSinCuenta, !state.isLoading());
+            // Actualizar UI según estado de carga
+            ViewExtensions.setVisible(findViewById(R.id.progress_bar), estado.isLoading());
+            ViewExtensions.setEnabled(binding.btnLogin, !estado.isLoading());
+            ViewExtensions.setEnabled(binding.btnIrRegistro, !estado.isLoading());
+            ViewExtensions.setEnabled(binding.tvContinuarSinCuenta, !estado.isLoading());
 
-            // Maneja estado éxito
-            if (state.isSuccess()) {
-                Toast.makeText(this, state.mensaje, Toast.LENGTH_SHORT).show();  // Mensaje
-                authViewModel.limpiarEstado();  // Limpia estado
-                //Sincronizar recetas después del login exitoso
+            // Manejar estado de éxito - navegar a pantalla principal
+            if (estado.isSuccess()) {
+                Toast.makeText(this, estado.mensaje, Toast.LENGTH_SHORT).show();
+                authViewModel.limpiarEstado();
                 sincronizarRecetas();
-                irAMain();  // Navega a main
+                irAMainActivity();
             }
-            // Maneja estado error
-            else if (state.hasError()) {
-                mostrarError(state.mensaje);    // Muestra error
-                authViewModel.limpiarEstado();  // Limpia estado
+            // Manejar estado de error - mostrar mensaje de error
+            else if (estado.hasError()) {
+                mostrarError(estado.mensaje);
+                authViewModel.limpiarEstado();
             }
         });
     }
 
-    //NUEVO MÉTODO: Sincronizar recetas después del login
+    /**
+     * Sincroniza las recetas del usuario después de un login exitoso.
+     * Descarga las recetas desde Firebase y las almacena localmente.
+     */
     private void sincronizarRecetas() {
         recetaViewModel.sincronizar();
         Toast.makeText(this, "Sincronizando recetas...", Toast.LENGTH_SHORT).show();
     }
 
-    // ===== MÉTODOS DE NAVEGACIÓN =====
+    // ==================== MÉTODOS DE NAVEGACIÓN ====================
 
     /**
-     * Navega a MainActivity limpiando stack
+     * Navega a la Activity principal limpiando el stack de actividades.
+     * Previene que el usuario pueda volver al login con el botón back.
      */
-    private void irAMain() {
-        Intent intent = new Intent(this, MainActivity.class);  // Crea intent
-        // Flags para nueva tarea y limpiar stack
+    private void irAMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);  // Inicia actividad
-        finish();               // Cierra esta actividad
+        startActivity(intent);
+        finish();
     }
 
     /**
-     * Navega a RegisterActivity
+     * Navega a la Activity de registro.
      */
-    private void irARegistro() {
-        Intent intent = new Intent(this, RegisterActivity.class);  // Crea intent
-        startActivity(intent);  // Inicia actividad (sin flags especiales)
+    private void irARegistroActivity() {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 
-    // ===== MÉTODOS AUXILIARES =====
+    // ==================== MÉTODOS AUXILIARES ====================
 
     /**
-     * Obtiene texto de forma segura de EditText
+     * Obtiene el texto de un EditText de forma segura.
+     *
+     * @param editText Campo de texto del que obtener el contenido
+     * @return Texto contenido o string vacío si es null
      */
-    private String getText(TextInputEditText editText) {
-        // Retorna texto trimmeado o string vacío si es null
+    private String obtenerTexto(TextInputEditText editText) {
         return editText.getText() != null ? editText.getText().toString().trim() : "";
     }
 
     /**
-     * Muestra diálogo de error
+     * Muestra un diálogo de error al usuario.
+     *
+     * @param mensaje Mensaje de error a mostrar
      */
     private void mostrarError(String mensaje) {
         new AlertDialog.Builder(this)
-                .setTitle("Error")        // Título
-                .setMessage(mensaje)      // Mensaje del error
-                .setPositiveButton("OK", null)  // Botón OK
-                .show();  // Muestra diálogo
+                .setTitle("Error")
+                .setMessage(mensaje)
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     /**
-     * Carga email guardado en preferencias
+     * Carga el email guardado en las preferencias (si existe).
+     * Rellena automáticamente el campo de email si el usuario eligió "recordar".
      */
     private void cargarEmailGuardado() {
-        // Obtiene email guardado, vacío si no existe
-        String emailGuardado = prefs.getString("email_guardado", "");
+        String emailGuardado = preferencias.getString("email_guardado", "");
         if (!emailGuardado.isEmpty()) {
-            binding.etEmail.setText(emailGuardado);    // Establece email en campo
-            binding.cbRecordar.setChecked(true);       // Marca checkbox recordar
+            binding.etEmail.setText(emailGuardado);
+            binding.cbRecordar.setChecked(true);
         }
     }
 
     /**
-     * Guarda email en preferencias
+     * Guarda el email en las preferencias para "recordar credenciales".
+     *
+     * @param email Email a guardar en preferencias
      */
     private void guardarEmail(String email) {
-        prefs.edit()                    // Obtiene editor
-                .putString("email_guardado", email)  // Guarda email
-                .apply();               // Aplica cambios
+        preferencias.edit()
+                .putString("email_guardado", email)
+                .apply();
     }
 
     /**
-     * Elimina email guardado de preferencias
+     * Elimina el email guardado de las preferencias.
      */
-    private void limpiarEmail() {
-        prefs.edit()                    // Obtiene editor
-                .remove("email_guardado")  // Elimina email
-                .apply();               // Aplica cambios
+    private void limpiarEmailGuardado() {
+        preferencias.edit()
+                .remove("email_guardado")
+                .apply();
     }
 
+    /**
+     * Limpieza de recursos al destruir la Activity.
+     * Libera la referencia al binding para evitar memory leaks.
+     */
     @Override
     protected void onDestroy() {
-        super.onDestroy();  // Llama método padre
-        binding = null;     // Libera binding para evitar memory leaks
+        super.onDestroy();
+        binding = null;
     }
 }
