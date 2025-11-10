@@ -55,7 +55,7 @@
             android:theme="@style/Theme.RecetarioApp"
             android:parentActivityName=".ui.MainActivity" />
 
-        <!-- AboutActivity - CORREGIDO: usa el mismo tema que tu app -->
+        <!-- AboutActivity - INFORMACIÓN EXTRA -->
         <activity
             android:name=".ui.AboutActivity"
             android:exported="false"

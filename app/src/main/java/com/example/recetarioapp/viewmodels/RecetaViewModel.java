@@ -36,13 +36,10 @@ public class RecetaViewModel extends AndroidViewModel {
     // Datos principales observables desde el Repository
     private final LiveData<List<Receta>> todasLasRecetas;
     private final LiveData<List<Receta>> recetasFavoritas;
-    private final LiveData<List<String>> categoriasDisponibles;
+   // private final LiveData<List<String>> categoriasDisponibles;
 
     // Controles de búsqueda y filtrado
     private final MutableLiveData<String> queryBusqueda = new MutableLiveData<>();
-    private final MutableLiveData<String> filtroCategoria = new MutableLiveData<>();
-    private final MutableLiveData<String> filtroDificultad = new MutableLiveData<>();
-    private final MutableLiveData<Integer> filtroTiempo = new MutableLiveData<>();
 
     // LiveData reactivo que combina búsqueda con datos base
     private final LiveData<List<Receta>> recetasFiltradas;
@@ -72,7 +69,7 @@ public class RecetaViewModel extends AndroidViewModel {
         // Inicializar LiveData desde el Repository
         todasLasRecetas = repositorioRecetas.getAllRecetas();
         recetasFavoritas = repositorioRecetas.getFavs();
-        categoriasDisponibles = repositorioRecetas.getCategorias();
+        //categoriasDisponibles = repositorioRecetas.getCategorias();
 
         // Configurar transformación reactiva para búsqueda en tiempo real
         recetasFiltradas = Transformations.switchMap(queryBusqueda, query -> {
@@ -217,23 +214,6 @@ public class RecetaViewModel extends AndroidViewModel {
         mensajeExito.postValue("Sincronizando...");
     }
 
-    /**
-     * Fuerza una resincronización manual ignorando el control de ejecución única.
-     */
-    public void forzarResincronizacion() {
-        Log.d("VIEWMODEL", "Forzando resincronización - Instancia: " + idInstancia);
-        repositorioRecetas.forzarSincronizacion();
-        mensajeExito.postValue("Resincronizando recetas...");
-    }
-
-    /**
-     * Resetea el estado de sincronización (principalmente para testing).
-     */
-    public void resetearSincronizacion() {
-        RecetaRepository.resetearSincronizacion();
-        Log.d("VIEWMODEL", "Sincronización reseteada - Instancia: " + idInstancia);
-    }
-
     // ==================== BÚSQUEDA Y FILTRADO ====================
 
     /**
@@ -286,16 +266,6 @@ public class RecetaViewModel extends AndroidViewModel {
         mensajeError.setValue(null);
     }
 
-    /**
-     * Método de diagnóstico para debugging de búsquedas.
-     *
-     * @param query Texto de búsqueda a debuggear
-     */
-    public void debugBuscar(String query) {
-        Log.d("BUSQUEDA", "Buscando: '" + query + "' - Instancia: " + idInstancia);
-        buscar(query);
-    }
-
     // ==================== GETTERS PARA LIVE DATA ====================
 
     /**
@@ -314,15 +284,6 @@ public class RecetaViewModel extends AndroidViewModel {
      */
     public LiveData<List<Receta>> getFavs() {
         return recetasFavoritas;
-    }
-
-    /**
-     * Obtiene las categorías únicas disponibles.
-     *
-     * @return LiveData con lista de categorías
-     */
-    public LiveData<List<String>> getCategorias() {
-        return categoriasDisponibles;
     }
 
     /**
@@ -380,23 +341,6 @@ public class RecetaViewModel extends AndroidViewModel {
         return favoritoActualizado;
     }
 
-    /**
-     * Obtiene el estado de carga actual.
-     *
-     * @return LiveData con estado de carga
-     */
-    public LiveData<Boolean> getEstadoCargando() {
-        return estadoCargando;
-    }
-
-    /**
-     * Obtiene el ID de instancia para debugging.
-     *
-     * @return ID único de esta instancia ViewModel
-     */
-    public String getInstanciaId() {
-        return idInstancia;
-    }
 
     // ==================== INTERFACE PARA CALLBACKS DE IMAGEN ====================
 

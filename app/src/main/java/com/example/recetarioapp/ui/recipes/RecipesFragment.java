@@ -406,17 +406,6 @@ public class RecipesFragment extends BaseFragment {
     }
 
     /**
-     * Abre el detalle de una receta específica.
-     * Sobrescribe el método de la clase base si se necesita comportamiento específico.
-     *
-     * @param receta Receta de la que mostrar detalles
-     */
-    @Override
-    protected void openRecipeDetail(Receta receta) {
-        super.openRecipeDetail(receta);
-    }
-
-    /**
      * Alterna el estado de favorito de una receta.
      * Delega la operación en el ViewModel.
      *

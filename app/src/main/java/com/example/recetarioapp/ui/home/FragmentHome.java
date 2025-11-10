@@ -33,7 +33,7 @@ import java.util.List;
 public class FragmentHome extends BaseFragment {
 
     // Vistas para mostrar estadísticas
-    private TextView tvTotalRecetas, tvTotalFavoritas, tvTotalCategorias;
+    private TextView tvTotalRecetas, tvTotalFavoritas;
 
     // RecyclerView para mostrar recetas recientes
     private RecyclerView rvRecetasRecientes;

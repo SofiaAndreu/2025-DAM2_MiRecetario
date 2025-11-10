@@ -158,13 +158,4 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
     }
-
-    /**
-     * Verifica si el usuario actual está en modo invitado/anónimo.
-     *
-     * @return true si es modo invitado, false si es usuario registrado
-     */
-    public boolean esModoInvitado() {
-        return authViewModel.esUsuarioAnonimo();
-    }
 }

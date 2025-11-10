@@ -148,6 +148,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         recyclerPasos.setAdapter(adaptadorPasos);
     }
 
+
     /**
      * Configura el selector de imágenes desde la galería.
      * Permite al usuario cambiar la imagen de la receta.
@@ -158,8 +159,20 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 uri -> {
                     // Manejar imagen seleccionada
                     if (uri != null && recetaActual != null) {
-                        imagenReceta.setImageURI(uri);
-                        recetaActual.setImagenPortadaURL(uri.toString());
+                        // GUARDAR EN ALMACENAMIENTO INTERNO
+                        String internalImagePath = ImageHelper.saveImageToInternalStorage(this, uri);
+
+                        if (internalImagePath != null) {
+                            // Actualizar UI y base de datos
+                            recetaActual.setImagenPortadaURL(internalImagePath);
+                            ImageLoader.loadRecipeImage(this, internalImagePath, imagenReceta);
+
+                            // GUARDAR CAMBIO EN LA BASE DE DATOS
+                            viewModel.actualizarReceta(recetaActual);
+                            Toast.makeText(this, "Imagen actualizada", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Error al guardar imagen", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
         );

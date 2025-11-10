@@ -105,7 +105,7 @@ public class AddRecetasFragment extends BaseFragment {
         setupDropdowns();
         setupListeners();
         setupObservadoresGuardado();
-        observeViewModel();
+       // observeViewModel();
 
         // Si está en modo edición, cargar datos de la receta
         if (modoEdicion) cargarRecetaParaEditar();
@@ -340,20 +340,6 @@ public class AddRecetasFragment extends BaseFragment {
                 }
             }
         });
-    }
-
-    /**
-     * Configura observadores del ViewModel para progreso y estado de UI.
-     */
-    private void observeViewModel() {
-        // Observar progreso de subida de imagen
-        viewModel.getProgresoSubida().observe(getViewLifecycleOwner(), progreso -> {
-            if (progreso != null && progreso > 0) {
-                progressBar.setProgress(progreso);
-            }
-        });
-
-        observeUiState();
     }
 
     /**

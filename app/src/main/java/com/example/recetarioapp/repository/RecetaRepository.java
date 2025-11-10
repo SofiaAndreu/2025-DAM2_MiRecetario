@@ -80,15 +80,6 @@ public class RecetaRepository {
     }
 
     /**
-     * Obtiene todas las categorías únicas disponibles.
-     *
-     * @return LiveData observable con lista de categorías
-     */
-    public LiveData<List<String>> getCategorias() {
-        return fuenteLocal.getCategorias();
-    }
-
-    /**
      * Busca recetas por nombre (búsqueda parcial).
      *
      * @param query Texto a buscar en nombres de recetas
@@ -294,34 +285,6 @@ public class RecetaRepository {
             android.util.Log.d(TAG, "SINCRONIZACIÓN omitida - Global: " + sincronizacionGlobalRealizada +
                     ", Usuario: " + (FirebaseAuth.getInstance().getCurrentUser() != null));
         }
-    }
-
-    // ==================== CONTROL DE SINCRONIZACIÓN ====================
-
-    /**
-     * Fuerza una nueva sincronización manualmente.
-     * Resetea el flag de control y ejecuta la sincronización.
-     */
-    public void forzarSincronizacion() {
-        sincronizacionGlobalRealizada = false;
-        sincronizarFBaLocal();
-    }
-
-    /**
-     * Resetea el estado de sincronización (principalmente para testing).
-     */
-    public static void resetearSincronizacion() {
-        sincronizacionGlobalRealizada = false;
-        android.util.Log.d(TAG, "Estado de sincronización reseteado");
-    }
-
-    /**
-     * Verifica si la sincronización global ya se realizó en esta sesión.
-     *
-     * @return true si la sincronización ya fue ejecutada
-     */
-    public static boolean isSincronizacionRealizada() {
-        return sincronizacionGlobalRealizada;
     }
 
     // ==================== UTILIDADES ====================
