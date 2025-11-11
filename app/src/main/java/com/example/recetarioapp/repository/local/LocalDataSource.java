@@ -61,15 +61,6 @@ public class LocalDataSource {
     }
 
     /**
-     * Obtiene todas las categorías únicas existentes en las recetas.
-     *
-     * @return LiveData con lista de categorías disponibles
-     */
-    public LiveData<List<String>> getCategorias() {
-        return recetaDAO.getCategorias();
-    }
-
-    /**
      * Busca recetas cuyo nombre contenga el texto de búsqueda.
      *
      * @param query Texto a buscar en los nombres de recetas

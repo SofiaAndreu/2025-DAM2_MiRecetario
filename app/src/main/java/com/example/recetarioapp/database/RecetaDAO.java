@@ -59,13 +59,6 @@ public interface RecetaDAO {
     @Delete
     void delete(Receta receta);
 
-    /**
-     * Elimina todas las recetas de la base de datos.
-     * ¡PRECAUCIÓN: Operación destructiva!
-     */
-    @Query("DELETE FROM recetas")
-    void deleteAll();
-
     // ==================== CONSULTAS DE LECTURA ====================
 
     /**
@@ -75,14 +68,6 @@ public interface RecetaDAO {
      */
     @Query("SELECT * FROM recetas ORDER BY fechaCreacion DESC")
     LiveData<List<Receta>> getAllRecetas();
-
-    /**
-     * Obtiene todas las recetas de forma síncrona (para operaciones en background).
-     *
-     * @return Lista de recetas ordenadas por fecha
-     */
-    @Query("SELECT * FROM recetas ORDER BY fechaCreacion DESC")
-    List<Receta> getAllRecetasSync();
 
     /**
      * Obtiene una receta específica por su ID local.
@@ -101,15 +86,6 @@ public interface RecetaDAO {
      */
     @Query("SELECT * FROM recetas WHERE firebaseId = :firebaseId")
     Receta getRecetaByFirebaseId(String firebaseId);
-
-    // ==================== OPERACIONES DE MANTENIMIENTO ====================
-
-    /**
-     * Elimina recetas que no tienen ingredientes o pasos válidos.
-     * Limpia la base de datos de registros corruptos o incompletos.
-     */
-    @Query("DELETE FROM recetas WHERE ingredientes IS NULL OR ingredientes = '' OR pasos IS NULL OR pasos = ''")
-    void eliminarRecetasVacias();
 
     // ==================== CONSULTAS DE FAVORITOS ====================
 
@@ -170,21 +146,4 @@ public interface RecetaDAO {
     @Query("SELECT * FROM recetas WHERE tiempoPreparacion <= :tiempoMax ORDER BY tiempoPreparacion ASC")
     LiveData<List<Receta>> getRecetasPorTiempo(int tiempoMax);
 
-    // ==================== CONSULTAS DE METADATOS ====================
-
-    /**
-     * Obtiene todas las categorías únicas existentes en las recetas.
-     *
-     * @return LiveData con lista de categorías disponibles
-     */
-    @Query("SELECT DISTINCT categoria FROM recetas WHERE categoria IS NOT NULL ORDER BY categoria ASC")
-    LiveData<List<String>> getCategorias();
-
-    /**
-     * Obtiene el número total de recetas en la base de datos.
-     *
-     * @return LiveData con el conteo de recetas
-     */
-    @Query("SELECT COUNT(*) FROM recetas")
-    LiveData<Integer> getConteoRecetas();
 }

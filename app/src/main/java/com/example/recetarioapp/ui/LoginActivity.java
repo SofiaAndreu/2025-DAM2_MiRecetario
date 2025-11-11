@@ -275,7 +275,6 @@ public class LoginActivity extends AppCompatActivity {
         String emailGuardado = preferencias.getString("email_guardado", "");
         if (!emailGuardado.isEmpty()) {
             binding.etEmail.setText(emailGuardado);
-          //  binding.cbRecordar.setChecked(true);
         }
     }
 
@@ -284,20 +283,20 @@ public class LoginActivity extends AppCompatActivity {
      *
      * @param email Email a guardar en preferencias
      */
-    private void guardarEmail(String email) {
-        preferencias.edit()
-                .putString("email_guardado", email)
-                .apply();
-    }
+//    private void guardarEmail(String email) {
+//        preferencias.edit()
+//                .putString("email_guardado", email)
+//                .apply();
+//    }
 
     /**
      * Elimina el email guardado de las preferencias.
      */
-    private void limpiarEmailGuardado() {
-        preferencias.edit()
-                .remove("email_guardado")
-                .apply();
-    }
+//    private void limpiarEmailGuardado() {
+//        preferencias.edit()
+//                .remove("email_guardado")
+//                .apply();
+//    }
 
     /**
      * Limpieza de recursos al destruir la Activity.

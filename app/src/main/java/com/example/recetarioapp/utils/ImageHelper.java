@@ -101,27 +101,27 @@ public class ImageHelper {
      * @param imagePath Ruta absoluta de la imagen a eliminar
      * @return true si se eliminó correctamente, false en caso contrario
      */
-    public static boolean deleteImage(String imagePath) {
-        // Validar parámetro de entrada
-        if (imagePath == null || imagePath.isEmpty()) {
-            return false;
-        }
-
-        try {
-            File imageFile = new File(imagePath);
-            if (imageFile.exists()) {
-                boolean deleted = imageFile.delete();
-                if (deleted) {
-                    Log.d(TAG, "Imagen eliminada: " + imagePath);
-                }
-                return deleted;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error al eliminar imagen", e);
-        }
-
-        return false;
-    }
+//    public static boolean deleteImage(String imagePath) {
+//        // Validar parámetro de entrada
+//        if (imagePath == null || imagePath.isEmpty()) {
+//            return false;
+//        }
+//
+//        try {
+//            File imageFile = new File(imagePath);
+//            if (imageFile.exists()) {
+//                boolean deleted = imageFile.delete();
+//                if (deleted) {
+//                    Log.d(TAG, "Imagen eliminada: " + imagePath);
+//                }
+//                return deleted;
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error al eliminar imagen", e);
+//        }
+//
+//        return false;
+//    }
 
     /**
      * Verifica si un archivo de imagen existe en la ruta especificada.
@@ -129,15 +129,15 @@ public class ImageHelper {
      * @param imagePath Ruta absoluta de la imagen a verificar
      * @return true si el archivo existe, false en caso contrario
      */
-    public static boolean imageExists(String imagePath) {
-        // Validar parámetro de entrada
-        if (imagePath == null || imagePath.isEmpty()) {
-            return false;
-        }
-
-        File imageFile = new File(imagePath);
-        return imageFile.exists();
-    }
+//    public static boolean imageExists(String imagePath) {
+//        // Validar parámetro de entrada
+//        if (imagePath == null || imagePath.isEmpty()) {
+//            return false;
+//        }
+//
+//        File imageFile = new File(imagePath);
+//        return imageFile.exists();
+//    }
 
     /**
      * Obtiene el objeto File correspondiente a una ruta de imagen.
@@ -146,11 +146,11 @@ public class ImageHelper {
      * @param imagePath Ruta absoluta de la imagen
      * @return Objeto File de la imagen, o null si la ruta es inválida
      */
-    public static File getImageFile(String imagePath) {
-        // Validar parámetro de entrada
-        if (imagePath == null || imagePath.isEmpty()) {
-            return null;
-        }
-        return new File(imagePath);
-    }
+//    public static File getImageFile(String imagePath) {
+//        // Validar parámetro de entrada
+//        if (imagePath == null || imagePath.isEmpty()) {
+//            return null;
+//        }
+//        return new File(imagePath);
+//    }
 }

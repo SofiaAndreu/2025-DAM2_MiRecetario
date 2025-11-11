@@ -200,22 +200,22 @@ public class CategoryHelper {
      * @param context Contexto para obtener strings de categorías predefinidas
      * @return true si la categoría es válida, false en caso contrario
      */
-    public static boolean esCategoriaValida(String categoria, Context context) {
-        // Manejar casos nulos o vacíos
-        if (categoria == null || categoria.trim().isEmpty()) {
-            return false;
-        }
-
-        String categoriaTrim = categoria.trim();
-
-        // Verificar coincidencia con cada categoría predefinida
-        return categoriaTrim.equals(getCategoriaPostres(context)) ||
-                categoriaTrim.equals(getCategoriaPrincipales(context)) ||
-                categoriaTrim.equals(getCategoriaAperitivos(context)) ||
-                categoriaTrim.equals(getCategoriaPanaderia(context)) ||
-                categoriaTrim.equals(getCategoriaBebidas(context)) ||
-                categoriaTrim.equals(getCategoriaEnsaladas(context)) ||
-                categoriaTrim.equals(getCategoriaSopas(context)) ||
-                categoriaTrim.equals(getCategoriaOtros(context));
-    }
+//    public static boolean esCategoriaValida(String categoria, Context context) {
+//        // Manejar casos nulos o vacíos
+//        if (categoria == null || categoria.trim().isEmpty()) {
+//            return false;
+//        }
+//
+//        String categoriaTrim = categoria.trim();
+//
+//        // Verificar coincidencia con cada categoría predefinida
+//        return categoriaTrim.equals(getCategoriaPostres(context)) ||
+//                categoriaTrim.equals(getCategoriaPrincipales(context)) ||
+//                categoriaTrim.equals(getCategoriaAperitivos(context)) ||
+//                categoriaTrim.equals(getCategoriaPanaderia(context)) ||
+//                categoriaTrim.equals(getCategoriaBebidas(context)) ||
+//                categoriaTrim.equals(getCategoriaEnsaladas(context)) ||
+//                categoriaTrim.equals(getCategoriaSopas(context)) ||
+//                categoriaTrim.equals(getCategoriaOtros(context));
+//    }
 }

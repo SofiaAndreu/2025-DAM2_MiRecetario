@@ -95,40 +95,6 @@ public class AuthViewModel extends AndroidViewModel {
                 });
     }
 
-    /**
-     * Cierra la sesión actual del usuario.
-     * Limpia tanto la autenticación de Firebase como el estado local.
-     */
-//    public void logout() {
-//        repositorioAuth.logout();
-//        // Limpiar modo anónimo al cerrar sesión
-//        limpiarModoAnonimo();
-//        estadoAuth.setValue(AuthState.idle());
-//    }
-
-    /**
-     * Envia email para recuperación de contraseña.
-     *
-     * @param email Email del usuario que solicita recuperación
-     */
-//    public void recuperarPassword(String email) {
-//        estadoAuth.setValue(AuthState.loading());
-//
-//        repositorioAuth.recuperarPassword(email,
-//                new AuthRepository.OnPasswordResetListener() {
-//                    @Override
-//                    public void onSuccess() {
-//                        estadoAuth.postValue(AuthState.success(
-//                                "Email de recuperación enviado. Revisa tu bandeja de entrada"));
-//                    }
-//
-//                    @Override
-//                    public void onError(String mensaje) {
-//                        estadoAuth.postValue(AuthState.error(mensaje));
-//                    }
-//                });
-//    }
-
     // ==================== GESTIÓN DE MODO ANÓNIMO ====================
 
     /**
