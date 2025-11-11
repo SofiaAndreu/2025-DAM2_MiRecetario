@@ -115,16 +115,6 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Recordar contraseña -->
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/cb_recordar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login_recordar"
-                    android:textColor="@color/color_text_primary"
-                    app:buttonTint="@color/color_primary"
-                    android:layout_marginBottom="24dp" />
-
                 <!-- Botón Login -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_login"
@@ -143,22 +133,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Olvidé contraseña -->
-        <TextView
-            android:id="@+id/tv_olvide_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/login_olvide_password"
-            android:textColor="@color/color_primary"
-            android:textSize="14sp"
-            android:clickable="true"
-            android:focusable="true"
-            style="?android:attr/borderlessButtonStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/card_login" />
-
         <!-- Separador -->
         <View
             android:id="@+id/separator"
@@ -170,7 +144,7 @@
             android:background="@color/color_text_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_olvide_password" />
+            app:layout_constraintTop_toBottomOf="@id/card_login" />
 
         <!-- Texto registro -->
         <TextView

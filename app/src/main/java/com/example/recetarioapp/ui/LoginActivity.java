@@ -114,11 +114,11 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Gestionar "recordar email" según preferencia del usuario
-        if (binding.cbRecordar.isChecked()) {
-            guardarEmail(email);
-        } else {
-            limpiarEmailGuardado();
-        }
+//        if (binding.cbRecordar.isChecked()) {
+//            guardarEmail(email);
+//        } else {
+//            limpiarEmailGuardado();
+//        }
 
         // Limpiar modo anónimo previo si existe
         limpiarModoAnonimo();
@@ -275,7 +275,7 @@ public class LoginActivity extends AppCompatActivity {
         String emailGuardado = preferencias.getString("email_guardado", "");
         if (!emailGuardado.isEmpty()) {
             binding.etEmail.setText(emailGuardado);
-            binding.cbRecordar.setChecked(true);
+          //  binding.cbRecordar.setChecked(true);
         }
     }
 
