@@ -384,6 +384,14 @@
             </FrameLayout>
 
         </LinearLayout>
+
+            <!-- ProgressBar -->
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                style="?android:attr/progressBarStyleHorizontal" />
     </LinearLayout>
 
 </ScrollView>
