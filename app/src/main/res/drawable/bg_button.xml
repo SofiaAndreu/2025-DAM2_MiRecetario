@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/drawable/bg_neumorphic_button.xml -->
+<!-- Archivo: bg_button.xml - Fondo para botones con efectos visuales -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Estado cuando el botón está siendo presionado -->
     <item android:state_pressed="true">
         <layer-list>
-            <!-- Estado presionado - hundido -->
+            <!-- Efecto de profundidad para estado presionado -->
             <item>
                 <shape android:shape="rectangle">
                     <gradient
@@ -18,10 +19,10 @@
         </layer-list>
     </item>
 
+    <!-- Estado normal del botón (sin presionar) -->
     <item>
-        <!-- Estado normal - elevado -->
         <layer-list>
-            <!-- Sombra oscura -->
+            <!-- Sombra en la parte inferior derecha -->
             <item
                 android:left="2dp"
                 android:top="2dp">
@@ -31,7 +32,7 @@
                 </shape>
             </item>
 
-            <!-- Sombra clara -->
+            <!-- Sombra en la parte superior izquierda -->
             <item
                 android:right="2dp"
                 android:bottom="2dp">
@@ -41,7 +42,7 @@
                 </shape>
             </item>
 
-            <!-- Botón principal -->
+            <!-- Fondo principal del botón -->
             <item
                 android:left="1dp"
                 android:top="1dp"

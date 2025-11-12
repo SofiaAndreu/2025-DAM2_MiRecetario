@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/drawable/bg_neumorphic_search.xml -->
+<!-- Archivo: bg_search.xml - Fondo para campos de búsqueda -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Sombra interna superior -->
+    <!-- Sombra interna en la parte superior -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -14,7 +14,7 @@
         </shape>
     </item>
 
-    <!-- Fondo principal -->
+    <!-- Fondo principal del campo de búsqueda -->
     <item
         android:top="1dp">
         <shape android:shape="rectangle">
@@ -23,7 +23,7 @@
         </shape>
     </item>
 
-    <!-- Brillo inferior sutil -->
+    <!-- Efecto de brillo sutil en la parte inferior -->
     <item
         android:top="50dp">
         <shape android:shape="rectangle">

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Archivo: dialog_filtros.xml - Diálogo para filtrar recetas -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,7 +14,7 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Título -->
+        <!-- Título del diálogo de filtros -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +25,7 @@
             android:fontFamily="serif"
             android:layout_marginBottom="20dp" />
 
-        <!-- Filtrar por categoría -->
+        <!-- Filtro por categoría -->
         <TextView
             android:id="@+id/label_categoria"
             android:layout_width="wrap_content"
@@ -52,7 +53,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Filtrar por dificultad -->
+        <!-- Filtro por dificultad -->
         <TextView
             android:id="@+id/label_dificultad"
             android:layout_width="wrap_content"
@@ -80,7 +81,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Filtrar por tiempo máximo -->
+        <!-- Filtro por tiempo máximo de preparación -->
         <TextView
             android:id="@+id/label_tiempo"
             android:layout_width="wrap_content"
@@ -92,7 +93,7 @@
             android:layout_marginBottom="8dp"
             android:labelFor="@id/slider_tiempo" />
 
-        <!-- Slider con fondo neumórfico -->
+        <!-- Control deslizante para seleccionar tiempo máximo -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -116,6 +117,7 @@
 
         </FrameLayout>
 
+        <!-- Texto que muestra el tiempo seleccionado -->
         <TextView
             android:id="@+id/tv_tiempo_seleccionado"
             android:layout_width="wrap_content"
@@ -126,7 +128,7 @@
             android:layout_marginBottom="20dp"
             android:layout_gravity="center_horizontal" />
 
-        <!-- Solo favoritas (checkbox neumórfico) -->
+        <!-- Checkbox para filtrar solo recetas favoritas -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,13 +146,14 @@
 
         </FrameLayout>
 
-        <!-- Botones -->
+        <!-- Botones de acción del diálogo -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end">
 
+            <!-- Botón para limpiar filtros -->
             <FrameLayout
                 android:id="@+id/btn_limpiar"
                 android:layout_width="wrap_content"
@@ -173,6 +176,7 @@
 
             </FrameLayout>
 
+            <!-- Botón para aplicar filtros -->
             <FrameLayout
                 android:id="@+id/btn_aplicar"
                 android:layout_width="wrap_content"

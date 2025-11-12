@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/drawable/bg_neumorphic_card.xml -->
+<!-- Archivo: bg_card.xml - Fondo para tarjetas con efecto de elevación -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Sombra exterior oscura (abajo-derecha) -->
+    <!-- Sombra exterior en la parte inferior derecha -->
     <item
         android:left="6dp"
         android:top="6dp">
@@ -12,7 +12,7 @@
         </shape>
     </item>
 
-    <!-- Sombra exterior clara (arriba-izquierda) -->
+    <!-- Sombra exterior en la parte superior izquierda -->
     <item
         android:right="6dp"
         android:bottom="6dp">
@@ -22,7 +22,7 @@
         </shape>
     </item>
 
-    <!-- Card principal -->
+    <!-- Fondo principal de la tarjeta -->
     <item
         android:left="3dp"
         android:top="3dp"
@@ -34,7 +34,7 @@
         </shape>
     </item>
 
-    <!-- Brillo sutil en la parte superior -->
+    <!-- Efecto de brillo sutil en la parte superior -->
     <item
         android:left="3dp"
         android:top="3dp"

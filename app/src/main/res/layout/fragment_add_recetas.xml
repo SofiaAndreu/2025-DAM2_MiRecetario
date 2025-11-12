@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/fragment_add_recetas.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE -->
+<!-- Archivo: fragment_add_recetas.xml - Pantalla para agregar nuevas recetas -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -16,7 +15,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Título -->
+        <!-- Título de la pantalla -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,7 +26,7 @@
             android:fontFamily="serif"
             android:layout_marginBottom="16dp" />
 
-        <!-- Botón importar desde URL (neumórfico) -->
+        <!-- Botón para importar receta desde URL -->
         <FrameLayout
             android:id="@+id/btn_importar_url"
             android:layout_width="match_parent"
@@ -63,7 +62,7 @@
 
         </FrameLayout>
 
-        <!-- Imagen (neumórfica) -->
+        <!-- Contenedor para la imagen de la receta -->
         <FrameLayout
             android:id="@+id/card_imagen"
             android:layout_width="match_parent"
@@ -76,6 +75,7 @@
                 android:layout_height="match_parent"
                 android:layout_margin="8dp">
 
+                <!-- Vista previa de la imagen seleccionada -->
                 <ImageView
                     android:id="@+id/iv_preview"
                     android:layout_width="match_parent"
@@ -83,6 +83,7 @@
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/add_imagen" />
 
+                <!-- Layout para agregar imagen (visible cuando no hay imagen) -->
                 <LinearLayout
                     android:id="@+id/layout_add_image"
                     android:layout_width="match_parent"
@@ -110,7 +111,7 @@
 
         </FrameLayout>
 
-        <!-- Nombre -->
+        <!-- Campo de entrada para el nombre de la receta -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -131,7 +132,7 @@
 
         </FrameLayout>
 
-        <!-- Descripción -->
+        <!-- Campo de entrada para la descripción de la receta -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -154,14 +155,14 @@
 
         </FrameLayout>
 
-        <!-- Tiempo y Porciones -->
+        <!-- Campos para tiempo y porciones en fila -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="16dp">
 
-            <!-- Tiempo -->
+            <!-- Campo para el tiempo de preparación -->
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -183,7 +184,7 @@
 
             </FrameLayout>
 
-            <!-- Porciones -->
+            <!-- Campo para el número de porciones -->
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -207,7 +208,7 @@
 
         </LinearLayout>
 
-        <!-- Dificultad -->
+        <!-- Selector desplegable para la dificultad -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -224,7 +225,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Categoría -->
+        <!-- Selector desplegable para la categoría -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -241,7 +242,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Origen -->
+        <!-- Campo de entrada para el origen de la receta -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -262,7 +263,7 @@
 
         </FrameLayout>
 
-        <!-- Sección Ingredientes -->
+        <!-- Sección para ingredientes -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -273,6 +274,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp" />
 
+        <!-- Campo de texto multilínea para ingredientes -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -294,7 +296,7 @@
 
         </FrameLayout>
 
-        <!-- Sección Pasos -->
+        <!-- Sección para pasos de preparación -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -305,6 +307,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp" />
 
+        <!-- Campo de texto multilínea para pasos de preparación -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -326,7 +329,7 @@
 
         </FrameLayout>
 
-        <!-- Botones -->
+        <!-- Botones de acción -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -335,6 +338,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp">
 
+            <!-- Botón para cancelar y descartar cambios -->
             <FrameLayout
                 android:id="@+id/btn_cancelar"
                 android:layout_width="wrap_content"
@@ -357,6 +361,7 @@
 
             </FrameLayout>
 
+            <!-- Botón para guardar la receta -->
             <FrameLayout
                 android:id="@+id/btn_guardar"
                 android:layout_width="wrap_content"
@@ -379,15 +384,6 @@
             </FrameLayout>
 
         </LinearLayout>
-
-        <!-- ProgressBar -->
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            style="?android:attr/progressBarStyleHorizontal" />
-
     </LinearLayout>
 
 </ScrollView>

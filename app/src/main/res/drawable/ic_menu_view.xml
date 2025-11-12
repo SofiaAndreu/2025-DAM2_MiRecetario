@@ -1,3 +1,4 @@
+<!-- Archivo: ic_menu_view.xml - Icono de lista para el menú de navegación -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"

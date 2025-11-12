@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Archivo: about.xml - Pantalla "Acerca de" de la aplicación -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,7 +16,7 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Logo de la app -->
+        <!-- Logo de la aplicación -->
         <ImageView
             android:layout_width="120dp"
             android:layout_height="120dp"
@@ -24,7 +25,7 @@
             android:contentDescription="@string/app_logo"
             android:layout_marginBottom="24dp" />
 
-        <!-- Nombre de la app -->
+        <!-- Nombre de la aplicación -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +37,7 @@
             android:fontFamily="serif"
             android:layout_marginBottom="8dp" />
 
-        <!-- Versión -->
+        <!-- Versión de la aplicación -->
         <TextView
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
@@ -47,7 +48,7 @@
             android:textColor="@color/color_text_secondary"
             android:layout_marginBottom="32dp" />
 
-        <!-- Card de información -->
+        <!-- Tarjeta con información de la aplicación -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,6 +63,7 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <!-- Título de la sección -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -72,6 +74,7 @@
                     android:fontFamily="serif"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Descripción de la aplicación -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -81,7 +84,7 @@
                     android:lineSpacingExtra="4dp"
                     android:layout_marginBottom="24dp" />
 
-                <!-- Hecho por -->
+                <!-- Información del desarrollador -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -105,7 +108,7 @@
                         android:textColor="@color/color_text_secondary" />
                 </LinearLayout>
 
-                <!-- Año -->
+                <!-- Año de desarrollo -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -131,7 +134,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Botón volver -->
+        <!-- Botón para volver a la pantalla anterior -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_volver"
             android:layout_width="wrap_content"

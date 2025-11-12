@@ -23,7 +23,6 @@ import java.util.List;
 @Entity(tableName = "recetas")
 @TypeConverters(Converters.class)
 public class Receta {
-
     // ATRIBUTOS PRINCIPALES
     @PrimaryKey(autoGenerate = true)
     private long id;                    // ID local auto-generado por Room

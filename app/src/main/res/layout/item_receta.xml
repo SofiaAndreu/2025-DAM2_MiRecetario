@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/item_receta.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE TU ARCHIVO ACTUAL -->
+<!-- Archivo: item_receta.xml - Elemento de lista para recetas -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -18,7 +17,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- Imagen de la receta -->
+        <!-- Tarjeta para la imagen de la receta -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_imagen"
             android:layout_width="match_parent"
@@ -30,6 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- Imagen de la receta -->
             <ImageView
                 android:id="@+id/iv_receta_imagen"
                 android:layout_width="match_parent"
@@ -41,7 +41,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Botón de favorito -->
+        <!-- Contenedor del botón de favorito -->
         <FrameLayout
             android:id="@+id/btn_favorito_container"
             android:layout_width="44dp"
@@ -53,6 +53,7 @@
             app:layout_constraintEnd_toEndOf="@id/card_imagen"
             app:layout_constraintTop_toTopOf="@id/card_imagen">
 
+            <!-- Icono de favorito -->
             <ImageView
                 android:id="@+id/btn_favorito"
                 android:layout_width="28dp"
@@ -64,7 +65,7 @@
 
         </FrameLayout>
 
-        <!-- Contenido -->
+        <!-- Contenido informativo de la receta -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +75,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Nombre -->
+            <!-- Nombre de la receta -->
             <TextView
                 android:id="@+id/tv_receta_nombre"
                 android:layout_width="match_parent"
@@ -85,9 +86,9 @@
                 android:fontFamily="serif"
                 android:maxLines="2"
                 android:ellipsize="end"
-                tools:text="Arroz con Chalotas y Setas" />
+                tools:text="Carbonara original" />
 
-            <!-- Descripción -->
+            <!-- Descripción breve de la receta -->
             <TextView
                 android:id="@+id/tv_receta_descripcion"
                 android:layout_width="match_parent"
@@ -97,16 +98,16 @@
                 android:textColor="@color/color_text_secondary"
                 android:maxLines="3"
                 android:ellipsize="end"
-                tools:text="Un arroz reconfortante..." />
+                tools:text="La verdadera receta de carbonara..." />
 
-            <!-- Metadata -->
+            <!-- Metadatos de la receta: tiempo, dificultad y porciones -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
-                <!-- Tiempo -->
+                <!-- Tiempo de preparación -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -128,11 +129,11 @@
                         android:layout_marginStart="4dp"
                         android:textSize="12sp"
                         android:textColor="@color/color_text_secondary"
-                        tools:text="60 min" />
+                        tools:text="20 min" />
 
                 </LinearLayout>
 
-                <!-- Dificultad -->
+                <!-- Nivel de dificultad -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -158,7 +159,7 @@
 
                 </LinearLayout>
 
-                <!-- Porciones -->
+                <!-- Número de porciones -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -186,7 +187,7 @@
 
             </LinearLayout>
 
-            <!-- Categoría -->
+            <!-- Chip para mostrar la categoría de la receta -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_categoria"
                 android:layout_width="wrap_content"

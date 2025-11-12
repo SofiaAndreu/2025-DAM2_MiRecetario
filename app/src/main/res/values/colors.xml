@@ -1,66 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>  <!-- PALETA DE COLORES -->
+<resources>
+    <!-- PALETA PRINCIPAL - Colores primarios -->
+    <color name="color_primary">#6D4C41</color>              <!-- Marrón chocolate principal -->
+    <color name="color_primary_dark">#4E342E</color>         <!-- Marrón oscuro para status bar -->
+    <color name="color_primary_light">#8D6E63</color>        <!-- Marrón claro para variantes -->
+    <color name="color_primary_variant">#795548</color>      <!-- Variante intermedia de marrón -->
 
-    <!-- Primarios - Marrones -->
-    <color name="color_primary">#6D4C41</color>              <!-- Marrón chocolate cálido -->
-    <color name="color_primary_dark">#4E342E</color>         <!-- Marrón intenso -->
-    <color name="color_primary_light">#8D6E63</color>        <!-- Marrón suave -->
-    <color name="color_primary_variant">#795548</color>      <!-- Variante intermedia -->
+    <!-- PALETA SECUNDARIA - Colores de acento -->
+    <color name="color_secondary">#BCAAA4</color>            <!-- Beige rosado secundario -->
+    <color name="color_secondary_light">#D7CCC8</color>      <!-- Beige claro para fondos -->
+    <color name="color_secondary_variant">#A1887F</color>    <!-- Taupe para elementos terciarios -->
 
-    <!-- Secundarios - Tonos complementarios -->
-    <color name="color_secondary">#BCAAA4</color>            <!-- Beige rosado -->
-    <color name="color_secondary_light">#D7CCC8</color>      <!-- Beige claro luminoso -->
-    <color name="color_secondary_variant">#A1887F</color>    <!-- Taupe -->
+    <!-- COLORES DE ACENTO - Elementos destacados -->
+    <color name="color_accent">#FFB74D</color>               <!-- Naranja cálido para botones -->
+    <color name="color_accent_light">#FFD0B0</color>         <!-- Durazno suave para estados hover -->
+    <color name="color_highlight">#FFA726</color>            <!-- Ámbar para elementos destacados -->
 
-    <!-- Acentos - Detalles -->
-    <color name="color_accent">#FFB74D</color>               <!-- Naranja cálido (mantequilla tostada) -->
-    <color name="color_accent_light">#FFD0B0</color>         <!-- Durazno suave -->
-    <color name="color_highlight">#FFA726</color>            <!-- Ámbar brillante -->
-
-    <!-- Superficies y fondos - capas/profundidad -->
-    <color name="color_background">#FAFAF8</color>           <!-- Blanco cálido off-white -->
-    <color name="color_background_light">#FFFFFF</color>     <!-- Blanco puro -->
-    <color name="color_surface">#F5F5F3</color>              <!-- Superficie elevada -->
-    <color name="color_surface_elevated">#FFFFFF</color>     <!-- Cards principales -->
+    <!-- FONDOS Y SUPERFICIES -->
+    <color name="color_background">#FAFAF8</color>           <!-- Fondo principal de la aplicación -->
+    <color name="color_background_light">#FFFFFF</color>     <!-- Fondo claro para cards -->
+    <color name="color_surface">#F5F5F3</color>              <!-- Superficie elevada principal -->
+    <color name="color_surface_elevated">#FFFFFF</color>     <!-- Superficie para tarjetas -->
     <color name="color_surface_variant">#EFEBE9</color>      <!-- Superficie alternativa -->
 
-    <!-- Texto -->
-    <color name="color_text_disabled">#D7CCC8</color>        <!-- Texto deshabilitado -->
-    <color name="color_text_hint">#BCAAA4</color>            <!-- Placeholders y hints -->
+    <!-- JERARQUÍA DE TEXTO -->
     <color name="color_text_primary">#3E2723</color>         <!-- Texto principal oscuro -->
     <color name="color_text_secondary">#6D4C41</color>       <!-- Texto secundario -->
-    <color name="color_text_tertiary">#8D6E63</color>        <!-- Texto terciario -->
+    <color name="color_text_tertiary">#8D6E63</color>        <!-- Texto terciario menos importante -->
+    <color name="color_text_hint">#BCAAA4</color>            <!-- Placeholders y texto de ayuda -->
+    <color name="color_text_disabled">#D7CCC8</color>        <!-- Texto en estado deshabilitado -->
 
-    <!-- Bordes y divisores -->
-    <color name="color_border">#E0E0E0</color>               <!-- Borde principal -->
-    <color name="color_border_light">#EEEEEE</color>         <!-- Borde sutil -->
+    <!-- ELEMENTOS VISUALES -->
+    <color name="color_border">#E0E0E0</color>               <!-- Bordes de elementos -->
+    <color name="color_border_light">#EEEEEE</color>         <!-- Bordes sutiles -->
     <color name="color_divider">#F5F5F5</color>              <!-- Líneas divisorias -->
 
-    <!-- Estados/retroalimentación -->
-    <color name="color_error">#EF5350</color>                <!-- Rojo error -->
-    <color name="color_favorite">#EC407A</color>             <!-- Rosa favoritos -->
-    <color name="color_info">#42A5F5</color>                 <!-- Azul información -->
-    <color name="color_success">#66BB6A</color>              <!-- Verde éxito -->
-    <color name="color_warning">#FFA726</color>
-    <color name="color_info_bg">#E3F2FD</color>
-    <color name="color_info_icon">#1976D2</color>
-    <color name="color_info_text">#0D47A1</color>
+    <!-- ESTADOS Y RETROALIMENTACIÓN -->
+    <color name="color_success">#66BB6A</color>              <!-- Verde para operaciones exitosas -->
+    <color name="color_warning">#FFA726</color>              <!-- Amarillo/naranja para advertencias -->
+    <color name="color_error">#EF5350</color>                <!-- Rojo para errores -->
+    <color name="color_info">#42A5F5</color>                 <!-- Azul para información -->
+    <color name="color_favorite">#EC407A</color>             <!-- Rosa para elementos favoritos -->
 
+    <!-- ESTADOS DE INFORMACIÓN -->
+    <color name="color_info_bg">#E3F2FD</color>              <!-- Fondo para mensajes informativos -->
+    <color name="color_info_icon">#1976D2</color>            <!-- Iconos en estados de información -->
+    <color name="color_info_text">#0D47A1</color>            <!-- Texto en estados de información -->
 
-    <!-- Overlays y sombras -->
-    <color name="color_overlay">#40000000</color>            <!-- Overlay suave -->
-    <color name="color_scrim">#80000000</color>              <!-- Scrim medio -->
-    <color name="color_shadow">#20000000</color>             <!-- Sombra difuminada -->
+    <!-- OVERLAYS Y EFECTOS VISUALES -->
+    <color name="color_overlay">#40000000</color>            <!-- Overlay semitransparente -->
+    <color name="color_scrim">#80000000</color>              <!-- Scrim para diálogos -->
+    <color name="color_shadow">#20000000</color>             <!-- Color base para sombras -->
 
-    <!-- Gradientes para fondos especiales -->
-    <color name="gradient_end">#8D6E63</color>
-    <color name="gradient_start">#6D4C41</color>
-
-    <!-- Colores del sistema -->
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
-
-    <!-- Interacciones de usuario - Estados hover/pressed -->
+    <!-- INTERACCIONES DE USUARIO -->
     <color name="color_pressed">#10000000</color>            <!-- Estado presionado -->
-    <color name="color_ripple">#20FFB74D</color>             <!-- Efecto ripple cálido -->
+    <color name="color_ripple">#20FFB74D</color>             <!-- Efecto ripple en interacciones -->
+
+    <!-- COLORES DEL SISTEMA -->
+    <color name="black">#000000</color>                      <!-- Negro puro -->
+    <color name="white">#FFFFFF</color>                      <!-- Blanco puro -->
 </resources>

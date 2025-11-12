@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Archivo: fragment_recipes.xml - Pantalla principal de listado de recetas -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,7 +9,7 @@
     android:background="@color/color_background"
     android:paddingTop="24dp">
 
-    <!-- Barra de búsqueda  -->
+    <!-- Contenedor de la barra de búsqueda -->
     <FrameLayout
         android:id="@+id/search_container"
         android:layout_width="match_parent"
@@ -26,6 +27,7 @@
             android:padding="12dp"
             android:gravity="center_vertical">
 
+            <!-- Campo de búsqueda de recetas -->
             <EditText
                 android:id="@+id/et_buscar"
                 android:layout_width="0dp"
@@ -42,6 +44,7 @@
                 android:imeOptions="actionSearch"
                 android:maxLines="1" />
 
+            <!-- Contenedor del botón de filtros -->
             <FrameLayout
                 android:id="@+id/btn_filtros_container"
                 android:layout_width="48dp"
@@ -51,6 +54,7 @@
                 android:clickable="true"
                 android:focusable="true">
 
+                <!-- Botón para abrir filtros avanzados -->
                 <ImageButton
                     android:id="@+id/btn_filtros"
                     android:layout_width="20dp"
@@ -67,7 +71,7 @@
 
     </FrameLayout>
 
-    <!-- Chips de filtros rápidos -->
+    <!-- Vista de desplazamiento horizontal para chips de filtros rápidos -->
     <HorizontalScrollView
         android:id="@+id/scroll_chips"
         android:layout_width="match_parent"
@@ -78,6 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Grupo de chips para filtros rápidos por categoría -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chip_group_filtros"
             android:layout_width="wrap_content"
@@ -86,6 +91,7 @@
             android:paddingEnd="16dp"
             app:singleSelection="false">
 
+            <!-- Chip para mostrar todas las recetas -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_todas"
                 style="@style/Widget.Material3.Chip.Filter"
@@ -94,6 +100,7 @@
                 android:text="Todas"
                 android:checked="true" />
 
+            <!-- Chip para filtrar por categoría postres -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_postres"
                 style="@style/Widget.Material3.Chip.Filter"
@@ -101,6 +108,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/categoria_postres" />
 
+            <!-- Chip para filtrar por categoría platos principales -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_principales"
                 style="@style/Widget.Material3.Chip.Filter"
@@ -108,6 +116,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/categoria_principales" />
 
+            <!-- Chip para filtrar recetas rápidas -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_rapidas"
                 style="@style/Widget.Material3.Chip.Filter"
@@ -119,7 +128,7 @@
 
     </HorizontalScrollView>
 
-    <!-- RecyclerView de recetas -->
+    <!-- Layout con funcionalidad de pull-to-refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
@@ -129,6 +138,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Lista principal de recetas -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_recetas"
             android:layout_width="match_parent"
@@ -139,7 +149,7 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Empty state mejorado -->
+    <!-- Estado vacío cuando no hay resultados de búsqueda -->
     <LinearLayout
         android:id="@+id/layout_empty"
         android:layout_width="match_parent"
@@ -153,6 +163,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Icono para estado vacío -->
         <TextView
             android:id="@+id/empty_icon"
             android:layout_width="wrap_content"
@@ -160,6 +171,7 @@
             android:textSize="80sp"
             android:layout_marginBottom="24dp" />
 
+        <!-- Título para estado vacío -->
         <TextView
             android:id="@+id/empty_title"
             android:layout_width="wrap_content"
@@ -170,6 +182,7 @@
             android:textColor="@color/color_text_primary"
             android:layout_marginBottom="8dp" />
 
+        <!-- Subtítulo con sugerencias -->
         <TextView
             android:id="@+id/empty_subtitle"
             android:layout_width="0dp"
@@ -182,6 +195,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <!-- Botón para limpiar búsqueda y filtros -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_limpiar_busqueda"
             android:layout_width="wrap_content"
@@ -192,16 +206,5 @@
             app:strokeColor="@color/color_primary" />
 
     </LinearLayout>
-
-    <!-- Loading -->
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

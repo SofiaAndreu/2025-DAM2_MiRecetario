@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Archivo: bottom_nav_menu.xml - Menú de navegación inferior -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Elemento para navegar a la pantalla de inicio -->
     <item
         android:id="@+id/navigation_home"
         android:icon="@drawable/ic_menu_home"
         android:title="@string/nav_home" />
 
+    <!-- Elemento para navegar a la pantalla de recetas -->
     <item
         android:id="@+id/navigation_recipes"
         android:icon="@drawable/ic_menu_view"
         android:title="@string/nav_recipes" />
 
+    <!-- Elemento para navegar a la pantalla de agregar receta -->
     <item
         android:id="@+id/navigation_add"
         android:icon="@drawable/ic_menu_add"
         android:title="@string/nav_add" />
 
+    <!-- Elemento para navegar a la pantalla de favoritos -->
     <item
         android:id="@+id/navigation_favorites"
         android:icon="@drawable/ic_menu_favs"

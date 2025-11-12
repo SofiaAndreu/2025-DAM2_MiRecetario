@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Archivo: activity_splash.xml - Pantalla de presentación de la aplicación -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,7 +8,7 @@
     android:background="@color/color_primary_dark"
     android:fitsSystemWindows="true">
 
-    <!-- Logo - QUITAR el tint -->
+    <!-- Logo de la aplicación en el centro -->
     <ImageView
         android:id="@+id/iv_splash_logo"
         android:layout_width="150dp"
@@ -19,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Nombre App -->
+    <!-- Nombre de la aplicación debajo del logo -->
     <TextView
         android:id="@+id/tv_app_name"
         android:layout_width="wrap_content"
@@ -34,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ProgressBar -->
+    <!-- Indicador de progreso durante la carga -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress_splash"
         android:layout_width="wrap_content"

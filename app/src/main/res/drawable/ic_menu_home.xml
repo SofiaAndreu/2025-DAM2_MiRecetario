@@ -1,3 +1,4 @@
+<!-- Archivo: ic_menu_home.xml - Icono de inicio para el menú de navegación -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:width="24dp"

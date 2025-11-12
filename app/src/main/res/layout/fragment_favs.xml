@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/fragment_favs.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE -->
+<!-- Archivo: fragment_favs.xml - Pantalla de recetas favoritas -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,7 +9,7 @@
     android:background="@color/color_background"
     android:paddingTop="24dp">
 
-    <!-- RecyclerView de favoritas -->
+    <!-- Lista de recetas favoritas -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favoritas"
         android:layout_width="match_parent"
@@ -19,7 +18,7 @@
         android:padding="8dp"
         tools:listitem="@layout/item_receta" />
 
-    <!-- Empty state  -->
+    <!-- Estado vacío cuando no hay recetas favoritas -->
     <FrameLayout
         android:id="@+id/layout_empty"
         android:layout_width="match_parent"

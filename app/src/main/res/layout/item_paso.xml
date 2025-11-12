@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/item_paso.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE -->
+<!-- Archivo: item_paso.xml - Elemento de lista para pasos de preparación -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,12 +17,13 @@
         android:padding="16dp"
         android:gravity="start">
 
-        <!-- Número del paso (círculo neumórfico) -->
+        <!-- Contenedor circular para el número del paso -->
         <FrameLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/bg_circulo">
 
+            <!-- Número del paso de preparación -->
             <TextView
                 android:id="@+id/tv_numero"
                 android:layout_width="match_parent"
@@ -36,7 +36,7 @@
 
         </FrameLayout>
 
-        <!-- Descripción del paso -->
+        <!-- Descripción detallada del paso -->
         <TextView
             android:id="@+id/tv_descripcion"
             android:layout_width="0dp"

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Archivo: activity_main.xml - Actividad principal con navegación inferior -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,7 +10,7 @@
     android:background="@color/color_background"
     tools:context=".ui.MainActivity">
 
-    <!-- Bottom Navigation Bar neumórfico -->
+    <!-- Contenedor para la barra de navegación inferior -->
     <FrameLayout
         android:id="@+id/bottom_navigation_container"
         android:layout_width="match_parent"
@@ -22,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Barra de navegación inferior con menú -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
@@ -35,7 +37,7 @@
 
     </FrameLayout>
 
-    <!-- Contenedor Fragments (MODIFICADO) -->
+    <!-- Contenedor para mostrar los fragments de navegación -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/layout/item_ingrediente.xml -->
-<!-- REEMPLAZAR COMPLETAMENTE -->
+<!-- Archivo: item_ingrediente.xml - Elemento de lista para ingredientes -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,7 +17,7 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <!-- Checkbox -->
+        <!-- Checkbox para marcar ingrediente como comprado -->
         <CheckBox
             android:id="@+id/cb_ingrediente"
             android:layout_width="wrap_content"
@@ -26,7 +25,7 @@
             android:buttonTint="@color/color_primary"
             android:layout_marginEnd="12dp" />
 
-        <!-- Texto del ingrediente -->
+        <!-- Texto del ingrediente con cantidad -->
         <TextView
             android:id="@+id/tv_ingrediente"
             android:layout_width="0dp"

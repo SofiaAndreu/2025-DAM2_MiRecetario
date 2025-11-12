@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ARCHIVO: res/drawable/bg_neumorphic.xml -->
+<!-- Archivo: bg_cuadrado.xml - Fondo para elementos cuadrados con efecto de profundidad -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Sombra oscura (abajo-derecha) -->
+    <!-- Sombra oscura en la parte inferior derecha -->
     <item
         android:left="4dp"
         android:top="4dp">
@@ -12,7 +12,7 @@
         </shape>
     </item>
 
-    <!-- Sombra clara (arriba-izquierda) -->
+    <!-- Sombra clara en la parte superior izquierda -->
     <item
         android:right="4dp"
         android:bottom="4dp">
@@ -22,7 +22,7 @@
         </shape>
     </item>
 
-    <!-- Superficie principal -->
+    <!-- Fondo principal del elemento -->
     <item
         android:left="2dp"
         android:top="2dp"
