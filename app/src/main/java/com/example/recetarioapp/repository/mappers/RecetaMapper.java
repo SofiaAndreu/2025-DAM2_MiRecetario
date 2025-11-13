@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Mapper especializado para conversiones bidireccionales entre objetos Receta y Map.
+ * Mapper para conversiones bidireccionales entre objetos Receta y Map.
  *
  * Esta clase resuelve el problema de incompatibilidad entre los objetos Java complejos
  * y la estructura plana de datos requerida por Firebase Firestore.

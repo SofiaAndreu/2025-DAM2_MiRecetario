@@ -53,7 +53,6 @@ public class FirebaseDataSource {
             errorListener.onError("Usuario no autenticado");
             return;
         }
-
         // Asociar receta al usuario actual
         receta.setUsuarioId(usuario.getUid());
         Map<String, Object> datosReceta = mapeador.toMap(receta);

@@ -193,7 +193,7 @@ public class LocalDataSource {
     }
 
     /**
-     * Inserta múltiples recetas en lote (para sincronización).
+     * Inserta múltiples recetas (para sincronización).
      *
      * @param recetas Lista de recetas a insertar
      */
@@ -205,17 +205,9 @@ public class LocalDataSource {
 
     // ==================== INTERFACES DE CALLBACK ====================
 
-    /**
-     * Interfaz para recibir el resultado de operaciones de inserción.
-     */
-    public interface OnInsertListener {
-        void onInserted(long id);
-    }
+    //Interfaz para recibir el resultado de operaciones de inserción.
+    public interface OnInsertListener { void onInserted(long id); }
 
-    /**
-     * Interfaz para manejar errores en operaciones asíncronas.
-     */
-    public interface OnErrorListener {
-        void onError(String mensaje);
-    }
+    //Interfaz para manejar errores en operaciones asíncronas.
+    public interface OnErrorListener { void onError(String mensaje);}
 }

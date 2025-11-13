@@ -36,7 +36,6 @@ public class RecetaViewModel extends AndroidViewModel {
     // Datos principales observables desde el Repository
     private final LiveData<List<Receta>> todasLasRecetas;
     private final LiveData<List<Receta>> recetasFavoritas;
-   // private final LiveData<List<String>> categoriasDisponibles;
 
     // Controles de búsqueda y filtrado
     private final MutableLiveData<String> queryBusqueda = new MutableLiveData<>();
@@ -62,9 +61,6 @@ public class RecetaViewModel extends AndroidViewModel {
     public RecetaViewModel(@NonNull Application application) {
         super(application);
         repositorioRecetas = new RecetaRepository(application);
-
-        // Log de creación para debugging de ciclo de vida
-        Log.d("VIEWMODEL", "Nueva Instancia ViewModel: " + idInstancia);
 
         // Inicializar LiveData desde el Repository
         todasLasRecetas = repositorioRecetas.getAllRecetas();
@@ -184,7 +180,6 @@ public class RecetaViewModel extends AndroidViewModel {
                 progresoSubida.postValue(100); // Completado
                 listener.onImagenSubida(ruta);
             }
-
             @Override
             public void onProgress(int porcentaje) {
                 progresoSubida.postValue(porcentaje);
@@ -219,8 +214,6 @@ public class RecetaViewModel extends AndroidViewModel {
     /**
      * Ejecuta búsqueda en tiempo real de recetas por nombre.
      * La transformación reactiva se encarga de actualizar recetasFiltradas.
-     *
-     * @param query Texto de búsqueda
      */
     public void buscar(String query) {
         queryBusqueda.setValue(query);
@@ -348,18 +341,10 @@ public class RecetaViewModel extends AndroidViewModel {
      * Interfaz para recibir resultados de operaciones con imágenes.
      */
     public interface OnImagenSubidaListener {
-        /**
-         * Se ejecuta cuando la imagen se sube exitosamente.
-         *
-         * @param url Ruta local de la imagen guardada
-         */
+        //Se ejecuta cuando la imagen se sube exitosamente.
         void onImagenSubida(String url);
 
-        /**
-         * Se ejecuta cuando ocurre un error en la subida.
-         *
-         * @param mensaje Mensaje de error descriptivo
-         */
+        //Se ejecuta cuando ocurre un error en la subida.
         void onError(String mensaje);
     }
 }

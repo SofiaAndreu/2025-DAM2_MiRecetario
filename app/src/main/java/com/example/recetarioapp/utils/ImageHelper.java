@@ -16,17 +16,14 @@ import java.util.UUID;
  *
  * Funcionalidades principales:
  * - Guardar imágenes desde URI con optimización de memoria y tamaño
- * - Eliminar imágenes del almacenamiento interno
- * - Verificar existencia de archivos de imagen
- * - Proporcionar acceso a archivos de imagen
- * - Manejo de errores robusto con logging
+ * - Manejo de errores con logging
  */
 public class ImageHelper {
 
     // Tag para logging de operaciones con imágenes
     private static final String TAG = "ImageHelper";
 
-    // Directorio donde se almacenan las imágenes de recetas
+    //Directorio donde se almacenan las imágenes de recetas
     private static final String IMAGES_DIR = "recetas_images";
 
     /**
@@ -93,64 +90,4 @@ public class ImageHelper {
             return null;
         }
     }
-
-    /**
-     * Elimina una imagen del almacenamiento interno.
-     * Útil para limpieza cuando se eliminan recetas.
-     *
-     * @param imagePath Ruta absoluta de la imagen a eliminar
-     * @return true si se eliminó correctamente, false en caso contrario
-     */
-//    public static boolean deleteImage(String imagePath) {
-//        // Validar parámetro de entrada
-//        if (imagePath == null || imagePath.isEmpty()) {
-//            return false;
-//        }
-//
-//        try {
-//            File imageFile = new File(imagePath);
-//            if (imageFile.exists()) {
-//                boolean deleted = imageFile.delete();
-//                if (deleted) {
-//                    Log.d(TAG, "Imagen eliminada: " + imagePath);
-//                }
-//                return deleted;
-//            }
-//        } catch (Exception e) {
-//            Log.e(TAG, "Error al eliminar imagen", e);
-//        }
-//
-//        return false;
-//    }
-
-    /**
-     * Verifica si un archivo de imagen existe en la ruta especificada.
-     *
-     * @param imagePath Ruta absoluta de la imagen a verificar
-     * @return true si el archivo existe, false en caso contrario
-     */
-//    public static boolean imageExists(String imagePath) {
-//        // Validar parámetro de entrada
-//        if (imagePath == null || imagePath.isEmpty()) {
-//            return false;
-//        }
-//
-//        File imageFile = new File(imagePath);
-//        return imageFile.exists();
-//    }
-
-    /**
-     * Obtiene el objeto File correspondiente a una ruta de imagen.
-     * Útil para operaciones que requieren el objeto File directamente.
-     *
-     * @param imagePath Ruta absoluta de la imagen
-     * @return Objeto File de la imagen, o null si la ruta es inválida
-     */
-//    public static File getImageFile(String imagePath) {
-//        // Validar parámetro de entrada
-//        if (imagePath == null || imagePath.isEmpty()) {
-//            return null;
-//        }
-//        return new File(imagePath);
-//    }
 }

@@ -61,7 +61,7 @@ public class AuthRepository {
      * Registra un nuevo usuario en el sistema.
      * Crea cuenta en Firebase Auth, actualiza perfil y guarda datos en Firestore/Room.
      *
-     * @param nombre Nombre display del usuario
+     * @param nombre Nombre del usuario
      * @param email Email para autenticación
      * @param password Contraseña del usuario
      * @param listener Callback para resultado de la operación
@@ -127,34 +127,6 @@ public class AuthRepository {
                 .addOnFailureListener(error -> {
                     listener.onError(parsearErrorAutenticacion(error.getMessage()));
                 });
-    }
-
-    /**
-     * Cierra la sesión actual del usuario.
-     * Limpia Firebase Auth y los datos locales del usuario.
-     */
-    public void logout() {
-        autenticacion.signOut();
-        usuarioActual.setValue(null);
-
-        // Limpiar datos de usuario de la base de datos local
-        RecetasBD.bdWriteExecutor.execute(() -> {
-            usuarioDAO.eliminarTodos();
-        });
-    }
-
-    /**
-     * Envia email para recuperación de contraseña.
-     *
-     * @param email Email del usuario que solicita recuperación
-     * @param listener Callback para resultado de la operación
-     */
-    public void recuperarPassword(String email, OnPasswordResetListener listener) {
-        autenticacion.sendPasswordResetEmail(email)
-                .addOnSuccessListener(aVoid -> listener.onSuccess())
-                .addOnFailureListener(error ->
-                        listener.onError(parsearErrorAutenticacion(error.getMessage()))
-                );
     }
 
     // ==================== CONSULTAS DE ESTADO ====================

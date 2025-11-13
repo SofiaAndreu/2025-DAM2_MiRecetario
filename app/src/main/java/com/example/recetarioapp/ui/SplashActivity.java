@@ -23,10 +23,7 @@ import com.example.recetarioapp.viewmodels.AuthViewModel;
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
 
-    /**
-     * Duración en milisegundos que se mostrará la pantalla de splash.
-     * Valor optimizado para permitir carga inicial sin hacer esperar al usuario.
-     */
+    // Duración en milisegundos que se mostrará la pantalla de splash.
     private static final long SPLASH_DELAY = 2000;
 
     /**

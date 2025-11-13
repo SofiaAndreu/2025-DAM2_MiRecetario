@@ -186,9 +186,7 @@ public class AuthViewModel extends AndroidViewModel {
      * Permite a la UI reaccionar consistentemente a diferentes estados.
      */
     public static class AuthState {
-        /**
-         * Estados posibles del flujo de autenticación.
-         */
+        //Estados posibles del flujo de autenticación.
         public enum Status {
             IDLE,       // Estado inicial/inactivo
             LOADING,    // Operación en progreso
@@ -213,40 +211,22 @@ public class AuthViewModel extends AndroidViewModel {
 
         // ==================== MÉTODOS FACTORY ====================
 
-        /**
-         * Crea estado inicial/inactivo.
-         *
-         * @return Estado AuthState en modo IDLE
-         */
+        //Crea estado inicial/inactivo.
         public static AuthState idle() {
             return new AuthState(Status.IDLE, null);
         }
 
-        /**
-         * Crea estado de carga/operación en progreso.
-         *
-         * @return Estado AuthState en modo LOADING
-         */
+        // Crea estado de carga/operación en progreso.
         public static AuthState loading() {
             return new AuthState(Status.LOADING, null);
         }
 
-        /**
-         * Crea estado de éxito con mensaje opcional.
-         *
-         * @param mensaje Mensaje de éxito (opcional)
-         * @return Estado AuthState en modo SUCCESS
-         */
+        // Crea estado de éxito con mensaje opcional.
         public static AuthState success(String mensaje) {
             return new AuthState(Status.SUCCESS, mensaje);
         }
 
-        /**
-         * Crea estado de error con mensaje descriptivo.
-         *
-         * @param mensaje Mensaje de error descriptivo
-         * @return Estado AuthState en modo ERROR
-         */
+        // Crea estado de error con mensaje descriptivo.
         public static AuthState error(String mensaje) {
             return new AuthState(Status.ERROR, mensaje);
         }

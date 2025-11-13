@@ -123,7 +123,7 @@ public class RecetaRepository {
 
     /**
      * Inserta una nueva receta con sincronización automática.
-     * Estrategia: Firebase primero, fallback a local si hay error.
+     * Firebase primero, fallback a local si hay error.
      *
      * @param receta Receta a insertar
      * @param listener Callback para resultado de la operación
@@ -131,24 +131,24 @@ public class RecetaRepository {
     public void insertarReceta(Receta receta, OnRecetaGuardadaListener listener) {
         // Verificar autenticación para sincronización con Firebase
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            // Estrategia: Firebase primero
+            //Firebase primero
             fuenteFirebase.guardarReceta(receta, firebaseId -> {
-                // Éxito en Firebase - guardar local con firebaseId
+                //Éxito en Firebase - guardar local con firebaseId
                 receta.setFirebaseId(firebaseId);
                 fuenteLocal.insertar(receta, localId -> {
                     receta.setId(localId);
                     listener.onSuccess(receta);
                 }, listener::onError);
             }, error -> {
-                // Falló Firebase - guardar solo local (modo offline)
-                android.util.Log.w(TAG, "Modo offline, guardando solo local: " + error);
+                //Falló Firebase - guardar solo local
+                android.util.Log.w(TAG, "Guardando solo local: " + error);
                 fuenteLocal.insertar(receta, localId -> {
                     receta.setId(localId);
                     listener.onSuccess(receta);
                 }, listener::onError);
             });
         } else {
-            // No hay usuario - guardar solo local
+            //No hay usuario - guardar solo local
             fuenteLocal.insertar(receta, localId -> {
                 receta.setId(localId);
                 listener.onSuccess(receta);
