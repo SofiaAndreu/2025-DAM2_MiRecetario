@@ -193,9 +193,7 @@ public class RecipesFragment extends BaseFragment {
         });
     }
 
-    /**
-     * Cambia al modo de búsqueda observando recetas filtradas.
-     */
+    //Cambia al modo de búsqueda observando recetas filtradas.
     private void switchToSearchMode() {
         viewModel.getTodasLasRecetas().removeObservers(getViewLifecycleOwner());
         viewModel.getRecetasFiltradas().observe(getViewLifecycleOwner(), this::actualizarLista);
@@ -332,11 +330,7 @@ public class RecipesFragment extends BaseFragment {
                 this::actualizarLista);
     }
 
-    /**
-     * Filtra recetas por tiempo máximo de preparación.
-     *
-     * @param tiempo Tiempo máximo en minutos
-     */
+    //Filtra recetas por tiempo máximo de preparación.
     private void filtrarPorTiempo(int tiempo) {
         viewModel.filtrarPorTiempo(tiempo).observe(getViewLifecycleOwner(),
                 this::actualizarLista);

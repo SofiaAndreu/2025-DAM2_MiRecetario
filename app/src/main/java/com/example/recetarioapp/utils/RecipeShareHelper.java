@@ -27,9 +27,9 @@ public class RecipeShareHelper {
 
         // Crear intent de compartir
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain"); // Tipo MIME para texto plano
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, receta.getNombre()); // Asunto
-        shareIntent.putExtra(Intent.EXTRA_TEXT, texto); // Contenido
+        shareIntent.setType("text/plain"); //Tipo MIME para texto plano
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, receta.getNombre()); //Asunto
+        shareIntent.putExtra(Intent.EXTRA_TEXT, texto); //Contenido
 
         // Crear selector de aplicaciones con título personalizado
         return Intent.createChooser(shareIntent, "Compartir receta");

@@ -248,7 +248,7 @@ public class AddRecetasFragment extends BaseFragment {
 
     /**
      * Valida y guarda la receta en la base de datos.
-     * Maneja subida de imagen si es necesario.
+     * Maneja subida de imagen si es necesario.D
      */
     private void guardarReceta() {
         // Validar campos obligatorios del formulario

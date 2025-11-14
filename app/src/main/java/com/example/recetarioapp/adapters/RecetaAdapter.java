@@ -48,27 +48,17 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
      * Determina qué items cambiaron y actualiza solo esos.
      */
     private static final DiffUtil.ItemCallback<Receta> DIFF_CALLBACK = new DiffUtil.ItemCallback<Receta>() {
-
         /**
          * Verifica si dos items representan el mismo objeto.
          * Compara por ID único de receta.
-         *
-         * @param oldItem Receta antigua
-         * @param newItem Receta nueva
-         * @return true si tienen el mismo ID, false en caso contrario
          */
         @Override
         public boolean areItemsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
             return oldItem.getId() == newItem.getId();
         }
-
         /**
          * Verifica si los contenidos de dos items son iguales.
          * Compara nombre y estado de favorito para detectar cambios.
-         *
-         * @param oldItem Receta antigua
-         * @param newItem Receta nueva
-         * @return true si los contenidos son iguales, false en caso contrario
          */
         @Override
         public boolean areContentsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {

@@ -123,6 +123,6 @@ public class RecipeParser {
             texto.append(paso.getNumeroPaso()).append(". ")
                     .append(paso.getDescripcion()).append("\n\n");
         }
-        return texto.toString().trim(); // Eliminar últimos saltos de línea
+        return texto.toString().trim(); //Eliminar últimos saltos de línea
     }
 }
