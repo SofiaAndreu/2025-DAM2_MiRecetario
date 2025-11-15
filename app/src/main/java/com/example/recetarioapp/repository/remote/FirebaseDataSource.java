@@ -10,43 +10,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Fuente de datos remota que maneja todas las operaciones con Firebase Firestore.
- *
- * Proporciona una API para las operaciones CRUD en la nube, incluyendo
- * autenticación de usuarios y sincronización de datos.
- * Utiliza RecetaMapper para convertir entre objetos Receta y la estructura
- * de datos plana requerida por Firebase.
- */
+//Fuente de datos remota que maneja todas las operaciones con Firebase Firestore
+// - Proporciona API para operaciones CRUD en la nube
+// - Incluye autenticación de usuarios y sincronización de datos
+// - Utiliza RecetaMapper para conversión entre objetos Receta y estructura Firebase
 public class FirebaseDataSource {
 
-    // Constantes de configuración
+    //Constantes de configuración
     private static final String COLECCION_RECETAS = "recetas";
 
-    // Dependencias de Firebase
+    //Dependencias de Firebase
     private final FirebaseFirestore firestore;
     private final FirebaseAuth autenticacion;
     private final RecetaMapper mapeador;
 
-    /**
-     * Constructor que inicializa las instancias de Firebase.
-     */
+    //Constructor que inicializa las instancias de Firebase
     public FirebaseDataSource() {
         this.firestore = FirebaseFirestore.getInstance();
         this.autenticacion = FirebaseAuth.getInstance();
         this.mapeador = new RecetaMapper();
     }
 
-    // ==================== OPERACIONES CRUD EN FIREBASE ====================
+    //==================== OPERACIONES CRUD EN FIREBASE ====================
 
-    /**
-     * Guarda una nueva receta en Firebase Firestore.
-     * Asocia automáticamente la receta al usuario autenticado actual.
-     *
-     * @param receta Receta a guardar en la nube
-     * @param listener Callback para éxito con el ID generado
-     * @param errorListener Callback para manejo de errores
-     */
+    //Guarda una nueva receta en Firebase Firestore
     public void guardarReceta(Receta receta, OnSuccessListener listener, OnErrorListener errorListener) {
         FirebaseUser usuario = autenticacion.getCurrentUser();
         if (usuario == null) {
@@ -54,7 +41,7 @@ public class FirebaseDataSource {
             return;
         }
 
-        // Asociar receta al usuario actual
+        //Asociar receta al usuario actual
         receta.setUsuarioId(usuario.getUid());
         Map<String, Object> datosReceta = mapeador.toMap(receta);
 
@@ -68,13 +55,7 @@ public class FirebaseDataSource {
                 );
     }
 
-    /**
-     * Actualiza una receta existente en Firebase.
-     *
-     * @param receta Receta con datos actualizados
-     * @param onSuccess Callback ejecutado al completar la actualización
-     * @param errorListener Callback para manejo de errores
-     */
+    //Actualiza una receta existente en Firebase
     public void actualizarReceta(Receta receta, Runnable onSuccess, OnErrorListener errorListener) {
         if (receta.getFirebaseId() == null) {
             errorListener.onError("La receta no tiene ID de Firebase");
@@ -92,13 +73,7 @@ public class FirebaseDataSource {
                 );
     }
 
-    /**
-     * Elimina una receta de Firebase.
-     *
-     * @param firebaseId ID único de la receta en Firebase
-     * @param onSuccess Callback ejecutado al completar la eliminación
-     * @param errorListener Callback para manejo de errores
-     */
+    //Elimina una receta de Firebase
     public void eliminarReceta(String firebaseId, Runnable onSuccess, OnErrorListener errorListener) {
         firestore.collection(COLECCION_RECETAS)
                 .document(firebaseId)
@@ -109,12 +84,7 @@ public class FirebaseDataSource {
                 );
     }
 
-    /**
-     * Obtiene todas las recetas del usuario autenticado actual desde Firebase.
-     *
-     * @param listener Callback con la lista de recetas obtenidas
-     * @param errorListener Callback para manejo de errores
-     */
+    //Obtiene todas las recetas del usuario autenticado actual desde Firebase
     public void obtenerRecetasUsuario(OnRecetasListener listener, OnErrorListener errorListener) {
         FirebaseUser usuario = autenticacion.getCurrentUser();
         if (usuario == null) {
@@ -129,7 +99,7 @@ public class FirebaseDataSource {
                     List<Receta> recetas = new ArrayList<>();
 
                     for (QueryDocumentSnapshot documento : consulta) {
-                        // Reconstruir receta desde los datos de Firebase
+                        //Reconstruir receta desde los datos de Firebase
                         Receta receta = mapeador.fromMap(documento.getData());
                         receta.setFirebaseId(documento.getId());
                         recetas.add(receta);
@@ -142,25 +112,19 @@ public class FirebaseDataSource {
                 );
     }
 
-    // ==================== INTERFACES DE CALLBACK ====================
+    //==================== INTERFACES DE CALLBACK ====================
 
-    /**
-     * Interfaz para recibir el ID generado al guardar en Firebase.
-     */
+    //Interfaz para recibir el ID generado al guardar en Firebase
     public interface OnSuccessListener {
         void onSuccess(String firebaseId);
     }
 
-    /**
-     * Interfaz para recibir listas de recetas desde Firebase.
-     */
+    //Interfaz para recibir listas de recetas desde Firebase
     public interface OnRecetasListener {
         void onRecetasLoaded(List<Receta> recetas);
     }
 
-    /**
-     * Interfaz para manejar errores en operaciones con Firebase.
-     */
+    //Interfaz para manejar errores en operaciones con Firebase
     public interface OnErrorListener {
         void onError(String mensaje);
     }

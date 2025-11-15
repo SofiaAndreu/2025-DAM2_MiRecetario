@@ -14,105 +14,81 @@ import com.example.recetarioapp.utils.ViewExtensions;
 import com.example.recetarioapp.viewmodels.AuthViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 
-/**
- * Activity para registro de nuevos usuarios con validaciones completas.
- *
- * Implementa un formulario de registro robusto con:
- * - Validación en tiempo real de todos los campos
- * - Verificación de seguridad de contraseña
- * - Aceptación de términos y condiciones
- * - Integración con Firebase Authentication
- * - Redirección automática al completar registro
- */
+//Activity para registro de nuevos usuarios con validaciones completas
+// - Validación en tiempo real de todos los campos
+// - Verificación de seguridad de contraseña
+// - Aceptación de términos y condiciones
+// - Integración con Firebase Authentication
+// - Redirección automática al completar registro
 public class RegisterActivity extends AppCompatActivity {
 
-    // Binding para acceso type-safe a las vistas del layout
+    //Binding para acceso type-safe a las vistas del layout
     private ActivityRegisterBinding binding;
 
-    // ViewModel para gestión de autenticación y registro
+    //ViewModel para gestión de autenticación y registro
     private AuthViewModel authViewModel;
 
-    /**
-     * Método de inicialización de la Activity.
-     * Configura el layout, inicializa ViewModel y configura listeners.
-     *
-     * @param savedInstanceState Estado previo de la Activity para restaurar estado
-     */
+    //Método de inicialización de la Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inflar layout usando ViewBinding
+        //Inflar layout usando ViewBinding
         binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Inicializar ViewModel para autenticación
+        //Inicializar ViewModel para autenticación
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
         configurarListeners();
         observarEstadoAutenticacion();
     }
 
-    /**
-     * Configura los listeners de interacción del usuario.
-     * Incluye botones de registro, navegación y acción del teclado.
-     */
+    //Configura los listeners de interacción del usuario
     private void configurarListeners() {
-        // Botón para volver atrás
+        //Botón para volver atrás
         binding.btnVolver.setOnClickListener(v -> finish());
 
-        // Botón principal de registro
+        //Botón principal de registro
         binding.btnRegistrarse.setOnClickListener(v -> intentarRegistro());
 
-        // Enlace para ir a login
+        //Enlace para ir a login
         binding.btnIrLogin.setOnClickListener(v -> finish());
 
-        // Acción de teclado para confirmar contraseña
+        //Acción de teclado para confirmar contraseña
         binding.etConfirmPassword.setOnEditorActionListener((v, actionId, event) -> {
             intentarRegistro();
             return true;
         });
     }
 
-    /**
-     * Intenta realizar el registro después de validar todos los campos.
-     * Ejecuta las validaciones y, si son exitosas, inicia el proceso de registro.
-     */
+    //Intenta realizar el registro después de validar todos los campos
     private void intentarRegistro() {
         String nombre = obtenerTexto(binding.etNombre);
         String email = obtenerTexto(binding.etEmailRegistro);
         String password = obtenerTexto(binding.etPasswordRegistro);
         String confirmPassword = obtenerTexto(binding.etConfirmPassword);
 
-        // Validar campos antes de proceder con el registro
+        //Validar campos antes de proceder con el registro
         if (!validarCampos(nombre, email, password, confirmPassword)) {
             return;
         }
 
-        // Verificar aceptación de términos y condiciones
+        //Verificar aceptación de términos y condiciones
         if (!binding.cbTerminos.isChecked()) {
             Toast.makeText(this, "Debes aceptar los términos y condiciones", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Iniciar proceso de registro con el ViewModel
+        //Iniciar proceso de registro con el ViewModel
         authViewModel.registrar(nombre, email, password);
     }
 
-    /**
-     * Valida todos los campos del formulario de registro.
-     * Realiza validaciones individuales y muestra errores específicos.
-     *
-     * @param nombre Nombre completo del usuario
-     * @param email Dirección de correo electrónico
-     * @param password Contraseña del usuario
-     * @param confirmPassword Confirmación de la contraseña
-     * @return true si todos los campos son válidos, false en caso contrario
-     */
+    //Valida todos los campos del formulario de registro
     private boolean validarCampos(String nombre, String email, String password, String confirmPassword) {
         boolean esValido = true;
 
-        // Validación de nombre - debe tener al menos 2 caracteres
+        //Validación de nombre - debe tener al menos 2 caracteres
         if (TextUtils.isEmpty(nombre)) {
             binding.tilNombre.setError("Ingresa tu nombre");
             esValido = false;
@@ -123,7 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
             binding.tilNombre.setError(null);
         }
 
-        // Validación de email - formato de correo electrónico válido
+        //Validación de email - formato de correo electrónico válido
         if (TextUtils.isEmpty(email)) {
             binding.tilEmailRegistro.setError("Ingresa tu email");
             esValido = false;
@@ -134,7 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
             binding.tilEmailRegistro.setError(null);
         }
 
-        // Validación de password - mínimo 6 caracteres y segura
+        //Validación de password - mínimo 6 caracteres y segura
         if (TextUtils.isEmpty(password)) {
             binding.tilPasswordRegistro.setError("Ingresa una contraseña");
             esValido = false;
@@ -148,7 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
             binding.tilPasswordRegistro.setError(null);
         }
 
-        // Validación de confirmación de password - debe coincidir
+        //Validación de confirmación de password - debe coincidir
         if (TextUtils.isEmpty(confirmPassword)) {
             binding.tilConfirmPassword.setError("Confirma tu contraseña");
             esValido = false;
@@ -162,36 +138,27 @@ public class RegisterActivity extends AppCompatActivity {
         return esValido;
     }
 
-    /**
-     * Verifica que la contraseña cumpla con requisitos básicos de seguridad.
-     * Debe contener al menos una letra y un número.
-     *
-     * @param password Contraseña a validar
-     * @return true si la contraseña es segura, false en caso contrario
-     */
+    //Verifica que la contraseña cumpla con requisitos básicos de seguridad
     private boolean esPasswordSeguro(String password) {
         return password.matches(".*[a-zA-Z].*") && password.matches(".*\\d.*");
     }
 
-    /**
-     * Observa los cambios en el estado de autenticación del ViewModel.
-     * Actualiza la UI según el estado actual (loading, success, error).
-     */
+    //Observa los cambios en el estado de autenticación del ViewModel
     private void observarEstadoAutenticacion() {
         authViewModel.getAuthState().observe(this, estado -> {
             if (estado == null) return;
 
-            // Actualizar UI según estado de carga
+            //Actualizar UI según estado de carga
             ViewExtensions.setVisible(findViewById(R.id.progress_bar), estado.isLoading());
             ViewExtensions.setEnabled(binding.btnRegistrarse, !estado.isLoading());
             ViewExtensions.setEnabled(binding.btnIrLogin, !estado.isLoading());
 
-            // Manejar estado de éxito - mostrar diálogo de confirmación
+            //Manejar estado de éxito - mostrar diálogo de confirmación
             if (estado.isSuccess()) {
                 mostrarDialogExito();
                 authViewModel.limpiarEstado();
             }
-            // Manejar estado de error - mostrar mensaje de error
+            //Manejar estado de error - mostrar mensaje de error
             else if (estado.hasError()) {
                 mostrarError(estado.mensaje);
                 authViewModel.limpiarEstado();
@@ -199,10 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Muestra diálogo de registro exitoso.
-     * Informa al usuario que su cuenta ha sido creada correctamente.
-     */
+    //Muestra diálogo de registro exitoso
     private void mostrarDialogExito() {
         new AlertDialog.Builder(this)
                 .setTitle("¡Registro Exitoso!")
@@ -213,10 +177,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Navega a la Activity principal de la aplicación.
-     * Limpia el stack de actividades para evitar volver al registro.
-     */
+    //Navega a la Activity principal de la aplicación
     private void irAMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -224,22 +185,12 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Obtiene texto de forma segura de un EditText.
-     * Maneja casos donde el texto puede ser null.
-     *
-     * @param editText Campo de texto del que obtener el contenido
-     * @return Texto contenido o string vacío si es null
-     */
+    //Obtiene texto de forma segura de un EditText
     private String obtenerTexto(TextInputEditText editText) {
         return editText.getText() != null ? editText.getText().toString().trim() : "";
     }
 
-    /**
-     * Muestra diálogo de error con el mensaje proporcionado.
-     *
-     * @param mensaje Mensaje de error a mostrar al usuario
-     */
+    //Muestra diálogo de error con el mensaje proporcionado
     private void mostrarError(String mensaje) {
         new AlertDialog.Builder(this)
                 .setTitle("Error en Registro")
@@ -248,10 +199,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Limpieza de recursos al destruir la Activity.
-     * Libera la referencia al binding para evitar memory leaks.
-     */
+    //Limpieza de recursos al destruir la Activity
     @Override
     protected void onDestroy() {
         super.onDestroy();

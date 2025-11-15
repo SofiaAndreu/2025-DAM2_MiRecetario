@@ -21,29 +21,21 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Helper para extraer recetas desde URLs web mediante web scraping.
- *
- * Funcionalidades principales:
- * - Extracción de recetas desde sitios web genéricos y YouTube
- * - Normalización automática de categorías usando CategoryHelper
- * - Soporte para Schema.org y estructuras HTML comunes
- * - Descarga y parseo robusto de contenido web
- * - Manejo de errores con logging detallado
- */
+// Helper para extraer recetas desde URLs web mediante web scraping.
+//
+// Funcionalidades principales:
+// - Extracción de recetas desde sitios web genéricos y YouTube
+// - Normalización automática de categorías usando CategoryHelper
+// - Soporte para Schema.org y estructuras HTML comunes
+// - Descarga y parseo robusto de contenido web
+// - Manejo de errores con logging detallado
 public class WebScraperHelper {
 
     // Tag para logging de operaciones de web scraping
     private static final String TAG = "WebScraperHelper";
 
-    /**
-     * Extrae una receta desde una URL web usando técnicas de web scraping.
-     * Soporta sitios web genéricos y YouTube, con normalización automática de categorías.
-     *
-     * @param url URL de la receta a extraer
-     * @param context Contexto para normalización de categorías (requerido)
-     * @return Objeto RecetaExtraida con los datos parseados, o null si falla
-     */
+    // Extrae una receta desde una URL web usando técnicas de web scraping.
+    // Soporta sitios web genéricos y YouTube, con normalización automática de categorías.
     public static RecetaExtraida extraerRecetaDesdeURL(String url, Context context) {
         try {
             // Descargar contenido HTML de la URL
@@ -79,13 +71,8 @@ public class WebScraperHelper {
         }
     }
 
-    /**
-     * Descarga el contenido HTML de una URL usando OkHttp.
-     * Incluye configuración de user agent y seguimiento de redirecciones.
-     *
-     * @param url URL a descargar
-     * @return Contenido HTML como String, o null si falla
-     */
+    // Descarga el contenido HTML de una URL usando OkHttp.
+    // Incluye configuración de user agent y seguimiento de redirecciones.
     private static String descargarHTML(String url) {
         try {
             OkHttpClient client = new OkHttpClient.Builder()
@@ -108,14 +95,8 @@ public class WebScraperHelper {
         return null;
     }
 
-    /**
-     * Extrae información de receta desde una página de YouTube.
-     * Utiliza meta tags Open Graph para obtener título, descripción e imagen.
-     *
-     * @param doc Documento JSoup parseado
-     * @param url URL original de YouTube
-     * @return RecetaExtraida con datos de YouTube
-     */
+    // Extrae información de receta desde una página de YouTube.
+    // Utiliza meta tags Open Graph para obtener título, descripción e imagen.
     private static RecetaExtraida extraerDeYouTube(Document doc, String url) {
         RecetaExtraida receta = new RecetaExtraida();
 
@@ -146,13 +127,8 @@ public class WebScraperHelper {
         return receta;
     }
 
-    /**
-     * Extrae información de receta desde sitios web genéricos.
-     * Utiliza múltiples estrategias (Schema.org, selectores CSS, meta tags).
-     *
-     * @param doc Documento JSoup parseado
-     * @return RecetaExtraida con datos del sitio web
-     */
+    // Extrae información de receta desde sitios web genéricos.
+    // Utiliza múltiples estrategias (Schema.org, selectores CSS, meta tags).
     private static RecetaExtraida extraerDeWebGenerica(Document doc) {
         RecetaExtraida receta = new RecetaExtraida();
 
@@ -172,13 +148,8 @@ public class WebScraperHelper {
         return receta;
     }
 
-    /**
-     * Extrae categoría de receta desde el documento HTML.
-     * Intenta múltiples fuentes: Schema.org, meta tags, clases CSS.
-     *
-     * @param doc Documento JSoup parseado
-     * @return Categoría extraída, o null si no se encuentra
-     */
+    // Extrae categoría de receta desde el documento HTML.
+    // Intenta múltiples fuentes: Schema.org, meta tags, clases CSS.
     private static String extraerCategoria(Document doc) {
         // Intentar Schema.org primero
         Element schemaCategoria = doc.selectFirst("[itemprop=recipeCategory]");
@@ -420,10 +391,8 @@ public class WebScraperHelper {
         }
     }
 
-    /**
-     * Clase contenedora para almacenar datos de receta extraídos.
-     * Utilizada para transferir datos entre métodos de extracción.
-     */
+    // Clase contenedora para almacenar datos de receta extraídos.
+    // Utilizada para transferir datos entre métodos de extracción.
     public static class RecetaExtraida {
         public String nombre = "";
         public String descripcion = "";

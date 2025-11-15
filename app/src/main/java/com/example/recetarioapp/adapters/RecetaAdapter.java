@@ -19,57 +19,37 @@ import com.google.android.material.chip.Chip;
 import java.io.File;
 import java.util.Objects;
 
-/**
- * Adapter para mostrar lista de recetas en RecyclerView con funcionalidades avanzadas.
- *
- * Características principales:
- * - Muestra información completa de recetas (imagen, nombre, descripción, etc.)
- * - Gestión eficiente de actualizaciones con DiffUtil
- * - Soporte para marcado de favoritos
- * - Carga optimizada de imágenes con Glide
- * - Interfaz de usuario rica con chips y elementos visuales
- */
+//Adapter para mostrar lista de recetas en RecyclerView con funcionalidades avanzadas
+//- Muestra info. completa de recetas (imagen, nombre, descripción, etc.)
+//- Gestión eficiente de actualizaciones con DiffUtil
+//- Soporte para marcado de favoritos
+//- Carga optimizada de imágenes con Glide
+//- Interfaz de usuario rica con chips y elementos visuales
 public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewHolder> {
 
-    // Listeners para manejar interacciones del usuario
+    //Listeners para manejar interacciones del usuario
     private OnRecetaClickListener listener;
     private OnFavClickListener favListener;
 
-    /**
-     * Constructor que inicializa el adapter con DiffUtil para optimización.
-     * Utiliza ListAdapter en lugar de RecyclerView.Adapter para mejor performance.
-     */
+    //Constructor que inicializa el adapter con DiffUtil para optimización
+    //Utiliza ListAdapter en lugar de RecyclerView.Adapter para mejor performance
     public RecetaAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    /**
-     * Callback de DiffUtil para comparar y actualizar items eficientemente.
-     * Determina qué items cambiaron y actualiza solo esos.
-     */
+    //Callback de DiffUtil para comparar y actualizar items eficientemente
+    //Determina qué items cambiaron y actualiza solo esos
     private static final DiffUtil.ItemCallback<Receta> DIFF_CALLBACK = new DiffUtil.ItemCallback<Receta>() {
 
-        /**
-         * Verifica si dos items representan el mismo objeto.
-         * Compara por ID único de receta.
-         *
-         * @param oldItem Receta antigua
-         * @param newItem Receta nueva
-         * @return true si tienen el mismo ID, false en caso contrario
-         */
+        //Verifica si dos items representan el mismo objeto
+        //Compara por ID único de receta
         @Override
         public boolean areItemsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
             return oldItem.getId() == newItem.getId();
         }
 
-        /**
-         * Verifica si los contenidos de dos items son iguales.
-         * Compara nombre y estado de favorito para detectar cambios.
-         *
-         * @param oldItem Receta antigua
-         * @param newItem Receta nueva
-         * @return true si los contenidos son iguales, false en caso contrario
-         */
+        //Verifica si los contenidos de dos items son iguales
+        //Compara nombre y estado de favorito para detectar cambios
         @Override
         public boolean areContentsTheSame(@NonNull Receta oldItem, @NonNull Receta newItem) {
             return Objects.equals(oldItem.getNombre(), newItem.getNombre()) &&
@@ -77,57 +57,38 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         }
     };
 
-    /**
-     * Crea nuevas vistas (ViewHolders) cuando el RecyclerView los necesita.
-     * Infla el layout del item de receta.
-     *
-     * @param parent ViewGroup padre al que se añadirá la nueva vista
-     * @param viewType Tipo de vista (no utilizado en este adapter)
-     * @return Nuevo ViewHolder para el item de receta
-     */
+    //Crea nuevas vistas (ViewHolders) cuando el RecyclerView los necesita
+    //Infla el layout del item de receta
     @NonNull
     @Override
     public RecetaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Convertir el layout XML item_receta en un objeto View
+        //Convertir el layout XML item_receta en un objeto View
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_receta, parent, false);
         return new RecetaViewHolder(view);
     }
 
-    /**
-     * Asigna los datos de la receta a las vistas del ViewHolder.
-     * Se llama para cada item visible en el RecyclerView.
-     *
-     * @param holder ViewHolder que contiene las vistas a actualizar
-     * @param position Posición del item en la lista de datos
-     */
+    //Asigna los datos de la receta a las vistas del ViewHolder
+    //Se llama para cada item visible en RecyclerView
     @Override
     public void onBindViewHolder(@NonNull RecetaViewHolder holder, int position) {
-        // Obtener la receta en la posición actual
+        //Obtener la receta en la posición actual
         Receta receta = getItem(position);
-        // Vincular datos de la receta con las vistas del ViewHolder
+        //Vincular datos de receta con vistas del ViewHolder
         holder.bind(receta);
     }
 
-    /**
-     * Obtiene la receta en una posición específica.
-     * Método de utilidad para acceso externo a los datos.
-     *
-     * @param position Posición de la receta a obtener
-     * @return Receta en la posición especificada
-     */
+    //Obtiene la receta en una posición específica
+    //Método de utilidad para acceso externo a los datos
     public Receta getRecetaEn(int position) {
         return getItem(position);
     }
 
-    // ==================== CLASE INTERNA VIEWHOLDER ====================
+    //==================== CLASE INTERNA VIEWHOLDER ====================
 
-    /**
-     * ViewHolder que representa cada item de receta en el RecyclerView.
-     * Mantiene referencias a todas las vistas para acceso eficiente.
-     */
+    //ViewHolder que representa cada item de receta en el RecyclerView
     class RecetaViewHolder extends RecyclerView.ViewHolder {
-        // Referencias a todas las vistas del layout de receta
+        //Referencias a vistas del layout de receta
         private final ImageView ivImagen;
         private final TextView tvNombre;
         private final TextView tvDescripcion;
@@ -137,14 +98,10 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         private final Chip chipCategoria;
         private final ImageView btnFavorito;
 
-        /**
-         * Constructor que inicializa las vistas y configura listeners.
-         *
-         * @param itemView Vista del item de receta
-         */
-        public RecetaViewHolder(@NonNull View itemView) {
+        //Constructor que inicializa las vistas y configura listeners
+        public RecetaViewHolder(@NonNull View itemView) { //itemView: Vista del item de receta
             super(itemView);
-            // Obtener referencias a todas las vistas del layout
+            //Obtener referencias a todas las vistas del layout
             ivImagen = itemView.findViewById(R.id.iv_receta_imagen);
             tvNombre = itemView.findViewById(R.id.tv_receta_nombre);
             tvDescripcion = itemView.findViewById(R.id.tv_receta_descripcion);
@@ -154,44 +111,36 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
             chipCategoria = itemView.findViewById(R.id.chip_categoria);
             btnFavorito = itemView.findViewById(R.id.btn_favorito);
 
-            /**
-             * Listener para clic en toda la tarjeta de receta.
-             * Navega a los detalles de la receta seleccionada.
-             */
+            //Listener para clic en toda la tarjeta de receta
+            //Navega a los detalles de la receta seleccionada
             itemView.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition();
-                // Verificar que la posición es válida y existe listener
+                //Verificar que la posición es válida y existe listener
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     listener.onRecetaClick(getItem(position));
                 }
             });
 
-            /**
-             * Listener para clic en el botón de favorito.
-             * Alterna el estado de favorito de la receta.
-             */
+            //Listener para clic en el botón de favorito
+            //Alterna el estado de favorito de la receta
             btnFavorito.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition();
-                // Verificar que la posición es válida y existe listener
+                //Verificar que la posición es válida y existe listener
                 if (favListener != null && position != RecyclerView.NO_POSITION) {
-                    // Obtener receta y alternar estado de favorito
+                    //Obtener receta y alternar estado de favorito
                     Receta receta = getItem(position);
                     favListener.onFavClick(receta, !receta.isFav());
                 }
             });
         }
 
-        /**
-         * Vincula los datos de una receta con las vistas del ViewHolder.
-         * Actualiza todos los elementos visuales con la información de la receta.
-         *
-         * @param receta Receta con los datos a mostrar
-         */
+        //Vincula los datos de una receta con las vistas del ViewHolder
+        //Actualiza todos los elementos visuales con la información de la receta
         public void bind(Receta receta) {
-            // Mostrar nombre de la receta
+            //Mostrar nombre de la receta
             tvNombre.setText(receta.getNombre());
 
-            // Mostrar descripción si existe, ocultar si está vacía
+            //Mostrar descripción si existe, ocultar si está vacía
             if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
                 tvDescripcion.setText(receta.getDescripcion());
                 tvDescripcion.setVisibility(View.VISIBLE);
@@ -199,21 +148,21 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
                 tvDescripcion.setVisibility(View.GONE);
             }
 
-            // Mostrar tiempo de preparación formateado
+            //Mostrar tiempo de preparación formateado
             tvTiempo.setText(receta.getTiempoPrepFormateado());
 
-            // Mostrar dificultad o guión si no está definida
+            //Mostrar dificultad o guión si no está definida
             String dificultad = receta.getDificultad() != null ? receta.getDificultad() : "-";
             tvDificultad.setText(dificultad);
 
-            // Mostrar número de porciones o guión si no está definido
+            //Mostrar número de porciones o guión si no está definido
             if (receta.getPorciones() > 0) {
                 tvPorciones.setText(receta.getPorciones() + " porc.");
             } else {
                 tvPorciones.setText("-");
             }
 
-            // Mostrar chip de categoría solo si existe
+            //Mostrar chip de categoría solo si existe
             if (receta.getCategoria() != null && !receta.getCategoria().isEmpty()) {
                 chipCategoria.setText(receta.getCategoria());
                 chipCategoria.setVisibility(View.VISIBLE);
@@ -221,23 +170,23 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
                 chipCategoria.setVisibility(View.GONE);
             }
 
-            // Cargar imagen de la receta usando Glide
+            //Cargar imagen de la receta usando Glide
             if (receta.getImagenPortadaURL() != null && !receta.getImagenPortadaURL().isEmpty()) {
-                // Crear objeto File desde la ruta de la imagen
+                //Crear objeto File desde la ruta de la imagen
                 File imageFile = new File(receta.getImagenPortadaURL());
-                // Configurar carga de imagen con Glide
+                //Configurar carga de imagen con Glide
                 Glide.with(itemView.getContext())
-                        .load(imageFile) // Archivo a cargar
-                        .placeholder(R.drawable.placeholder_receta) // Imagen mientras carga
-                        .error(R.drawable.placeholder_receta) // Imagen si hay error
-                        .centerCrop() // Recortar al centro
-                        .into(ivImagen); // ImageView destino
+                        .load(imageFile) //Archivo a cargar
+                        .placeholder(R.drawable.placeholder_receta) //Imagen mientras carga
+                        .error(R.drawable.placeholder_receta) //Imagen si hay error
+                        .centerCrop() //Recortar al centro
+                        .into(ivImagen); //ImageView destino
             } else {
-                // Usar imagen placeholder si no hay imagen
+                //Usar imagen placeholder si no hay imagen
                 ivImagen.setImageResource(R.drawable.placeholder_receta);
             }
 
-            // Actualizar icono de favorito según el estado
+            //Actualizar icono según el estado
             if (receta.isFav()) {
                 btnFavorito.setImageResource(R.drawable.ic_fav);
             } else {
@@ -246,40 +195,28 @@ public class RecetaAdapter extends ListAdapter<Receta, RecetaAdapter.RecetaViewH
         }
     }
 
-    // ==================== INTERFACES PARA CALLBACKS ====================
+    //==================== INTERFACES PARA CALLBACKS ====================
 
-    /**
-     * Interfaz para manejar clics en recetas.
-     * Permite navegar a los detalles de la receta seleccionada.
-     */
+    //Interfaz para manejar clics en recetas
+    //Permite navegar a los detalles de la receta seleccionada
     public interface OnRecetaClickListener {
         void onRecetaClick(Receta receta);
     }
 
-    /**
-     * Interfaz para manejar clics en botones de favorito.
-     * Permite agregar o quitar recetas de favoritos.
-     */
+    //Interfaz para manejar clics en botones de favorito
+    //PAgregar/Quitar recetas de favoritos
     public interface OnFavClickListener {
         void onFavClick(Receta receta, boolean isFav);
     }
 
-    // ==================== SETTERS PARA LISTENERS ====================
+    //==================== SETTERS PARA LISTENERS ====================
 
-    /**
-     * Establece el listener para clics en recetas.
-     *
-     * @param listener Listener a establecer
-     */
+    //Listener para clics en recetas
     public void setOnRecetaClickListener(OnRecetaClickListener listener) {
         this.listener = listener;
     }
 
-    /**
-     * Establece el listener para clics en favoritos.
-     *
-     * @param listener Listener a establecer
-     */
+    //Listener para clics en favoritos
     public void setOnFavClickListener(OnFavClickListener listener) {
         this.favListener = listener;
     }

@@ -8,112 +8,65 @@ import com.example.recetarioapp.models.Receta;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Fuente de datos local que encapsula todas las operaciones con Room Database.
- *
- * Proporciona una API limpia y abstracta para las operaciones CRUD locales,
- * separando la lógica de acceso a datos del resto de la aplicación.
- * Todas las operaciones de escritura se ejecutan en background mediante
- * el ExecutorService configurado en RecetasBD.
- */
+//Fuente de datos local que encapsula todas las operaciones con Room Database
+// - Proporciona API abstracta para las operaciones CRUD locales
+// - Separa lógica de acceso a datos del resto de la aplicación
+// - Todas las operaciones de escritura se ejecutan en background mediante ExecutorService (de RecetasBD)
 public class LocalDataSource {
 
     private final RecetaDAO recetaDAO;
 
-    /**
-     * Constructor que inicializa la conexión con la base de datos local.
-     *
-     * @param app Contexto de la aplicación para obtener la instancia de BD
-     */
+    //Constructor que inicializa la conexión con la base de datos local
     public LocalDataSource(Application app) {
         RecetasBD baseDatos = RecetasBD.getInstance(app);
         this.recetaDAO = baseDatos.recetaDAO();
     }
 
-    // ==================== OPERACIONES DE LECTURA OBSERVABLES ====================
+    //==================== OPERACIONES DE LECTURA OBSERVABLES ====================
 
-    /**
-     * Obtiene todas las recetas ordenadas por fecha de creación (más recientes primero).
-     *
-     * @return LiveData con lista observable de recetas
-     */
+    //Obtiene todas las recetas ordenadas por fecha de creación (más recientes primero)
     public LiveData<List<Receta>> getAllRecetas() {
         return recetaDAO.getAllRecetas();
     }
 
-    /**
-     * Obtiene una receta específica por su ID local.
-     *
-     * @param id ID local de la receta
-     * @return LiveData con la receta observada
-     */
+    //Obtiene una receta específica por su ID local
     public LiveData<Receta> getRecetaById(long id) {
         return recetaDAO.getRecetaById(id);
     }
 
-    /**
-     * Obtiene todas las recetas marcadas como favoritas.
-     *
-     * @return LiveData con lista observable de recetas favoritas
-     */
+    //Obtiene todas las recetas marcadas como favoritas
     public LiveData<List<Receta>> getFavoritas() {
         return recetaDAO.getFavs();
     }
 
-    /**
-     * Busca recetas cuyo nombre contenga el texto de búsqueda.
-     *
-     * @param query Texto a buscar en los nombres de recetas
-     * @return LiveData con lista observable de recetas que coinciden
-     */
+    //Busca recetas cuyo nombre contenga el texto de búsqueda
     public LiveData<List<Receta>> buscarPorNombre(String query) {
         return recetaDAO.buscarPorNombre(query);
     }
 
-    /**
-     * Filtra recetas por categoría específica.
-     *
-     * @param categoria Categoría a filtrar
-     * @return LiveData con recetas de la categoría especificada
-     */
+    //Filtra recetas por categoría específica
     public LiveData<List<Receta>> getRecetasPorCategoria(String categoria) {
         return recetaDAO.getRecetasPorCategoria(categoria);
     }
 
-    /**
-     * Filtra recetas por nivel de dificultad.
-     *
-     * @param dificultad Nivel de dificultad (Fácil, Media, Difícil)
-     * @return LiveData con recetas del nivel especificado
-     */
+    //Filtra recetas por nivel de dificultad
     public LiveData<List<Receta>> getRecetasPorDificultad(String dificultad) {
         return recetaDAO.getRecetasPorDificultad(dificultad);
     }
 
-    /**
-     * Filtra recetas por tiempo máximo de preparación.
-     *
-     * @param tiempoMax Tiempo máximo en minutos
-     * @return LiveData con recetas que no exceden el tiempo especificado
-     */
+    //Filtra recetas por tiempo máximo de preparación
     public LiveData<List<Receta>> getRecetasPorTiempo(int tiempoMax) {
         return recetaDAO.getRecetasPorTiempo(tiempoMax);
     }
 
-    // ==================== OPERACIONES DE ESCRITURA ASÍNCRONAS ====================
+    //==================== OPERACIONES DE ESCRITURA ASÍNCRONAS ====================
 
-    /**
-     * Inserta una nueva receta en la base de datos local.
-     * Actualiza automáticamente las fechas de creación y modificación.
-     *
-     * @param receta Receta a insertar
-     * @param listener Callback para el resultado de la inserción
-     * @param errorListener Callback para manejo de errores
-     */
+    //Inserta una nueva receta en la base de datos local
+    //Actualiza automáticamente las fechas de creación y modificación
     public void insertar(Receta receta, OnInsertListener listener, OnErrorListener errorListener) {
         RecetasBD.bdWriteExecutor.execute(() -> {
             try {
-                // Establecer timestamps antes de insertar
+                //Establecer timestamps antes de insertar
                 receta.setFechaCreacion(new Date());
                 receta.setFechaModificacion(new Date());
 
@@ -125,14 +78,8 @@ public class LocalDataSource {
         });
     }
 
-    /**
-     * Actualiza una receta existente en la base de datos local.
-     * Actualiza automáticamente la fecha de modificación.
-     *
-     * @param receta Receta con datos actualizados
-     * @param onSuccess Callback ejecutado al completar la actualización
-     * @param errorListener Callback para manejo de errores
-     */
+    //Actualiza una receta existente en la base de datos local
+    //Actualiza automáticamente la fecha de modificación
     public void actualizar(Receta receta, Runnable onSuccess, OnErrorListener errorListener) {
         RecetasBD.bdWriteExecutor.execute(() -> {
             try {
@@ -145,13 +92,7 @@ public class LocalDataSource {
         });
     }
 
-    /**
-     * Elimina una receta de la base de datos local.
-     *
-     * @param receta Receta a eliminar
-     * @param onSuccess Callback ejecutado al completar la eliminación
-     * @param errorListener Callback para manejo de errores
-     */
+    //Elimina una receta de la base de datos local
     public void eliminar(Receta receta, Runnable onSuccess, OnErrorListener errorListener) {
         RecetasBD.bdWriteExecutor.execute(() -> {
             try {
@@ -163,14 +104,9 @@ public class LocalDataSource {
         });
     }
 
-    // ==================== OPERACIONES ESPECIALIZADAS ====================
+    //==================== OPERACIONES ESPECIALIZADAS ====================
 
-    /**
-     * Busca una receta por su ID de Firebase (para sincronización).
-     *
-     * @param firebaseId ID único de Firebase Firestore
-     * @return Receta correspondiente o null si no existe
-     */
+    //Busca una receta por su ID de Firebase (para sincronización)
     public Receta getRecetaByFirebaseId(String firebaseId) {
         try {
             return recetaDAO.getRecetaByFirebaseId(firebaseId);
@@ -180,41 +116,28 @@ public class LocalDataSource {
         }
     }
 
-    /**
-     * Establece o remueve el estado de favorito de una receta.
-     *
-     * @param id ID local de la receta
-     * @param esFavorito Nuevo estado de favorito
-     */
+    //Establece o remueve el estado de favorito de una receta
     public void establecerFavorita(long id, boolean esFavorito) {
         RecetasBD.bdWriteExecutor.execute(() ->
                 recetaDAO.actualizarFavorita(id, esFavorito)
         );
     }
 
-    /**
-     * Inserta múltiples recetas en lote (para sincronización).
-     *
-     * @param recetas Lista de recetas a insertar
-     */
+    //Inserta múltiples recetas en lote (para sincronización)
     public void insertarVarias(List<Receta> recetas) {
         RecetasBD.bdWriteExecutor.execute(() ->
                 recetaDAO.insertAll(recetas)
         );
     }
 
-    // ==================== INTERFACES DE CALLBACK ====================
+    //==================== INTERFACES DE CALLBACK ====================
 
-    /**
-     * Interfaz para recibir el resultado de operaciones de inserción.
-     */
+    //Interfaz para recibir el resultado de operaciones de inserción
     public interface OnInsertListener {
         void onInserted(long id);
     }
 
-    /**
-     * Interfaz para manejar errores en operaciones asíncronas.
-     */
+    //Interfaz para manejar errores en operaciones asíncronas
     public interface OnErrorListener {
         void onError(String mensaje);
     }

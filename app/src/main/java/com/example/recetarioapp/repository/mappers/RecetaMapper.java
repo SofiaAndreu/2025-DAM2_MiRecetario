@@ -8,29 +8,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Mapper especializado para conversiones bidireccionales entre objetos Receta y Map.
- *
- * Esta clase resuelve el problema de incompatibilidad entre los objetos Java complejos
- * y la estructura plana de datos requerida por Firebase Firestore.
- * Proporciona serialización/deserialización completa de todos los componentes
- * de una receta, incluyendo listas anidadas de ingredientes y pasos.
- */
+//Mapper especializado para conversiones bidireccionales entre objetos Receta y Map
+// - Resuelve incompatibilidad entre objetos Java complejos y estructura plana de Firebase
+// - Proporciona serialización/deserialización completa de todos los componentes
+// - Maneja listas anidadas de ingredientes y pasos
 public class RecetaMapper {
 
-    // ==================== CONVERSIÓN RECETA → MAP ====================
+    //==================== CONVERSIÓN RECETA → MAP ====================
 
-    /**
-     * Convierte un objeto Receta completo a Map para almacenamiento en Firebase.
-     * Serializa todos los atributos incluyendo listas complejas de ingredientes y pasos.
-     *
-     * @param receta Objeto Receta a serializar
-     * @return Map con todos los datos de la receta en formato Firebase-compatible
-     */
+    //Convierte un objeto Receta completo a Map para almacenamiento en Firebase
     public Map<String, Object> toMap(Receta receta) {
         Map<String, Object> map = new HashMap<>();
 
-        // Atributos básicos de la receta
+        //Atributos básicos de la receta
         map.put("nombre", receta.getNombre());
         map.put("descripcion", receta.getDescripcion());
         map.put("imagenPortadaUrl", receta.getImagenPortadaURL());
@@ -40,12 +30,12 @@ public class RecetaMapper {
         map.put("categoria", receta.getCategoria());
         map.put("origen", receta.getOrigen());
 
-        // Conversión de listas complejas a estructuras Firebase-compatibles
+        //Conversión de listas complejas a estructuras Firebase-compatibles
         map.put("ingredientes", ingredientesToMapList(receta.getIngredientes()));
         map.put("pasos", pasosToMapList(receta.getPasos()));
         map.put("etiquetas", receta.getTags());
 
-        // Metadatos
+        //Metadatos
         map.put("fechaCreacion", receta.getFechaCreacion());
         map.put("fechaModificacion", receta.getFechaModificacion());
         map.put("esFavorita", receta.isFav());
@@ -54,19 +44,13 @@ public class RecetaMapper {
         return map;
     }
 
-    // ==================== CONVERSIÓN MAP → RECETA ====================
+    //==================== CONVERSIÓN MAP → RECETA ====================
 
-    /**
-     * Reconstruye un objeto Receta completo desde un Map de Firebase.
-     * Deserializa todos los componentes incluyendo listas anidadas.
-     *
-     * @param map Map con datos de Firebase
-     * @return Objeto Receta completamente reconstruido
-     */
+    //Reconstruye un objeto Receta completo desde un Map de Firebase
     public Receta fromMap(Map<String, Object> map) {
         Receta receta = new Receta();
 
-        // Atributos básicos
+        //Atributos básicos
         receta.setNombre(getString(map, "nombre"));
         receta.setDescripcion(getString(map, "descripcion"));
         receta.setImagenPortadaURL(getString(map, "imagenPortadaUrl"));
@@ -78,7 +62,7 @@ public class RecetaMapper {
         receta.setUsuarioId(getString(map, "usuarioId"));
         receta.setFav(getBoolean(map, "esFavorita"));
 
-        // Reconstrucción de listas complejas
+        //Reconstrucción de listas complejas
         receta.setIngredientes(mapListToIngredientes(map.get("ingredientes")));
         receta.setPasos(mapListToPasos(map.get("pasos")));
         receta.setTags(mapListToStrings(map.get("etiquetas")));
@@ -86,14 +70,9 @@ public class RecetaMapper {
         return receta;
     }
 
-    // ==================== CONVERSORES DE INGREDIENTES ====================
+    //==================== CONVERSORES DE INGREDIENTES ====================
 
-    /**
-     * Serializa una lista de Ingredientes a lista de Maps para Firebase.
-     *
-     * @param ingredientes Lista de objetos Ingrediente
-     * @return Lista de Maps con datos de ingredientes
-     */
+    //Serializa una lista de Ingredientes a lista de Maps para Firebase
     private List<Map<String, Object>> ingredientesToMapList(List<Ingrediente> ingredientes) {
         List<Map<String, Object>> listaMaps = new ArrayList<>();
         if (ingredientes == null) return listaMaps;
@@ -108,12 +87,7 @@ public class RecetaMapper {
         return listaMaps;
     }
 
-    /**
-     * Deserializa una lista de Maps a objetos Ingrediente.
-     *
-     * @param obj Objeto que puede contener la lista de ingredientes
-     * @return Lista de objetos Ingrediente reconstruidos
-     */
+    //Deserializa una lista de Maps a objetos Ingrediente
     private List<Ingrediente> mapListToIngredientes(Object obj) {
         List<Ingrediente> ingredientes = new ArrayList<>();
         if (!(obj instanceof List)) return ingredientes;
@@ -134,14 +108,9 @@ public class RecetaMapper {
         return ingredientes;
     }
 
-    // ==================== CONVERSORES DE PASOS ====================
+    //==================== CONVERSORES DE PASOS ====================
 
-    /**
-     * Serializa una lista de Pasos a lista de Maps para Firebase.
-     *
-     * @param pasos Lista de objetos Paso
-     * @return Lista de Maps con datos de pasos
-     */
+    //Serializa una lista de Pasos a lista de Maps para Firebase
     private List<Map<String, Object>> pasosToMapList(List<Paso> pasos) {
         List<Map<String, Object>> listaMaps = new ArrayList<>();
         if (pasos == null) return listaMaps;
@@ -155,12 +124,7 @@ public class RecetaMapper {
         return listaMaps;
     }
 
-    /**
-     * Deserializa una lista de Maps a objetos Paso.
-     *
-     * @param obj Objeto que puede contener la lista de pasos
-     * @return Lista de objetos Paso reconstruidos
-     */
+    //Deserializa una lista de Maps a objetos Paso
     private List<Paso> mapListToPasos(Object obj) {
         List<Paso> pasos = new ArrayList<>();
         if (!(obj instanceof List)) return pasos;
@@ -180,14 +144,9 @@ public class RecetaMapper {
         return pasos;
     }
 
-    // ==================== CONVERSOR DE ETIQUETAS ====================
+    //==================== CONVERSOR DE ETIQUETAS ====================
 
-    /**
-     * Deserializa una lista genérica a lista de Strings para etiquetas.
-     *
-     * @param obj Objeto que puede contener la lista de etiquetas
-     * @return Lista de Strings con las etiquetas
-     */
+    //Deserializa una lista genérica a lista de Strings para etiquetas
     private List<String> mapListToStrings(Object obj) {
         List<String> strings = new ArrayList<>();
         if (!(obj instanceof List)) return strings;
@@ -201,33 +160,20 @@ public class RecetaMapper {
         return strings;
     }
 
-    // ==================== HELPERS DE TIPADO SEGURO ====================
+    //==================== HELPERS DE TIPADO SEGURO ====================
 
-    /**
-     * Obtiene un String de forma segura desde un Map.
-     *
-     * @param map Map que contiene el valor
-     * @param key Clave del valor
-     * @return String o null si no existe
-     */
+    //Obtiene un String de forma segura desde un Map
     private String getString(Map<String, Object> map, String key) {
         Object value = map.get(key);
         return value != null ? String.valueOf(value) : null;
     }
 
-    /**
-     * Obtiene un int de forma segura desde un Map.
-     * Maneja diferentes tipos numéricos (Long, Integer, etc.)
-     *
-     * @param map Map que contiene el valor
-     * @param key Clave del valor
-     * @return Valor numérico o 0 por defecto
-     */
+    //Obtiene un int de forma segura desde un Map
     private int getInt(Map<String, Object> map, String key) {
         Object value = map.get(key);
         if (value == null) return 0;
 
-        // Conversión segura de diferentes tipos numéricos
+        //Conversión segura de diferentes tipos numéricos
         if (value instanceof Long) {
             return ((Long) value).intValue();
         } else if (value instanceof Integer) {
@@ -238,13 +184,7 @@ public class RecetaMapper {
         return 0;
     }
 
-    /**
-     * Obtiene un boolean de forma segura desde un Map.
-     *
-     * @param map Map que contiene el valor
-     * @param key Clave del valor
-     * @return Valor boolean o false por defecto
-     */
+    //Obtiene un boolean de forma segura desde un Map
     private boolean getBoolean(Map<String, Object> map, String key) {
         Object value = map.get(key);
         if (value == null) return false;

@@ -20,50 +20,41 @@ import com.example.recetarioapp.ui.base.BaseFragment;
 import com.example.recetarioapp.utils.ViewExtensions;
 import java.util.List;
 
-/**
- * Fragment principal que muestra el dashboard de la aplicación.
- *
- * Funcionalidades principales:
- * - Estadísticas de recetas (total, favoritas, categorías)
- * - Lista de recetas recientes
- * - Acceso rápido a información "Acerca de"
- * - Navegación a detalles de recetas
- * - Gestión de favoritos desde la vista principal
- */
+//Fragment principal que muestra el dashboard de la aplicación
+// - Estadísticas de recetas (total, favoritas, categorías)
+// - Lista de recetas recientes
+// - Acceso rápido a información "Acerca de"
+// - Navegación a detalles de recetas
+// - Gestión de favoritos desde la vista principal
 public class FragmentHome extends BaseFragment {
 
-    // Vistas para mostrar estadísticas
+    //Vistas para mostrar estadísticas
     private TextView tvTotalRecetas, tvTotalFavoritas;
 
-    // RecyclerView para mostrar recetas recientes
+    //RecyclerView para mostrar recetas recientes
     private RecyclerView rvRecetasRecientes;
 
-    // Layout que se muestra cuando no hay recetas
+    //Layout que se muestra cuando no hay recetas
     private LinearLayout layoutEmptyState;
 
-    // Adaptador para la lista de recetas
+    //Adaptador para la lista de recetas
     private RecetaAdapter adapter;
 
-    // Botón para acceder a la información "Acerca de"
+    //Botón para acceder a la información "Acerca de"
     private FrameLayout btnAbout;
 
-    /**
-     * Crea la vista del fragmento inflando el layout correspondiente.
-     */
+    //Crea la vista del fragmento inflando el layout correspondiente
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
-    /**
-     * Configura la vista después de que ha sido creada.
-     * Inicializa componentes y configura observadores de datos.
-     */
+    //Configura la vista después de que ha sido creada
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar todos los componentes
+        //Inicializar todos los componentes
         initViewModel();
         initViews(view);
         setupRecyclerView();
@@ -72,11 +63,7 @@ public class FragmentHome extends BaseFragment {
         observeUiState();
     }
 
-    /**
-     * Inicializa las referencias a las vistas del layout.
-     *
-     * @param view Vista raíz del fragmento
-     */
+    //Inicializa las referencias a las vistas del layout
     private void initViews(View view) {
         tvTotalRecetas = view.findViewById(R.id.tv_total_recetas);
         tvTotalFavoritas = view.findViewById(R.id.tv_total_favoritas);
@@ -85,59 +72,51 @@ public class FragmentHome extends BaseFragment {
         btnAbout = view.findViewById(R.id.btn_about);
     }
 
-    /**
-     * Configura el botón "Acerca de" para navegar a la Activity correspondiente.
-     */
+    //Configura el botón "Acerca de" para navegar a la Activity correspondiente
     private void setupAboutButton() {
         if (btnAbout != null) {
             btnAbout.setOnClickListener(v -> {
-                // Navegar a AboutActivity
+                //Navegar a AboutActivity
                 Intent intent = new Intent(getActivity(), AboutActivity.class);
                 startActivity(intent);
             });
         }
     }
 
-    /**
-     * Configura el RecyclerView para mostrar las recetas recientes.
-     * Establece el layout manager, adapter y listeners de interacción.
-     */
+    //Configura el RecyclerView para mostrar las recetas recientes
     private void setupRecyclerView() {
         adapter = new RecetaAdapter();
         rvRecetasRecientes.setLayoutManager(new LinearLayoutManager(getContext()));
         rvRecetasRecientes.setAdapter(adapter);
 
-        // Configurar listeners para interacciones con recetas
+        //Configurar listeners para interacciones con recetas
         adapter.setOnRecetaClickListener(this::openRecipeDetail);
         adapter.setOnFavClickListener(this::toggleFavorite);
     }
 
-    /**
-     * Observa los cambios en los datos de recetas y favoritos.
-     * Actualiza las estadísticas y la lista de recetas recientes.
-     */
+    //Observa los cambios en los datos de recetas y favoritos
     private void observeData() {
-        // Observar todas las recetas para estadísticas y lista reciente
+        //Observar todas las recetas para estadísticas y lista reciente
         viewModel.getTodasLasRecetas().observe(getViewLifecycleOwner(), recetas -> {
             if (recetas == null) return;
 
-            // Actualizar contador de recetas totales
+            //Actualizar contador de recetas totales
             tvTotalRecetas.setText(String.valueOf(recetas.size()));
 
-            // Obtener las 5 recetas más recientes (o todas si hay menos de 5)
+            //Obtener las 5 recetas más recientes (o todas si hay menos de 5)
             List<Receta> recetasRecientes = recetas.size() > 5
                     ? recetas.subList(0, 5)
                     : recetas;
 
-            // Actualizar lista de recetas recientes
+            //Actualizar lista de recetas recientes
             adapter.submitList(recetasRecientes);
 
-            // Mostrar/ocultar elementos según si hay recetas
+            //Mostrar/ocultar elementos según si hay recetas
             ViewExtensions.setVisible(rvRecetasRecientes, !recetas.isEmpty());
             ViewExtensions.setVisible(layoutEmptyState, recetas.isEmpty());
         });
 
-        // Observar recetas favoritas para actualizar contador
+        //Observar recetas favoritas para actualizar contador
         viewModel.getFavs().observe(getViewLifecycleOwner(), favoritas -> {
             if (favoritas != null) {
                 tvTotalFavoritas.setText(String.valueOf(favoritas.size()));
